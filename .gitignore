@@ -21,6 +21,7 @@ mono_crash.*
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
+[Ll]ogFiles/
 x64/
 x86/
 [Aa][Rr][Mm]/
@@ -28,8 +29,15 @@ x86/
 bld/
 [Bb]in/
 [Oo]bj/
+[Oo]ut/
 [Ll]og/
 [Ll]ogs/
+node_modules
+build
+
+**/node_modules
+**/build
+**/LogFiles
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -348,3 +356,12 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# dependencies
+node_modules
+
+# testing
+coverage
+
+# production
+build
