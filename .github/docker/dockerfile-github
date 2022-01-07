@@ -3,10 +3,10 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0-bullseye-slim
 
 ENV DEFAULT_PORT 30100
 
-COPY ./out .
-COPY ./src/configuration ./ClientApp
-COPY ./template.zip .
-COPY ./module-definition/info.json .
+COPY out .
+COPY src/configuration ./ClientApp
+COPY template.zip .
+COPY module-definition/info.json .
 
 EXPOSE 30100
 

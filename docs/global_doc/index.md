@@ -1,0 +1,1 @@
+# Beispiel für Global Documentation

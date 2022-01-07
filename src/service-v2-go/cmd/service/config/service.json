@@ -1,0 +1,9 @@
+{
+    "project_service": "http://localhost:30002",
+    "upload_token": "demo",
+    "log": {
+        "output": "console",
+        "mode": "Debug"
+    },
+    "port": 30100
+}

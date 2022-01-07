@@ -1,0 +1,96 @@
+name: 'Module - cache (Nightly)'
+
+on:
+  # schedule:
+  #   - cron: "0 0 * * *"
+  workflow_dispatch:
+    inputs:
+      releaseversion:
+        description: 'Enter a release version'
+        required: false
+        default: '2.0.0'
+
+jobs:
+  build-container-online:
+    name: 'Build Module cache Service for Linux'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      - name: Ensure GitHub NuGet Source
+        run: |
+          dotnet nuget add source -u ${{ secrets.GH_ACTION_USER }} -p ${{ secrets.GH_ACTION_TOKEN }} --store-password-in-clear-text --name github ${{ secrets.AWDEV_NUGET_URL }}
+      - uses: actions/setup-node@v2
+        with:
+          always-auth: true
+          registry-url: 'https://npm.pkg.github.com'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          scope: '@actiwaredevelopment'
+      - name: Restore dependencies
+        run: dotnet restore src/service-v2-dotnet/service/io2-module-template-service.csproj
+      - name: Build
+        run: dotnet build src/service-v2-dotnet/service/io2-module-template-service.csproj --configuration Release --force
+      - name: Publish
+        run: |
+          dotnet publish src/service-v2-dotnet/service/io2-module-template-service.csproj -c Release -o out --force
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 'Create module definition file'
+        uses: vimtor/action-zip@v1
+        with:
+          dest: template.zip
+          files: './module-definition'
+          recursive: true
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: 'yyyy.MM.DD'
+      - name: 'Create version information'
+        uses: finnp/create-file-action@master
+        env:
+          FILE_NAME: './version.txt'
+          FILE_DATA: '${{ steps.current-time.outputs.formattedTime }}-developer'
+      - name: 'Upload the Publish Artifact'
+        uses: actions/upload-artifact@v2.2.2
+        with:
+          name: ServiceForLinux
+          path: |
+            ./version.txt
+            ./out
+            ./src/configuration/build
+            ${{ github.workspace }}/template.zip
+            ./module-definition/info.json
+            ./.github/docker/dockerfile
+
+  docker-release-online:
+    name: 'Create and Publish Docker-Image'
+    needs: [build-container-online]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 'Download Artifact'
+        uses: actions/download-artifact@v2.0.8
+        with: 
+          name: ServiceForLinux
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_SECRET }}
+      - name: 'Build and Publish to Docker Hub'
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          tags: actiwareio/io-module-template:2-nightly
+          file: ./.github/docker/dockerfile
+          push: true

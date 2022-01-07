@@ -1,0 +1,29 @@
+[
+    {
+        "prefix": "DAT",
+        "name": "DataField",
+        "fields": [
+            "Barcode",
+            "Document Date",
+            "Document Name",
+            "Document Type"
+        ]
+    },
+    {
+        "prefix": "VAR",
+        "name": "Variable",
+        "fields": [
+            "Document Identifier",
+            "Process Type"
+        ]
+    },
+    {
+        "prefix": "NDF",
+        "name": "Field",
+        "fields": [
+            "Test",
+            "My Number",
+            "Calculated Value"
+        ]
+    }
+]
