@@ -27,12 +27,9 @@ jobs:
       - name: Create npmrc
         run: |
           echo -e "${{ secrets.NPMRC_CONFIG }}" >> ${{ github.workspace }}/.npmrc
-      - uses: actions/setup-node@v2
-        with:
-          always-auth: true
-          registry-url: 'https://npm.pkg.github.com'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          scope: '@actiwaredevelopment'
+      - name: Create npmrc
+        run: |
+          echo -e "${{ secrets.NPMRC_CONFIG }}" >> ${{ github.workspace }}/.npmrc
       - name: Restore dependencies
         run: dotnet restore src/service-v2-dotnet/service/io2-module-template-service.csproj
       - name: Build
