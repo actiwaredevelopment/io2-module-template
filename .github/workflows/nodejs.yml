@@ -26,6 +26,10 @@ jobs:
 
       - name: 'Build'
         run: yarn run build
+        env:
+          npm_config_userconfig: '${{ github.workspace }}/.npmrc'
+          npm_config_globalconfig: '${{ github.workspace }}/.npmrc'
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 'Build and Publish Docker Image'
         uses: matootie/github-docker@v3.1.0

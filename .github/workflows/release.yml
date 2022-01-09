@@ -25,12 +25,9 @@ jobs:
       - name: Ensure GitHub NuGet Source
         run: |
           dotnet nuget add source -u ${{ secrets.GH_ACTION_USER }} -p ${{ secrets.GH_ACTION_TOKEN }} --store-password-in-clear-text --name github ${{ secrets.AWDEV_NUGET_URL }}
-      - uses: actions/setup-node@v2
-        with:
-          always-auth: true
-          registry-url: 'https://npm.pkg.github.com'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          scope: '@actiwaredevelopment'
+      - name: Create npmrc
+        run: |
+          echo -e "${{ secrets.NPMRC_CONFIG }}" >> ${{ github.workspace }}/.npmrc
       - name: Restore dependencies
         run: dotnet restore src/service-v2-dotnet/service/io2-module-template-service.csproj
       - name: Build
@@ -39,6 +36,8 @@ jobs:
         run: |
           dotnet publish src/service-v2-dotnet/service/io2-module-template-service.csproj -c Release -r win-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesInSingleFile=true -p:IncludeAllContentForSelfExtract=true -p:EnableCompressionInSingleFile=true --self-contained true -o out --force
         env:
+          npm_config_userconfig: '${{ github.workspace }}/.npmrc'
+          npm_config_globalconfig: '${{ github.workspace }}/.npmrc'
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: 'Create module definition file'
         uses: vimtor/action-zip@v1
@@ -80,12 +79,9 @@ jobs:
       - name: Ensure GitHub NuGet Source
         run: |
           dotnet nuget add source -u ${{ secrets.GH_ACTION_USER }} -p ${{ secrets.GH_ACTION_TOKEN }} --store-password-in-clear-text --name github ${{ secrets.AWDEV_NUGET_URL }}
-      - uses: actions/setup-node@v2
-        with:
-          always-auth: true
-          registry-url: 'https://npm.pkg.github.com'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          scope: '@actiwaredevelopment'
+      - name: Create npmrc
+        run: |
+          echo -e "${{ secrets.NPMRC_CONFIG }}" >> ${{ github.workspace }}/.npmrc
       - name: Restore dependencies
         run: dotnet restore src/service-v2-dotnet/service/io2-module-template-service.csproj
       - name: Build
@@ -94,6 +90,8 @@ jobs:
         run: |
           dotnet publish src/service-v2-dotnet/service/io2-module-template-service.csproj -c Release -o out --force
         env:
+          npm_config_userconfig: '${{ github.workspace }}/.npmrc'
+          npm_config_globalconfig: '${{ github.workspace }}/.npmrc'
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: 'Create module definition file'
         uses: vimtor/action-zip@v1
