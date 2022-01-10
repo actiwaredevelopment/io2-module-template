@@ -26,10 +26,7 @@ jobs:
           dotnet nuget add source -u ${{ secrets.GH_ACTION_USER }} -p ${{ secrets.GH_ACTION_TOKEN }} --store-password-in-clear-text --name github ${{ secrets.AWDEV_NUGET_URL }}
       - name: Create npmrc
         run: |
-          echo -e "${{ secrets.NPMRC_CONFIG }}" >> ${{ github.workspace }}/.npmrc
-      - name: Create npmrc
-        run: |
-          echo -e "${{ secrets.NPMRC_CONFIG }}" >> ${{ github.workspace }}/.npmrc
+          echo "${{ secrets.NPMRC_CONFIG }}" > .npmrc
       - name: Restore dependencies
         run: dotnet restore src/service-v2-dotnet/service/io2-module-template-service.csproj
       - name: Build
@@ -40,7 +37,7 @@ jobs:
         env:
           npm_config_userconfig: '${{ github.workspace }}/.npmrc'
           npm_config_globalconfig: '${{ github.workspace }}/.npmrc'
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
       - name: 'Create module definition file'
         uses: vimtor/action-zip@v1
         with:
