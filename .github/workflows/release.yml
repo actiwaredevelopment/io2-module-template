@@ -1,4 +1,4 @@
-name: 'Module - cache (Release)'
+name: 'Module - Template (Release)'
 
 on:
   push:
@@ -13,7 +13,7 @@ on:
 
 jobs:
   build-exe:
-    name: 'Build Module cache Service for Windows'
+    name: 'Build Service for Windows'
     runs-on: ubuntu-latest
 
     steps:
@@ -67,7 +67,7 @@ jobs:
             ./module-definition/info.json
 
   build-container:
-    name: 'Build Module cache Service for Linux'
+    name: 'Build Service for Linux'
     runs-on: ubuntu-latest
 
     steps:

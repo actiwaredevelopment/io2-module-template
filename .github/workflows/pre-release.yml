@@ -1,11 +1,11 @@
-name: 'Module - cache (Pre-Release)'
+name: 'Module - Template (Pre-Release)'
 
 on:
   workflow_dispatch:
 
 jobs:
   build-container-online:
-    name: 'Build Module cache Service for Linux'
+    name: 'Build Service for Linux'
     runs-on: ubuntu-latest
 
     steps:

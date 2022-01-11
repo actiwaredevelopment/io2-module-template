@@ -1,4 +1,4 @@
-name: 'Module - cache (Windows)'
+name: 'Module - Template (Windows)'
 
 on:
   # push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: 'Build Module cache Service for Windows'
+    name: 'Build Service for Windows'
     runs-on: ubuntu-latest
 
     steps:

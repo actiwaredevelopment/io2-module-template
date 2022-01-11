@@ -1,4 +1,4 @@
-name: 'Module - cache (Developer)'
+name: 'Module - Template (Developer)'
 
 on:
   # push:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-container:
-    name: 'Build Module cache Service for Linux'
+    name: 'Build Service for Linux'
     runs-on: ubuntu-latest
 
     steps:
