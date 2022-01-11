@@ -1,8 +1,8 @@
 name: 'Module - cache (Nightly)'
 
 on:
-  # schedule:
-  #   - cron: "0 0 * * *"
+  schedule:
+    - cron: "0 0 * * *"
 
 jobs:
   build-container-online:
@@ -10,76 +10,130 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Activity check
+        run: |
+          :
+          # old check, requires already cloned repository; left for reference
+          # timestamp=$(git log --all --invert-grep --author="<${{ secrets.ANTALASKAYA_EMAIL }}>" --date=unix --format=%ad -1)
+          curl -sL https://api.github.com/repos/$GITHUB_REPOSITORY/commits | jq -r '[.[] | select(.author.login != "${{ secrets.ANTALASKAYA_LOGIN }}")][0]' > $HOME/commit.json
+          date="$(jq -r '.commit.author.date' $HOME/commit.json)"
+          timestamp=$(date --utc -d "$date" +%s)
+          author="$(jq -r '.commit.author.name' $HOME/commit.json)"
+          url="$(jq -r '.html_url' $HOME/commit.json)"
+          days=$(( ( $(date --utc +%s) - $timestamp ) / 86400 ))
+          rm -f $HOME/commit.json
+          echo "Repository activity : $timestamp $author $url"
+          alive=0
+          if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+             echo "[WARNING] Ignoring activity limits : workflow triggered manually"
+             alive=1
+          else
+             if [ $days -gt 1 ]; then
+                echo "[WARNING] Repository activity : $days days ago"
+             else
+                echo "[WARNING] Repository not updated : event<${{ github.event_name }}> not allowed to modify stale repository"
+             fi
+          fi
+          if [ $alive -eq 1 ]; then
+             echo ::set-env name=GHA_REPO_ALIVE::true
+             echo ::set-env name=GHA_REPO_ACTIVITY::$days
+          fi
+        shell: bash    
+    
       - uses: actions/checkout@v2
+        if: env.GHA_REPO_ALIVE == 'true'
+        
       - name: Setup .NET
+        if: env.GHA_REPO_ALIVE == 'true'
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 6.0.x
+          
       - name: Ensure GitHub NuGet Source
+        if: env.GHA_REPO_ALIVE == 'true'
         run: |
           dotnet nuget add source -u ${{ secrets.GH_ACTION_USER }} -p ${{ secrets.GH_ACTION_TOKEN }} --store-password-in-clear-text --name github ${{ secrets.AWDEV_NUGET_URL }}
+          
       - name: Create npmrc
+        if: env.GHA_REPO_ALIVE == 'true'
         run: |
           echo "${{ secrets.NPMRC_CONFIG }}" > .npmrc
+          
       - name: Restore dependencies
+        if: env.GHA_REPO_ALIVE == 'true'
         run: dotnet restore src/service-v2-dotnet/service/io2-module-template-service.csproj
+        
       - name: Build
+        if: env.GHA_REPO_ALIVE == 'true'
         run: dotnet build src/service-v2-dotnet/service/io2-module-template-service.csproj --configuration Release --force
+        
       - name: Publish
+        if: env.GHA_REPO_ALIVE == 'true'
         run: |
           dotnet publish src/service-v2-dotnet/service/io2-module-template-service.csproj -c Release -o out --force
         env:
           npm_config_userconfig: '${{ github.workspace }}/.npmrc'
           npm_config_globalconfig: '${{ github.workspace }}/.npmrc'
           NODE_AUTH_TOKEN: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
+          
       - name: 'Create module definition file'
+        if: env.GHA_REPO_ALIVE == 'true'
         uses: vimtor/action-zip@v1
         with:
           dest: template.zip
           files: './module-definition'
           recursive: true
+          
       - name: Get module version
+        if: env.GHA_REPO_ALIVE == 'true'
         id: module-version
         uses: actiwaredevelopment/action-io-get-module-version@v0.1
         with:
           module-definition-file: './module-definition/info.json'
+          
       - name: 'Create version information'
+        if: env.GHA_REPO_ALIVE == 'true'
         uses: finnp/create-file-action@master
         env:
           FILE_NAME: './version.txt'
           FILE_DATA: '${{ steps.module-version.outputs.version }}'
-      - name: 'Upload the Publish Artifact'
-        uses: actions/upload-artifact@v2.2.2
-        with:
-          name: ServiceForLinux
-          path: |
-            ./version.txt
-            ./out
-            ./src/configuration/build
-            ${{ github.workspace }}/template.zip
-            ./module-definition/info.json
-            ./.github/docker/dockerfile
+          
+      # - name: 'Upload the Publish Artifact'
+      #   if: env.GHA_REPO_ALIVE == 'true'
+      #   uses: actions/upload-artifact@v2.2.2
+      #   with:
+      #     name: ServiceForLinux
+      #     path: |
+      #       ./version.txt
+      #       ./out
+      #       ./src/configuration/build
+      #       ${{ github.workspace }}/template.zip
+      #       ./module-definition/info.json
+      #       ./.github/docker/dockerfile
 
-  docker-release-online:
-    name: 'Create and Publish Docker-Image'
-    needs: [build-container-online]
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: 'Download Artifact'
-        uses: actions/download-artifact@v2.0.8
-        with: 
-          name: ServiceForLinux
+      # - name: 'Download Artifact'
+      #   if: env.GHA_REPO_ALIVE == 'true'
+      #   uses: actions/download-artifact@v2.0.8
+      #   with: 
+      #     name: ServiceForLinux
+
       - name: Set up QEMU
+        if: env.GHA_REPO_ALIVE == 'true'
         uses: docker/setup-qemu-action@v1
+        
       - name: Set up Docker Buildx
+        if: env.GHA_REPO_ALIVE == 'true'
         uses: docker/setup-buildx-action@v1
+        
       - name: Login to DockerHub
+        if: env.GHA_REPO_ALIVE == 'true'
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_SECRET }}
+          
       - name: 'Build and Publish to Docker Hub'
+        if: env.GHA_REPO_ALIVE == 'true'
         uses: docker/build-push-action@v2
         with:
           context: .
