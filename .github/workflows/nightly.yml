@@ -3,12 +3,6 @@ name: 'Module - cache (Nightly)'
 on:
   # schedule:
   #   - cron: "0 0 * * *"
-  workflow_dispatch:
-    inputs:
-      releaseversion:
-        description: 'Enter a release version'
-        required: false
-        default: '2.0.0'
 
 jobs:
   build-container-online:
@@ -44,16 +38,16 @@ jobs:
           dest: template.zip
           files: './module-definition'
           recursive: true
-      - name: Get current time
-        uses: 1466587594/get-current-time@v2
-        id: current-time
+      - name: Get module version
+        id: module-version
+        uses: actiwaredevelopment/action-io-get-module-version@v0.1
         with:
-          format: 'yyyy.MM.DD'
+          module-definition-file: './module-definition/info.json'
       - name: 'Create version information'
         uses: finnp/create-file-action@master
         env:
           FILE_NAME: './version.txt'
-          FILE_DATA: '${{ steps.current-time.outputs.formattedTime }}-developer'
+          FILE_DATA: '${{ steps.module-version.outputs.version }}'
       - name: 'Upload the Publish Artifact'
         uses: actions/upload-artifact@v2.2.2
         with:
@@ -78,8 +72,7 @@ jobs:
           name: ServiceForLinux
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       - name: Login to DockerHub
         uses: docker/login-action@v1
