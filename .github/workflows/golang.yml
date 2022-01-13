@@ -10,6 +10,7 @@ jobs:
       repository: ${{ github.repository }}
       version-postfix: '-developer'
       branch: ${{ github.ref_name }}
+      go-mod-path: src/service-v2-go
       mainfile: src/service-v2-go/cmd/service/main.go
       outputfile: io-module-service
       modulefile: template.zip
