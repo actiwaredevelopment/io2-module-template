@@ -1,7 +1,7 @@
 FROM debian:buster-slim
 
 COPY ./io-module-service .
-RUN chmode +x io-module-service
+RUN chmod +x io-module-service
 
 EXPOSE 30100
 
