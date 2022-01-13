@@ -1,19 +1,21 @@
-name: 'Build Docker image for GitHub (Nodejs)'
+name: 'Build Docker image for GitHub (Golang)'
 
 on:
   workflow_dispatch:
 
 jobs:
   build:
-    uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-nodejs-io-module.yml@main
+    uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-golang-io-module.yml@main
     with:
       repository: ${{ github.repository }}
       version-postfix: '-developer'
       branch: ${{ github.ref_name }}
-      project: ./src/service-v2-nodejs
+      mainfile: src/service-v2-go/cmd/service/main.go
+      outputfile: io-module-service
       modulefile: template.zip
-      dockerfile: ./.github/docker/dockerfile-nodejs
-      build-path: ./dist-nodejs
+      dockerfile: ./.github/docker/dockerfile-go
+      go-os: 'linux'
+      go-arch: 'amd64'
     secrets:
       action-user: ${{ secrets.GH_ACTION_USER }}
       action-token: ${{ secrets.GH_ACTION_TOKEN }}

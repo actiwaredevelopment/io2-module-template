@@ -1,4 +1,4 @@
-name: 'Module - Template (Nightly)'
+name: 'Nightly Build (Docker Hub)'
 
 on:
   schedule:
@@ -6,114 +6,46 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-container-online:
-    name: 'Build Service for Linux'
-    runs-on: ubuntu-latest
+  check-last-commits:
+    name: Check Repository
+    uses: actiwaredevelopment/action-io-repo-last-commit-check/.github/workflows/check-repository.yml@main
+    with:
+      repository: ${{ github.repository }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+  
+  build:
+    if: ${{ needs.check-last-commit.outputs.has-changes == 'true' }}
+    needs: check-last-commits
 
-    steps:
-      - name: Activity check
-        id: commit-check
-        uses: actiwaredevelopment/action-io-repo-last-commit-check@v0.1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-    
-      - uses: actions/checkout@v2
-        if: steps.commit-check.outputs.has-updates == 'true'
-        
-      - name: Setup .NET
-        if: steps.commit-check.outputs.has-updates == 'true'
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 6.0.x
-          
-      - name: Ensure GitHub NuGet Source
-        if: steps.commit-check.outputs.has-updates == 'true'
-        run: |
-          dotnet nuget add source -u ${{ secrets.GH_ACTION_USER }} -p ${{ secrets.GH_ACTION_TOKEN }} --store-password-in-clear-text --name github ${{ secrets.AWDEV_NUGET_URL }}
-          
-      - name: Create npmrc
-        if: steps.commit-check.outputs.has-updates == 'true'
-        run: |
-          echo "${{ secrets.NPMRC_CONFIG }}" > .npmrc
-          
-      - name: Restore dependencies
-        if: steps.commit-check.outputs.has-updates == 'true'
-        run: dotnet restore src/service-v2-dotnet/service/io2-module-template-service.csproj
-        
-      - name: Build
-        if: steps.commit-check.outputs.has-updates == 'true'
-        run: dotnet build src/service-v2-dotnet/service/io2-module-template-service.csproj --configuration Release --force
-        
-      - name: Publish
-        if: steps.commit-check.outputs.has-updates == 'true'
-        run: |
-          dotnet publish src/service-v2-dotnet/service/io2-module-template-service.csproj -c Release -o out --force
-        env:
-          npm_config_userconfig: '${{ github.workspace }}/.npmrc'
-          npm_config_globalconfig: '${{ github.workspace }}/.npmrc'
-          NODE_AUTH_TOKEN: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
-          
-      - name: 'Create module definition file'
-        if: steps.commit-check.outputs.has-updates == 'true'
-        uses: vimtor/action-zip@v1
-        with:
-          dest: template.zip
-          files: './module-definition'
-          recursive: true
-          
-      - name: Get module version
-        if: steps.commit-check.outputs.has-updates == 'true'
-        id: module-version
-        uses: actiwaredevelopment/action-io-get-module-version@v0.1
-        with:
-          module-definition-file: './module-definition/info.json'
-          
-      - name: 'Create version information'
-        if: steps.commit-check.outputs.has-updates == 'true'
-        uses: finnp/create-file-action@master
-        env:
-          FILE_NAME: './version.txt'
-          FILE_DATA: '${{ steps.module-version.outputs.version }}'
-          
-      # - name: 'Upload the Publish Artifact'
-      #   if: steps.commit-check.outputs.has-updates == 'true'
-      #   uses: actions/upload-artifact@v2.2.2
-      #   with:
-      #     name: ServiceForLinux
-      #     path: |
-      #       ./version.txt
-      #       ./out
-      #       ./src/configuration/build
-      #       ${{ github.workspace }}/template.zip
-      #       ./module-definition/info.json
-      #       ./.github/docker/dockerfile
+    uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
+    with:
+      repository: ${{ github.repository }}
+      version-postfix: '-nightly'
+      branch: ${{ github.ref_name }}
+      dotnet-version: 6.0.x
+      project: src/service-v2-dotnet/service/io2-module-template-service.csproj
+      modulefile: template.zip
+      dockerfile: ./.github/docker/dockerfile
+      ui-build-path: ./src/configuration/build
+      rid: 'linux-x64'
+      create-single-file: false
+    secrets:
+      action-user: ${{ secrets.GH_ACTION_USER }}
+      action-token: ${{ secrets.GH_ACTION_TOKEN }}
+      awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
+      npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
+      npmrc-config: ${{ secrets.NPMRC_CONFIG }}
 
-      # - name: 'Download Artifact'
-      #   if: steps.commit-check.outputs.has-updates == 'true'
-      #   uses: actions/download-artifact@v2.0.8
-      #   with: 
-      #     name: ServiceForLinux
+  docker:
+    if: ${{ needs.check-last-commit.outputs.has-changes == 'true' }} 
+    needs: [check-last-commits, build]
 
-      - name: Set up QEMU
-        if: steps.commit-check.outputs.has-updates == 'true'
-        uses: docker/setup-qemu-action@v1
-        
-      - name: Set up Docker Buildx
-        if: steps.commit-check.outputs.has-updates == 'true'
-        uses: docker/setup-buildx-action@v1
-        
-      - name: Login to DockerHub
-        if: steps.commit-check.outputs.has-updates == 'true'
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_SECRET }}
-          
-      - name: 'Build and Publish to Docker Hub'
-        if: steps.commit-check.outputs.has-updates == 'true'
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          tags: actiwareio/io-module-template:2-nightly
-          file: ./.github/docker/dockerfile
-          push: true
+    uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
+    with:
+      artifact: ${{ needs.build.outputs.download }}
+      image-name: actiwareio/io-module-template
+      image-tag: nightly
+    secrets:
+      docker-username: ${{ secrets.DOCKER_HUB_USER }}
+      docker-password: ${{ secrets.DOCKER_HUB_SECRET }}

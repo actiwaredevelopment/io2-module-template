@@ -1,179 +1,83 @@
-name: 'Module - Template (Release)'
+name: 'Release Build (Auto)'
 
 on:
   push:
     tags:
       - 'release-*'
-  workflow_dispatch:
-    inputs:
-      releaseversion:
-        description: 'Enter a release version'
-        required: true
-        default: '2.0.0'
 
 jobs:
-  build-exe:
-    name: 'Build Service for Windows'
-    runs-on: ubuntu-latest
+  build-linux:
+    uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
+    with:
+      artifact-name: BuildOutputLinux
+      repository: ${{ github.repository }}
+      branch: tags/${{ github.ref_name }}
+      dotnet-version: 6.0.x
+      project: src/service-v2-dotnet/service/io2-module-template-service.csproj
+      modulefile: template.zip
+      dockerfile: ./.github/docker/dockerfile
+      ui-build-path: ./src/configuration/build
+      rid: 'linux-x64'
+      create-single-file: false
+    secrets:
+      action-user: ${{ secrets.GH_ACTION_USER }}
+      action-token: ${{ secrets.GH_ACTION_TOKEN }}
+      awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
+      npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
+      npmrc-config: ${{ secrets.NPMRC_CONFIG }}
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 6.0.x
-      - name: Ensure GitHub NuGet Source
-        run: |
-          dotnet nuget add source -u ${{ secrets.GH_ACTION_USER }} -p ${{ secrets.GH_ACTION_TOKEN }} --store-password-in-clear-text --name github ${{ secrets.AWDEV_NUGET_URL }}
-      - name: Create npmrc
-        run: |
-          echo "${{ secrets.NPMRC_CONFIG }}" > .npmrc
-      - name: Restore dependencies
-        run: dotnet restore src/service-v2-dotnet/service/io2-module-template-service.csproj
-      - name: Build
-        run: dotnet build src/service-v2-dotnet/service/io2-module-template-service.csproj --configuration Release --force
-      - name: Publish
-        run: |
-          dotnet publish src/service-v2-dotnet/service/io2-module-template-service.csproj -c Release -r win-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesInSingleFile=true -p:IncludeAllContentForSelfExtract=true -p:EnableCompressionInSingleFile=true --self-contained true -o out --force
-        env:
-          npm_config_userconfig: '${{ github.workspace }}/.npmrc'
-          npm_config_globalconfig: '${{ github.workspace }}/.npmrc'
-          NODE_AUTH_TOKEN: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
-      - name: 'Create module definition file'
-        uses: vimtor/action-zip@v1
-        with:
-          dest: template.zip
-          files: './module-definition'
-          recursive: true
-      - name: Get module version
-        id: module-version
-        uses: actiwaredevelopment/action-io-get-module-version@v0.1
-        with:
-          module-definition-file: './module-definition/info.json'
-      - name: 'Create version information'
-        uses: finnp/create-file-action@master
-        env:
-          FILE_NAME: './version.txt'
-          FILE_DATA: '${{ steps.module-version.outputs.version }}'
-      - name: 'Upload the Publish Artifact'
-        uses: actions/upload-artifact@v2.2.2
-        with:
-          name: ServiceForWindows
-          path: |
-            ./version.txt
-            ./out
-            ./src/configuration/build
-            ${{ github.workspace }}/template.zip
-            ./module-definition/info.json
+  build-windows:
+    uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
+    with:
+      artifact-name: BuildOutputWindows
+      repository: ${{ github.repository }}
+      branch: tags/${{ github.ref_name }}
+      dotnet-version: 6.0.x
+      project: src/service-v2-dotnet/service/io2-module-template-service.csproj
+      modulefile: template.zip
+      dockerfile: ./.github/docker/dockerfile
+      ui-build-path: ./src/configuration/build
+      rid: 'win-x64'
+      create-single-file: true
+    secrets:
+      action-user: ${{ secrets.GH_ACTION_USER }}
+      action-token: ${{ secrets.GH_ACTION_TOKEN }}
+      awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
+      npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
+      npmrc-config: ${{ secrets.NPMRC_CONFIG }}
 
-  build-container:
-    name: 'Build Service for Linux'
-    runs-on: ubuntu-latest
+  docker-latest:
+    needs: build-linux
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 6.0.x
-      - name: Ensure GitHub NuGet Source
-        run: |
-          dotnet nuget add source -u ${{ secrets.GH_ACTION_USER }} -p ${{ secrets.GH_ACTION_TOKEN }} --store-password-in-clear-text --name github ${{ secrets.AWDEV_NUGET_URL }}
-      - name: Create npmrc
-        run: |
-          echo "${{ secrets.NPMRC_CONFIG }}" > .npmrc
-      - name: Restore dependencies
-        run: dotnet restore src/service-v2-dotnet/service/io2-module-template-service.csproj
-      - name: Build
-        run: dotnet build src/service-v2-dotnet/service/io2-module-template-service.csproj --configuration Release --force
-      - name: Publish
-        run: |
-          dotnet publish src/service-v2-dotnet/service/io2-module-template-service.csproj -c Release -o out --force
-        env:
-          npm_config_userconfig: '${{ github.workspace }}/.npmrc'
-          npm_config_globalconfig: '${{ github.workspace }}/.npmrc'
-          NODE_AUTH_TOKEN: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
-      - name: 'Create module definition file'
-        uses: vimtor/action-zip@v1
-        with:
-          dest: template.zip
-          files: './module-definition'
-          recursive: true
-      - name: Get module version
-        id: module-version
-        uses: actiwaredevelopment/action-io-get-module-version@v0.1
-        with:
-          module-definition-file: './module-definition/info.json'
-      - name: 'Create version information'
-        uses: finnp/create-file-action@master
-        env:
-          FILE_NAME: './version.txt'
-          FILE_DATA: '${{ steps.module-version.outputs.version }}'
-      - name: 'Upload the Publish Artifact'
-        uses: actions/upload-artifact@v2.2.2
-        with:
-          name: ServiceForLinux
-          path: |
-            ./version.txt
-            ./out
-            ./src/configuration/build
-            ${{ github.workspace }}/template.zip
-            ./module-definition/info.json
-            ./.github/docker/dockerfile
+    uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
+    with:
+      artifact: ${{ needs.build-linux.outputs.download }}
+      image-name: actiwareio/io-module-template
+      image-tag: 2-latest
+    secrets:
+      docker-username: ${{ secrets.DOCKER_HUB_USER }}
+      docker-password: ${{ secrets.DOCKER_HUB_SECRET }}
 
-  docker:
-    name: 'Create and Publish Docker-Image'
-    needs: [build-container]
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Extract version
-        id: version
-        uses: actions/github-script@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: return context.payload.ref.replace(/refs\/tags\/release-/gi, '');
-          result-encoding: string
-      - name: 'Download Artifact'
-        uses: actions/download-artifact@v2.0.8
-        with: 
-          name: ServiceForLinux
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_SECRET }}
-      - name: 'Build and Publish to Docker Hub'
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          tags: actiwareio/io-module-template:2-latest,actiwareio/io-module-template:${{ steps.version.outputs.result }}
-          file: ./.github/docker/dockerfile
-          push: true
+  docker-release:
+    needs: build-linux
 
-  ftp-deployment:
-    name: 'Deploy Service via FTP'
-    needs: [build-exe]
-    runs-on: ubuntu-latest
+    uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
+    with:
+      artifact: ${{ needs.build-linux.outputs.download }}
+      image-name: actiwareio/io-module-template
+      image-tag: context.payload.ref.replace(/refs\/tags\/release-/gi, '')
+    secrets:
+      docker-username: ${{ secrets.DOCKER_HUB_USER }}
+      docker-password: ${{ secrets.DOCKER_HUB_SECRET }}
 
-    steps:
-      - name: 'Download Artifact'
-        uses: actions/download-artifact@v2.0.8
-        with: 
-          name: ServiceForWindows
-      - name: FTP Deployment
-        uses: sebastianpopp/ftp-action@releases/v2
-        with:
-          localDir: ./
-          remoteDir: /Development/actiwareio/Source/Modules/v2/cache/
-          # Deployment destination server & path. Formatted as protocol://domain.com:port/full/destination/path/
-          host: ${{ secrets.SFTP_HOST }}:522
-          # FTP account username
-          user: ${{ secrets.SFTP_USER }}
-          # FTP account password
-          password: ${{ secrets.SFTP_PASSWORD }}
+  ftp:
+    needs: build-windows
+
+    uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-ftp.yml@main
+    with:
+      artifact: ${{ needs.build-windows.outputs.download }}
+      remote-dir: /Development/actiwareio/Source/Modules/v2/Template/
+    secrets:
+      address: ${{ secrets.SFTP_HOST }}:522
+      user: ${{ secrets.SFTP_USER }}
+      password: ${{ secrets.SFTP_PASSWORD }}
