@@ -103,7 +103,7 @@ builder.Services.AddSwaggerGen(config =>
     config.SwaggerDoc("v2", new Microsoft.OpenApi.Models.OpenApiInfo()
     {
         Version = "v2",
-        Title = "Module: template",
+        Title = "Module: Template",
         Description = "",
         TermsOfService = new Uri("https://actiware-development.atlassian.net/wiki/spaces/AWIO/pages/1957101656"),
         Contact = new Microsoft.OpenApi.Models.OpenApiContact()

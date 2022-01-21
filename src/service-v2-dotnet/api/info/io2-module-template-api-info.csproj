@@ -14,7 +14,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Development.SDK.Logging" Version="2.0.5" />
-		<PackageReference Include="Development.SDK.Module" Version="2.0.56" />
+		<PackageReference Include="Development.SDK.Module" Version="2.0.58" />
 	</ItemGroup>
 
 	<ItemGroup>

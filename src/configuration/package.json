@@ -5,8 +5,8 @@
     "installTypes": true,
     "dependencies": {
         "@actiwaredevelopment/io-sdk-react": "^0.0.79",
-        "@actiwaredevelopment/io-sdk-typescript-designer": "^0.0.12",
-        "@actiwaredevelopment/io-sdk-typescript-models": "^0.0.21",
+        "@actiwaredevelopment/io-sdk-typescript-designer": "^0.0.13",
+        "@actiwaredevelopment/io-sdk-typescript-models": "^0.0.23",
         "@fluentui/font-icons-mdl2": "^8.1.17",
         "@fluentui/react": "^8.41.4",
         "@fluentui/react-hooks": "^8.3.6",
