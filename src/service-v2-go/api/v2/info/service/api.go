@@ -8,8 +8,8 @@ import (
 	"os"
 
 	"github.com/actiwaredevelopment/go-framework/log"
-	"github.com/actiwaredevelopment/io2-module-template/internal/utils"
-	"github.com/actiwaredevelopment/io2-module-template/models"
+	"github.com/actiwaredevelopment/io2-module-iotemplate/internal/utils"
+	"github.com/actiwaredevelopment/io2-module-iotemplate/models"
 	"github.com/gorilla/mux"
 )
 
@@ -23,7 +23,7 @@ func Register(router *mux.Router) {
 func getServiceInfo(response http.ResponseWriter, request *http.Request) {
 	serviceData := models.ServiceStats{
 		Product:        "ACTIWARE: IO",
-		ProductName:    "Module: Template",
+		ProductName:    "Module: IOTemplate",
 		ProductVersion: "2.0.0.0000",
 		FileVersion:    "2.0.0",
 		Status:         true,
@@ -98,8 +98,8 @@ func getModuleDefinition(response http.ResponseWriter, request *http.Request) {
 }
 
 func downloadModule(response http.ResponseWriter, request *http.Request) {
-	if _, err := os.Stat("template.zip"); err == nil {
-		fileBytes, err := ioutil.ReadFile("template.zip")
+	if _, err := os.Stat("iotemplate.zip"); err == nil {
+		fileBytes, err := ioutil.ReadFile("iotemplate.zip")
 
 		if err != nil {
 			log.Error.Printf("%s", err.Error())
@@ -112,7 +112,7 @@ func downloadModule(response http.ResponseWriter, request *http.Request) {
 
 		// response.Header().Add("Content-Length", fmt.Sprintf("%d", moduleFile.Length))
 		response.Header().Add("Content-Type", "application/octet-stream")
-		response.Header().Add("Content-Disposition", `attachment; filename="template.zip"`)
+		response.Header().Add("Content-Disposition", `attachment; filename="iotemplate.zip"`)
 
 		response.WriteHeader(http.StatusOK)
 

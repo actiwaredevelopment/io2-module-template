@@ -1,36 +1,36 @@
 name: 'Developer Build (Github Docker)'
 
 on:
-  workflow_dispatch:
+    workflow_dispatch:
 
 jobs:
-  build:
-    uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
-    with:
-      repository: ${{ github.repository }}
-      version-postfix: '-developer'
-      branch: ${{ github.ref_name }}
-      dotnet-version: 6.0.x
-      project: src/service-v2-dotnet/service/io2-module-template-service.csproj
-      modulefile: template.zip
-      dockerfile: ./.github/docker/dockerfile
-      ui-build-path: ./src/configuration/build
-      rid: 'linux-x64'
-      create-single-file: false
-    secrets:
-      action-user: ${{ secrets.GH_ACTION_USER }}
-      action-token: ${{ secrets.GH_ACTION_TOKEN }}
-      awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
-      npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
-      npmrc-config: ${{ secrets.NPMRC_CONFIG }}
+    build:
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
+        with:
+            repository: ${{ github.repository }}
+            version-postfix: '-developer'
+            branch: ${{ github.ref_name }}
+            dotnet-version: 6.0.x
+            project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
+            modulefile: iotemplate.zip
+            dockerfile: ./.github/docker/dockerfile
+            ui-build-path: ./src/configuration/build
+            rid: 'linux-x64'
+            create-single-file: false
+        secrets:
+            action-user: ${{ secrets.GH_ACTION_USER }}
+            action-token: ${{ secrets.GH_ACTION_TOKEN }}
+            awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
+            npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
+            npmrc-config: ${{ secrets.NPMRC_CONFIG }}
 
-  docker:
-    needs: [build]
+    docker:
+        needs: [build]
 
-    uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-github-docker.yml@main
-    with:
-      artifact: ${{ needs.build.outputs.download }}
-      image-name: io2-module-template
-      image-tag: developer
-    secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-github-docker.yml@main
+        with:
+            artifact: ${{ needs.build.outputs.download }}
+            image-name: io2-module-iotemplate
+            image-tag: developer
+        secrets:
+            token: ${{ secrets.GITHUB_TOKEN }}

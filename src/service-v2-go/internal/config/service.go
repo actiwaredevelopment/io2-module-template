@@ -7,7 +7,7 @@ import (
 
 	"github.com/actiwaredevelopment/go-framework/errors"
 	"github.com/actiwaredevelopment/go-framework/log"
-	"github.com/actiwaredevelopment/io2-module-template/models"
+	"github.com/actiwaredevelopment/io2-module-iotemplate/models"
 )
 
 // Service represents the interface for the config service

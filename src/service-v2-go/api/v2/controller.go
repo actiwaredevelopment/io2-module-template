@@ -3,7 +3,7 @@ package apiv2
 import (
 	"github.com/gorilla/mux"
 
-	infoservice "github.com/actiwaredevelopment/io2-module-template/api/v2/info/service"
+	infoservice "github.com/actiwaredevelopment/io2-module-iotemplate/api/v2/info/service"
 )
 
 // Register the api router for api version 1.0

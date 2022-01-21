@@ -5,9 +5,9 @@ ENV DEFAULT_PORT 30100
 
 COPY ./out .
 COPY ./src/configuration ./ClientApp
-COPY ./template.zip .
+COPY ./iotemplate.zip .
 COPY ./module-definition/info.json .
 
 EXPOSE 30100
 
-ENTRYPOINT ["dotnet", "io2-module-template-service.dll"]
+ENTRYPOINT ["dotnet", "io2-module-iotemplate-service.dll"]

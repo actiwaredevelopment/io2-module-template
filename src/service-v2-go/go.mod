@@ -1,4 +1,4 @@
-module github.com/actiwaredevelopment/io2-module-template
+module github.com/actiwaredevelopment/io2-module-iotemplate
 
 go 1.17
 

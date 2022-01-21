@@ -2,10 +2,10 @@
 
 ## Status
 ### Build Status
-* ![Build Status Release](https://github.com/actiwaredevelopment/io2-module-template/actions/workflows/release.yml/badge.svg)
-* ![Build Status Nightly](https://github.com/actiwaredevelopment/io2-module-template/actions/workflows/nightly.yml/badge.svg)
-* ![Build Status Linux](https://github.com/actiwaredevelopment/io2-module-template/actions/workflows/linux.yml/badge.svg)
-* ![Build Status Windows](https://github.com/actiwaredevelopment/io2-module-template/actions/workflows/windows.yml/badge.svg)
+* ![Build Status Release](https://github.com/actiwaredevelopment/io2-module-iotemplate/actions/workflows/release.yml/badge.svg)
+* ![Build Status Nightly](https://github.com/actiwaredevelopment/io2-module-iotemplate/actions/workflows/nightly.yml/badge.svg)
+* ![Build Status Linux](https://github.com/actiwaredevelopment/io2-module-iotemplate/actions/workflows/linux.yml/badge.svg)
+* ![Build Status Windows](https://github.com/actiwaredevelopment/io2-module-iotemplate/actions/workflows/windows.yml/badge.svg)
 
 ## Quick reference
 * Maintained by: ACTIWARE Development GmbH

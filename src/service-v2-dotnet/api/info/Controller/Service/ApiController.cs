@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Module.Template.Api.Info.Controller.Service;
+namespace Module.IOTemplate.Api.Info.Controller.Service;
 
 /// <summary>
 /// The controller for the registration of the routes for the function.
@@ -93,7 +93,7 @@ public class ApiController : ControllerBase
     {
         try
         {
-            string moduleFile = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "template.zip");
+            string moduleFile = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "iotemplate.zip");
 
             if (System.IO.File.Exists(moduleFile) == true)
             {

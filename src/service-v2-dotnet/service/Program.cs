@@ -24,7 +24,7 @@ else
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
     loggerConfiguration.ReadFrom.Configuration(context.Configuration);
-    loggerConfiguration.SetLoggerSettings("io-module-template", "/io/module/template", "2.0.0");
+    loggerConfiguration.SetLoggerSettings("io-module-iotemplate", "/io/module/template", "2.0.0");
 });
 
 // Add cors policies
@@ -63,7 +63,7 @@ builder.Services.AddSingleton<Development.SDK.Module.Controller.LanguageManager>
         return new Development.SDK.Module.Controller.LanguageManager("languages", false);
     }
 });
-builder.Services.AddSingleton<Module.Template.Utils.Data.Common.Information>();
+builder.Services.AddSingleton<Module.IOTemplate.Utils.Data.Common.Information>();
 
 // Add scope for api's
 builder.Services.AddInfoApiScope();
@@ -91,7 +91,7 @@ builder.Services.AddControllers();
 builder.Services.AddControllersWithViews();
 
 // Upload module file to project service (attention: the file must be in the project root directory and case sensitiv is necessary)
-builder.Configuration.UploadModuleDefinition(System.IO.Path.Combine(baseDirectory ?? System.AppDomain.CurrentDomain.BaseDirectory, "template.zip"));
+builder.Configuration.UploadModuleDefinition(System.IO.Path.Combine(baseDirectory ?? System.AppDomain.CurrentDomain.BaseDirectory, "iotemplate.zip"));
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -103,7 +103,7 @@ builder.Services.AddSwaggerGen(config =>
     config.SwaggerDoc("v2", new Microsoft.OpenApi.Models.OpenApiInfo()
     {
         Version = "v2",
-        Title = "Module: Template",
+        Title = "Module: IOTemplate",
         Description = "",
         TermsOfService = new Uri("https://actiware-development.atlassian.net/wiki/spaces/AWIO/pages/1957101656"),
         Contact = new Microsoft.OpenApi.Models.OpenApiContact()
@@ -127,7 +127,7 @@ builder.Services.AddSwaggerGen(config =>
     {
         foreach (string xmlFile in xmlFiles)
         {
-            if (System.IO.Path.GetFileNameWithoutExtension(xmlFile).StartsWith("io2-module-template-api") == true)
+            if (System.IO.Path.GetFileNameWithoutExtension(xmlFile).StartsWith("io2-module-iotemplate-api") == true)
             {
                 config.IncludeXmlComments(xmlFile);
             }
@@ -144,12 +144,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger(config =>
     {
-        config.RouteTemplate = "docs/api/{documentName}/swagger.json";
+        config.RouteIOTemplate = "docs/api/{documentName}/swagger.json";
     });
 
     app.UseSwaggerUI(config =>
     {
-        config.SwaggerEndpoint("/docs/api/v2/swagger.json", "Module: Template - API V2");
+        config.SwaggerEndpoint("/docs/api/v2/swagger.json", "Module: IOTemplate - API V2");
         config.RoutePrefix = "docs/api";
     });
 }

@@ -1,4 +1,4 @@
-namespace Module.Template.Utils.Data.Common;
+namespace Module.IOTemplate.Utils.Data.Common;
 
 public class Information
 {
@@ -24,7 +24,7 @@ public class Information
     #region Information
 
     public string ProductName { get; init; } = "ACTIWARE: IO";
-    public string ModuleName { get; init; } = "Module: Template";
+    public string ModuleName { get; init; } = "Module: IOTemplate";
 
     public Version ModuleVersion { get; init; } = new Version(2, 0, 0, 0000);
 

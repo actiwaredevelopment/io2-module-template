@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/build-service/net6.0/io2-module-template-service.dll",
+            "program": "${workspaceFolder}/build-service/net6.0/io2-module-iotemplate-service.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/service-v2-dotnet/service",
             "stopAtEntry": false,

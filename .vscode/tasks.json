@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/service-v2-dotnet/service/io2-module-template-service.csproj",
+                "${workspaceFolder}/src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/src/service-v2-dotnet/service/io2-module-template-service.csproj",
+                "${workspaceFolder}/src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -32,7 +32,7 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/src/service-v2-dotnet/service/io2-module-template-service.csproj",
+                "${workspaceFolder}/src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

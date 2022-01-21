@@ -1,4 +1,4 @@
-﻿namespace Module.Template.Api.Info.Extensions;
+﻿namespace Module.IOTemplate.Api.Info.Extensions;
 
 /// <summary>
 /// Extension to register the controllers in the service for the function.

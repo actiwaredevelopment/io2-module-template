@@ -10,11 +10,11 @@ Das Modul unterstützt den Betrieb als Docker-Image. Für den Betrieb in Docker 
 Für den Betrieb als Docker-Image kann folgendes Beispiel verwendet werden:
 
 ```yml
-io-module-template:
-    image: actiwareio/io-module-template:1-latest
+io-module-iotemplate:
+    image: actiwareio/io-module-iotemplate:1-latest
     restart: always
     ports:
-      - 30106:30106
+      - 30100:30100
 ```
 
 ### Verfügbare Images
@@ -22,15 +22,15 @@ Eine Übersicht der verfügbaren Docker-Images für das System entnehmen Sie bit
 
 Für jede erstellte Version unserers Moduls wird ein Version-Tag erstellt mit diesem man eine explizite Version des Modules in seiner Umgebung verwenden kann. Wenn man beispielsweise die Version 1.0.0 vom Modul verwenden möchte, würde man das Docker-Image wie folgt angeben:
 
-> actiwareio/io-module-template:1.0.0
+> actiwareio/io-module-iotemplate:1.0.0
 
 Nachstehend haben wir eine Übersicht über die weiteren Tags aufgeführt, die wir den Docker-Images vergeben um bestimmte Versionen anzusteuern.
 
-| Tag | Beschreibung |
-|:-----|--------------|
-| nightly | Gibt an, dass immer die zuletzt veröffentlichte Entwicklerversion bezogen werden soll. Mit diesem Tag greifen Sie immer auf ein nächtlich erstelltes Docker-Image eines Service und/oder Moduls zurück. |
+| Tag      | Beschreibung                                                                                                                                                                                                                                                             |
+| :------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| nightly  | Gibt an, dass immer die zuletzt veröffentlichte Entwicklerversion bezogen werden soll. Mit diesem Tag greifen Sie immer auf ein nächtlich erstelltes Docker-Image eines Service und/oder Moduls zurück.                                                                  |
 | x-latest | Gibt an, dass immer die zuletzt veröffentlichte Version bezogen werden soll. Mit diesem Tag greifen Sie immer auf das aktuelle Release eines Services und/oder Moduls zurück. Dabei ist zu beachten, dass das x mit der Hauptversion 1 oder 2 bspw. ersetzt werden muss. |
-| x.x.x | Angabe der entsprechenden Version des Docker-Images, welches explizit verwendet werden soll. |
+| x.x.x    | Angabe der entsprechenden Version des Docker-Images, welches explizit verwendet werden soll.                                                                                                                                                                             |
 
 > [!CAUTION]
 > Bitte beachten Sie, dass es sich hierbei um eine Entwicklerversion handelt, welche noch keine QM Tests durchlaufen hat und nicht als Release freigegeben wurde.

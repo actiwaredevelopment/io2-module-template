@@ -1,5 +1,5 @@
 {
-    "name": "io2-module-template",
+    "name": "io2-module-iotemplate",
     "version": "2.0.0",
     "description": "",
     "main": "../../build-service/nodejs/index.js",

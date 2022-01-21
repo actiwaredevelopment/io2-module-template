@@ -1,6 +1,6 @@
 {
-    "short_name": "IO Module: Template",
-    "name": "ACTIWARE - IO - Module: Template",
+    "short_name": "IO Module: IOTemplate",
+    "name": "ACTIWARE - IO - Module: IOTemplate",
     "start_url": ".",
     "display": "standalone",
     "theme_color": "#000000",

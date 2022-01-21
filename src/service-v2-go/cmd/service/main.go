@@ -16,11 +16,11 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/actiwaredevelopment/go-framework/log"
-	"github.com/actiwaredevelopment/io2-module-template/internal/config"
-	"github.com/actiwaredevelopment/io2-module-template/internal/utils"
-	"github.com/actiwaredevelopment/io2-module-template/models"
+	"github.com/actiwaredevelopment/io2-module-iotemplate/internal/config"
+	"github.com/actiwaredevelopment/io2-module-iotemplate/internal/utils"
+	"github.com/actiwaredevelopment/io2-module-iotemplate/models"
 
-	apiv2 "github.com/actiwaredevelopment/io2-module-template/api/v2"
+	apiv2 "github.com/actiwaredevelopment/io2-module-iotemplate/api/v2"
 )
 
 func main() {
@@ -122,14 +122,14 @@ func uploadModuleFile(config *models.Config) {
 		return
 	}
 
-	request, err := utils.NewFileUploadRequest(fmt.Sprintf("%s/api/v1/module", projectService), "file", "template.zip")
+	request, err := utils.NewFileUploadRequest(fmt.Sprintf("%s/api/v1/module", projectService), "file", "iotemplate.zip")
 
 	if err != nil {
 		log.Error.Println(err.Error())
 	} else {
 		request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", uploadToken))
 
-		log.Message.Printf("Try to upload the module definition file: template.zip to the project service: %s/api/v1/module", projectService)
+		log.Message.Printf("Try to upload the module definition file: iotemplate.zip to the project service: %s/api/v1/module", projectService)
 
 		client := &http.Client{}
 		resp, err := client.Do(request)
