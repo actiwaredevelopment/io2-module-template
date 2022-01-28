@@ -2,17 +2,40 @@ name: 'Pre-Release Build (Auto)'
 
 on:
     push:
-        tags:
-            - 'prerelease-*'
+        branches:
+            - 'prerelease/*'
 
 jobs:
+    version:
+        name: 'Determine Version'
+        runs-on: ubuntu-latest
+
+        outputs:
+            version: ${{ steps.version.outputs.result }}
+
+        steps:
+            - name: Set Version
+              id: version
+              uses: actions/github-script@v3
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  result-encoding: string
+                  script: |
+                      const version = context.payload.ref.replace(/refs\/heads\/prerelease\//gi, '')
+
+                      if (version !== '' && version !== 'refs/heads/master') {
+                        return version
+                      }
+
+                      return '${{ github.event.inputs.releaseversion }}'
+
     build-linux:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
         with:
             artifact-name: BuildOutputLinux
             version-postfix: '-pre-release'
             repository: ${{ github.repository }}
-            branch: tags/${{ github.ref_name }}
+            branch: ${{ github.ref_name }}
             dotnet-version: 6.0.x
             project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
             modulefile: iotemplate.zip
@@ -33,7 +56,7 @@ jobs:
             artifact-name: BuildOutputWindows
             version-postfix: '-pre-release'
             repository: ${{ github.repository }}
-            branch: tags/${{ github.ref_name }}
+            branch: ${{ github.ref_name }}
             dotnet-version: 6.0.x
             project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
             modulefile: iotemplate.zip
@@ -49,13 +72,13 @@ jobs:
             npmrc-config: ${{ secrets.NPMRC_CONFIG }}
 
     docker:
-        needs: build-linux
+        needs: [version, build-linux]
 
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
         with:
             artifact: ${{ needs.build-linux.outputs.download }}
             image-name: actiwareio/io-module-iotemplate
-            image-tag: ${{ github.ref_name }}
+            image-tag: prerelease-${{ needs.version.outputs.version }}
         secrets:
             docker-username: ${{ secrets.DOCKER_HUB_USER }}
             docker-password: ${{ secrets.DOCKER_HUB_SECRET }}

@@ -6,6 +6,29 @@ on:
             - 'release-*'
 
 jobs:
+    version:
+        name: 'Determine Version'
+        runs-on: ubuntu-latest
+
+        outputs:
+            version: ${{ steps.version.outputs.result }}
+
+        steps:
+            - name: Set Version
+              id: version
+              uses: actions/github-script@v3
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  result-encoding: string
+                  script: |
+                      const version = context.payload.ref.replace(/refs\/tags\/release-/gi, '')
+
+                      if (version !== '' && version !== 'refs/heads/master') {
+                        return version
+                      }
+
+                      return '${{ github.event.inputs.releaseversion }}'
+
     build-linux:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
         with:
@@ -39,13 +62,13 @@ jobs:
             docker-password: ${{ secrets.DOCKER_HUB_SECRET }}
 
     docker-release:
-        needs: build-linux
+        needs: [version, build-linux]
 
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
         with:
             artifact: ${{ needs.build-linux.outputs.download }}
             image-name: actiwareio/io-module-iotemplate
-            image-tag: context.payload.ref.replace(/refs\/tags\/release-/gi, '')
+            image-tag: ${{ needs.version.outputs.version }}
         secrets:
             docker-username: ${{ secrets.DOCKER_HUB_USER }}
             docker-password: ${{ secrets.DOCKER_HUB_SECRET }}
