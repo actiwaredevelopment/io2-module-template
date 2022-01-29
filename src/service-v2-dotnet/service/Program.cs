@@ -28,13 +28,6 @@ if (WindowsServiceHelpers.IsWindowsService())
     Console.WriteLine($"[INF][{DateTime.Now.ToString()}]: Start the service as windows service.");
 
     builder.Services.AddSingleton<IHostLifetime, WindowsServiceLifetime>();
-    builder.Logging.AddEventLog(settings =>
-    {
-        if (string.IsNullOrEmpty(settings.SourceName))
-        {
-            settings.SourceName = builder.Environment.ApplicationName;
-        }
-    });
 }
 
 // Add cors policies
