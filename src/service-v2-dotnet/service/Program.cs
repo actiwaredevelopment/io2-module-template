@@ -1,4 +1,9 @@
-string? baseDirectory = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+string? baseDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()?.Location);
+
+if (OperatingSystem.IsWindows() == true)
+{
+    baseDirectory = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+}
 
 if (baseDirectory == null)
 {
@@ -9,12 +14,22 @@ else
     baseDirectory = System.IO.Path.GetDirectoryName(baseDirectory);
 }
 
-var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
+WebApplicationBuilder builder;
+
+if (OperatingSystem.IsWindows() == true)
 {
-    ApplicationName = typeof(Program).Assembly.FullName,
-    ContentRootPath = baseDirectory,
-    Args = args
-});
+    // Create web application build for windows
+    builder = WebApplication.CreateBuilder(new WebApplicationOptions()
+    {
+        ApplicationName = typeof(Program).Assembly.FullName,
+        ContentRootPath = baseDirectory,
+        Args = args
+    });
+}
+else
+{
+    builder = WebApplication.CreateBuilder();
+}
 
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
