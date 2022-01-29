@@ -1,31 +1,41 @@
-var builder = WebApplication.CreateBuilder(args);
+string? baseDirectory = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
 
-string? baseDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()?.Location);
-
-if (args != null &&
-    args.Length > 0 &&
-    string.IsNullOrWhiteSpace(args.First()) == false &&
-    Directory.Exists(args.First()))
+if (baseDirectory == null)
 {
-    if (System.Environment.OSVersion.Platform == PlatformID.Win32NT)
-    {
-        baseDirectory = args.First();
-    }
-
-    builder.Configuration.SetBasePath(args.First());
-    Console.WriteLine($"Use following base path: {args.First()}");
+    baseDirectory = Directory.GetCurrentDirectory();
 }
 else
 {
-    builder.Configuration.SetBasePath(Directory.GetCurrentDirectory());
-    Console.WriteLine($"Use following base path: {Directory.GetCurrentDirectory()}");
+    baseDirectory = System.IO.Path.GetDirectoryName(baseDirectory);
 }
+
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
+{
+    ApplicationName = typeof(Program).Assembly.FullName,
+    ContentRootPath = baseDirectory,
+    Args = args
+});
 
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
     loggerConfiguration.ReadFrom.Configuration(context.Configuration);
-    loggerConfiguration.SetLoggerSettings("io-module-iotemplate", "/io/module/template", "2.0.0");
+    loggerConfiguration.SetLoggerSettings("io-module-odata", "/io/module/odata", "2.0.0");
 });
+
+// Check if os is windows the use windows service
+if (WindowsServiceHelpers.IsWindowsService())
+{
+    Console.WriteLine($"[INF][{DateTime.Now.ToString()}]: Start the service as windows service.");
+
+    builder.Services.AddSingleton<IHostLifetime, WindowsServiceLifetime>();
+    builder.Logging.AddEventLog(settings =>
+    {
+        if (string.IsNullOrEmpty(settings.SourceName))
+        {
+            settings.SourceName = builder.Environment.ApplicationName;
+        }
+    });
+}
 
 // Add cors policies
 builder.Services.AddCors(options =>

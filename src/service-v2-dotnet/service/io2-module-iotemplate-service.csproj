@@ -22,6 +22,7 @@
   <ItemGroup>
     <PackageReference Include="Development.SDK.Logging" Version="2.0.5" />
     <PackageReference Include="Development.SDK.Module" Version="2.0.58" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
