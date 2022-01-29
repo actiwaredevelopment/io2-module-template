@@ -19,7 +19,7 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
     loggerConfiguration.ReadFrom.Configuration(context.Configuration);
-    loggerConfiguration.SetLoggerSettings("io-module-odata", "/io/module/odata", "2.0.0");
+    loggerConfiguration.SetLoggerSettings("io-module-template", "/io/module/template", "2.0.0");
 });
 
 // Check if os is windows the use windows service
