@@ -1,10 +1,19 @@
-FROM node:10-alpine
+FROM node:14.19.0-alpine3.15
+
+USER root
+
+RUN apk update
+RUN apk upgrade
+RUN apk --no-cache add ca-certificates
+RUN update-ca-certificates
 
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 
 WORKDIR /home/node/app
 
-COPY ./dist-nodejs/*.js* ./
+COPY ./build-service/nodejs ./
+COPY ./src/configuration/build ./build
+COPY ./src/service-v2-nodejs/node_modules ./node_modules
 
 USER node
 
@@ -12,4 +21,4 @@ COPY --chown=node:node . .
 
 EXPOSE 30100
 
-CMD [ "node", "index.js" ]
+CMD [ "node", "build-service/nodejs/service-v2-nodejs/index.js" ]

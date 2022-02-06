@@ -13,7 +13,8 @@ jobs:
             project: ./src/service-v2-nodejs
             modulefile: iotemplate.zip
             dockerfile: ./.github/docker/dockerfile-nodejs
-            build-path: ./dist-nodejs
+            build-path: ./build-service/nodejs
+            build-ui-path: ./src/configuration/build
         secrets:
             action-user: ${{ secrets.GH_ACTION_USER }}
             action-token: ${{ secrets.GH_ACTION_TOKEN }}

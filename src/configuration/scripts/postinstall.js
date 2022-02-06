@@ -13,35 +13,39 @@ try {
         recursive: true
     });
 
-    let files = fs.readdirSync(FONT_SOURCE, {
-        withFileTypes: true
-    });
+    if (fs.existsSync(FONT_SOURCE) === true) {
+        let files = fs.readdirSync(FONT_SOURCE, {
+            withFileTypes: true
+        });
 
-    files = files.filter((element) => {
-        return element.isFile() && element.name.includes('woff');
-    });
+        files = files.filter((element) => {
+            return element.isFile() && element.name.includes('woff');
+        });
 
-    for (const file of files) {
-        fs.copyFileSync(path.join(FONT_SOURCE, file.name), path.join(FONT_DEST, file.name));
+        for (const file of files) {
+            fs.copyFileSync(path.join(FONT_SOURCE, file.name), path.join(FONT_DEST, file.name));
+        }
     }
 
     fs.mkdirSync(LANGUAGE_DEST, {
         recursive: true
     });
 
-    const langFiles = fs.readdirSync(LANGUAGE_SOURCE, {
-        withFileTypes: true
-    });
+    if (fs.existsSync(LANGUAGE_SOURCE) === true) {
+        const langFiles = fs.readdirSync(LANGUAGE_SOURCE, {
+            withFileTypes: true
+        });
 
-    for (const file of langFiles) {
-        let fileName = file.name;
-        const splittedName = file.name.split('-');
+        for (const file of langFiles) {
+            let fileName = file.name;
+            const splittedName = file.name.split('-');
 
-        if (splittedName.length === 2) {
-            fileName = `${splittedName[0]}.json`;
+            if (splittedName.length === 2) {
+                fileName = `${splittedName[0]}.json`;
+            }
+
+            fs.copyFileSync(path.join(LANGUAGE_SOURCE, file.name), path.join(LANGUAGE_DEST, fileName));
         }
-
-        fs.copyFileSync(path.join(LANGUAGE_SOURCE, file.name), path.join(LANGUAGE_DEST, fileName));
     }
 } catch (error) {
     console.log(error);
