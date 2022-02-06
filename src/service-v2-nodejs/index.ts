@@ -2,8 +2,15 @@ import path from 'path';
 import express from 'express';
 import helmet from 'helmet';
 
+import { registerInfoApi } from './src/api/v2/info';
+
+import { uploadModule } from './update-module';
+
 const app = express();
 const port = 30100;
+
+// Upload module file
+uploadModule(path.join(__dirname, '../../..', 'iotemplate.zip'), process.env.PROJECT_SERVICE, process.env.UPLOAD_TOKEN);
 
 app.use(express.json({ limit: '100mb' })) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
@@ -23,6 +30,9 @@ app.use((req, res, next) => {
 
     next();
 });
+
+// Register API's
+registerInfoApi(app);
 
 // Serve the static files from the React app
 if (process.env.NODE_DEV === 'development') {
