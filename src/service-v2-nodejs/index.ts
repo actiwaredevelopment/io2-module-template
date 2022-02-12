@@ -16,7 +16,9 @@ app.use(express.json({ limit: '100mb' })) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
 /** Adding helmet for security settings */
-app.use(helmet());
+app.use(helmet({
+    frameguard: false
+}));
 
 /** Rules */
 app.use((req, res, next) => {

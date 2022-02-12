@@ -1,4 +1,3 @@
-import { initializeIcons } from '@fluentui/font-icons-mdl2';
 import { registerIcons } from '@fluentui/react';
 
 import React from 'react';
@@ -11,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faPlus,
     faTrash,
+    faCircleTrash,
     faPen,
     faSave,
     faPlay,
@@ -32,8 +32,6 @@ import i18n from './i18n';
 import sdkDE from '@actiwaredevelopment/io-sdk-react/public/locals/language/sdk/de.json';
 import sdkEN from '@actiwaredevelopment/io-sdk-react/public/locals/language/sdk/en.json';
 
-initializeIcons('/fonts/font-icons-mdl2/');
-
 registerIcons({
     fontFace: {
         fontFamily: `"Font Awesome 6 Pro"`
@@ -44,6 +42,7 @@ registerIcons({
         'fa-plus': <FontAwesomeIcon icon={faPlus} />,
         'fa-play': <FontAwesomeIcon icon={faPlay} />,
         'fa-trash': <FontAwesomeIcon icon={faTrash} />,
+        'fa-circle-trash': <FontAwesomeIcon icon={faCircleTrash} />,
         'fa-clone': <FontAwesomeIcon icon={faClone} />,
         'fa-pen': <FontAwesomeIcon icon={faPen} />,
         'fa-copy': <FontAwesomeIcon icon={faCopy} />,

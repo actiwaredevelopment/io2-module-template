@@ -14,8 +14,7 @@
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",
         "plugin:react-hooks/recommended",
-        "plugin:@typescript-eslint/recommended",
-        "prettier"
+        "plugin:@typescript-eslint/recommended"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -31,6 +30,35 @@
     ],
     "rules": {
         "no-else-return": "error",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "space-before-blocks": [
+            "error",
+            "always"
+        ],
+        "object-curly-spacing": [
+            "error",
+            "always"
+        ],
+        "object-curly-newline": [
+            "error",
+            {
+                "ObjectExpression": {
+                    "minProperties": 1
+                },
+                "ObjectPattern": {
+                    "consistent": true
+                },
+                "ImportDeclaration": {
+                    "multiline": true,
+                    "minProperties": 2
+                },
+                "ExportDeclaration": {
+                    "multiline": true,
+                    "minProperties": 2
+                }
+            }
+        ],
         "padding-line-between-statements": [
             "error",
             {
