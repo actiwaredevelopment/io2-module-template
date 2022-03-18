@@ -12,8 +12,15 @@ jobs:
 
         outputs:
             version: ${{ steps.version.outputs.result }}
+            build-version: ${{ steps.build.outputs.formattedTime }}
 
         steps:
+            - name: Get current date
+              id: build
+              uses: josStorer/get-current-time@v2
+              with:
+                  format: MMDD
+
             - name: Set Version
               id: version
               uses: actions/github-script@v3
@@ -83,14 +90,70 @@ jobs:
             docker-username: ${{ secrets.DOCKER_HUB_USER }}
             docker-password: ${{ secrets.DOCKER_HUB_SECRET }}
 
-    ftp:
-        needs: build-windows
-
-        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-ftp.yml@main
+    build-setup-for-io:
+        needs: [build-windows]
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
         with:
-            artifact: ${{ needs.build-windows.outputs.download }}
-            remote-dir: /Development/actiwareio/Source/Modules/v2/IOTemplate/
+            artifact: BuildOutputWindows
+            artifact-setup: IoSetup
+            aip-file: src/setup/setup-module-dotnet.aip
+            major-version: 2
+            build-version: ${{ needs.version.outputs.build-version }}
+            service-name: 'IoTemplateService'
+            setup-name: 'IO - Template Module'
+            publish-target: 'pre-release/IO/04 - Modules'
+            manufacture: 'ACTIWARE Development GmbH'
+            partner: 'ACTIWARE'
+            branding: 'IO'
         secrets:
-            address: ${{ secrets.SFTP_HOST }}:522
-            user: ${{ secrets.SFTP_USER }}
-            password: ${{ secrets.SFTP_PASSWORD }}
+            aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
+            action-user: ${{ secrets.GH_ACTION_USER }}
+            action-token: ${{ secrets.GH_ACTION_TOKEN }}
+            aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
+            aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
+
+    build-setup-for-bt:
+        needs: [build-windows]
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
+        with:
+            artifact: BuildOutputWindows
+            artifact-setup: BtSetup
+            aip-file: src/setup/setup-module.aip
+            major-version: 5
+            minor-version: 3
+            build-version: ${{ needs.version.outputs.build-version }}
+            service-name: 'BtTemplateService'
+            setup-name: 'Business Template - Template Module'
+            publish-target: 'pre-release/BT/04 - Modules'
+            manufacture: 'ACTIWARE GmbH'
+            partner: 'ACTIWARE'
+            branding: 'Business Template'
+        secrets:
+            aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
+            action-user: ${{ secrets.GH_ACTION_USER }}
+            action-token: ${{ secrets.GH_ACTION_TOKEN }}
+            aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
+            aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
+
+    build-setup-for-blp:
+        needs: [build-windows]
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
+        with:
+            artifact: BuildOutputWindows
+            artifact-setup: BlpSetup
+            aip-file: src/setup/setup-module.aip
+            major-version: 5
+            minor-version: 3
+            build-version: ${{ needs.version.outputs.build-version }}
+            service-name: 'BlpTemplateService'
+            setup-name: 'Business Logic Provider - Template Module'
+            publish-target: 'pre-release/BLP/04 - Modules'
+            manufacture: 'Template Digital Office GmbH'
+            partner: 'Template'
+            branding: 'Business Logic Provider'
+        secrets:
+            aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
+            action-user: ${{ secrets.GH_ACTION_USER }}
+            action-token: ${{ secrets.GH_ACTION_TOKEN }}
+            aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
+            aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}

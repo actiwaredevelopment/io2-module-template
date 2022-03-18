@@ -13,9 +13,34 @@ jobs:
         secrets:
             token: ${{ secrets.GITHUB_TOKEN }}
 
-    build:
+    version:
+        name: 'Determine Version'
+        runs-on: ubuntu-latest
+
+        outputs:
+            version: ${{ steps.version.outputs.version }}
+            build-version: ${{ steps.build.outputs.formattedTime }}
+
+        steps:
+            - name: Get current date
+              id: build
+              uses: josStorer/get-current-time@v2
+              with:
+                  format: MMDD
+
+            - name: Get version
+              id: version
+              uses: actiwaredevelopment/action-io-get-module-version@v0.5
+              with:
+                  module-definition-file: module-definition/info.json
+                  fallback-version: '1.0.0'
+                  alternative-major-version: 1
+                  alternative-minor-version: 0
+                  alternative-build-version: ${{ steps.build.outputs.formattedTime }}
+
+    build-linux:
         if: ${{ needs.check-last-commit.outputs.has-changes == 'true' }}
-        needs: check-last-commits
+        needs: [check-last-commits, version]
 
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
         with:
@@ -36,9 +61,32 @@ jobs:
             npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
             npmrc-config: ${{ secrets.NPMRC_CONFIG }}
 
+    build-windows:
+        if: ${{ needs.check-last-commit.outputs.has-changes == 'true' }}
+        needs: [check-last-commits, version]
+
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
+        with:
+            repository: ${{ github.repository }}
+            version-postfix: '-nightly'
+            branch: ${{ github.ref_name }}
+            dotnet-version: 6.0.x
+            project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
+            modulefile: iotemplate.zip
+            dockerfile: ./.github/docker/dockerfile
+            ui-build-path: ./src/configuration/build
+            rid: 'win-x64'
+            create-single-file: true
+        secrets:
+            action-user: ${{ secrets.GH_ACTION_USER }}
+            action-token: ${{ secrets.GH_ACTION_TOKEN }}
+            awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
+            npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
+            npmrc-config: ${{ secrets.NPMRC_CONFIG }}
+
     docker:
         if: ${{ needs.check-last-commit.outputs.has-changes == 'true' }}
-        needs: [check-last-commits, build]
+        needs: [check-last-commits, build-linux]
 
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
         with:
@@ -48,3 +96,71 @@ jobs:
         secrets:
             docker-username: ${{ secrets.DOCKER_HUB_USER }}
             docker-password: ${{ secrets.DOCKER_HUB_SECRET }}
+
+    build-setup-for-io:
+        needs: [build-windows]
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
+        with:
+            artifact: BuildOutputWindows
+            artifact-setup: IoSetup
+            aip-file: src/setup/setup-module-dotnet.aip
+            major-version: 2
+            build-version: ${{ needs.version.outputs.build-version }}
+            service-name: 'IoTemplateService'
+            setup-name: 'IO - Template Module'
+            publish-target: 'nightly/IO/04 - Modules'
+            manufacture: 'ACTIWARE Development GmbH'
+            partner: 'ACTIWARE'
+            branding: 'IO'
+        secrets:
+            aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
+            action-user: ${{ secrets.GH_ACTION_USER }}
+            action-token: ${{ secrets.GH_ACTION_TOKEN }}
+            aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
+            aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
+
+    build-setup-for-bt:
+        needs: [build-windows]
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
+        with:
+            artifact: BuildOutputWindows
+            artifact-setup: BtSetup
+            aip-file: src/setup/setup-module.aip
+            major-version: 5
+            minor-version: 3
+            build-version: ${{ needs.version.outputs.build-version }}
+            service-name: 'BtTemplateService'
+            setup-name: 'Business Template - Template Module'
+            publish-target: 'nightly/BT/04 - Modules'
+            manufacture: 'ACTIWARE GmbH'
+            partner: 'ACTIWARE'
+            branding: 'Business Template'
+        secrets:
+            aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
+            action-user: ${{ secrets.GH_ACTION_USER }}
+            action-token: ${{ secrets.GH_ACTION_TOKEN }}
+            aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
+            aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
+
+    build-setup-for-blp:
+        needs: [build-windows]
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
+        with:
+            artifact: BuildOutputWindows
+            artifact-setup: BlpSetup
+            aip-file: src/setup/setup-module.aip
+            major-version: 5
+            minor-version: 3
+            build-version: ${{ needs.version.outputs.build-version }}
+            service-name: 'BlpTemplateService'
+            setup-name: 'Business Logic Provider - Template Module'
+            publish-target: 'nightly/BLP/04 - Modules'
+            manufacture: 'Template Digital Office GmbH'
+            partner: 'Template'
+            branding: 'Business Logic Provider'
+        secrets:
+            aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
+            action-user: ${{ secrets.GH_ACTION_USER }}
+            action-token: ${{ secrets.GH_ACTION_TOKEN }}
+            aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
+            aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}

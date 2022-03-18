@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DOCUMENT Type="Advanced Installer" CreateVersion="19.2" version="19.2" Modules="enterprise" RootPath="." Language="en" Id="{FF1B82B5-1D04-4290-A4D5-70F8310C7A08}">
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
+    <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
+    <ROW Property="AI_CURRENT_YEAR" Value="2022" ValueLocId="-"/>
+    <ROW Property="AI_FINDEXE_TITLE" Value="Select the installation package for [|ProductName]" ValueLocId="AI.Property.FindExeTitle"/>
+    <ROW Property="ALLUSERS" Value="1"/>
+    <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
+    <ROW Property="ARPCONTACT" Value="ACTIWARE Development GmbH"/>
+    <ROW Property="ARPHELPTELEPHONE" Value="+49 (6464) 91 31 0"/>
+    <ROW Property="ARPNOREPAIR" MultiBuildValue="DefaultBuild:1"/>
+    <ROW Property="ARPURLINFOABOUT" Value="http://www.actiware.com"/>
+    <ROW Property="DEFAULT_PORT" Value="30102"/>
+    <ROW Property="PROJECT_SERVICE_ADDRESS" Value="http://localhost:30002"/>
+    <ROW Property="TOKEN" Value="demo"/>
+    <ROW Property="Manufacturer" Value="ACTIWARE Development GmbH"/>
+    <ROW Property="ModuleName" Value="Template"/>
+    <ROW Property="OemBranding" Value="IO"/>
+    <ROW Property="OemMajorRelease" Value="2"/>
+    <ROW Property="OemPartner" Value="ACTIWARE"/>
+    <ROW Property="OemProductName" Value="Module - [|ModuleName]"/>
+    <ROW Property="ProductCode" Value="1033:{351207B3-7CC4-435B-BD5C-55DA4C1C7BE3} " Type="16"/>
+    <ROW Property="ProductLanguage" Value="1033"/>
+    <ROW Property="ProductName" Value="[|OemBranding] [|OemMajorRelease] - [|OemProductName]"/>
+    <ROW Property="ProductVersion" Value="1.0.0"/>
+    <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
+    <ROW Property="ServiceDescription" Value="This module provides access to external data sources e.g. OLEDB or SQL."/>
+    <ROW Property="ServiceDisplayName" Value="[|OemBranding] [|OemMajorRelease] - [|OemProductName]"/>
+    <ROW Property="ServiceName" Value="IoModuleTemplate"/>
+    <ROW Property="SetupName" Value="[|OemBranding] - [|ModuleName]"/>
+    <ROW Property="UpgradeCode" Value="{A0FE818A-688C-4F05-A3AF-908D73487776}"/>
+    <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsType9XDisplay" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40" MultiBuildValue="DefaultBuild:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40Display" MultiBuildValue="DefaultBuild:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50Display" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5X" MultiBuildValue="DefaultBuild:Windows XP/2003" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5XDisplay" MultiBuildValue="DefaultBuild:Windows XP/2003" ValueLocId="-"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
+    <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
+    <ROW Directory="ClientApp_Dir" Directory_Parent="Service_Dir" DefaultDir="CLIENT~1|ClientApp"/>
+    <ROW Directory="Modules_Dir" Directory_Parent="APPDIR" DefaultDir="Modules"/>
+    <ROW Directory="Service_Dir" Directory_Parent="Modules_Dir" DefaultDir="MODDIR~1|Template"/>
+    <ROW Directory="LanguageFiles_Dir" Directory_Parent="Service_Dir" DefaultDir="LANGUA~1|languages"/>
+    <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="AI_ExePath" ComponentId="{ADA84252-56B2-4A3C-B603-CBD0C92416B5}" Directory_="APPDIR" Attributes="260" KeyPath="AI_ExePath"/>
+    <ROW Component="APPDIR" ComponentId="{86D73F8D-2E5E-4851-997A-17B8AEAA2FF5}" Directory_="APPDIR" Attributes="256"/>
+    <ROW Component="ProductInformation" ComponentId="{66A4B35F-FC92-47A7-A46B-002EB47BA177}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
+    <ROW Component="ServiceApplication" ComponentId="{1CAC4FEB-8790-4155-91D0-82E8E55C3BB5}" Directory_="Service_Dir" Attributes="256" KeyPath="io2moduleiotemplateservice.exe"/>
+    <ROW Component="LanguageFiles" ComponentId="{E29AE921-C3F8-45AE-9E9C-81C535F8BE1C}" Directory_="LanguageFiles_Dir" Attributes="0"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
+    <ROW Feature="Module" Title="Module" Display="1" Level="1" Directory_="APPDIR" Attributes="0"/>
+    <ATTRIBUTE name="CurrentFeature" value="Module"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
+    <ROW File="io2moduleiotemplateservice.exe" Component_="ServiceApplication" FileName="SERVIC~1.EXE|io2-module-iotemplate-service.exe" Attributes="0" SourcePath="out\io2-module-iotemplate-service.exe" SelfReg="false" DigSign="true"/>
+    <ROW File="Template.zip" Component_="ServiceApplication" FileName="MODULE~1.ZIP|Template.zip" Attributes="0" SourcePath="Template.zip" SelfReg="false"/>
+    <ROW File="version.txt" Component_="ServiceApplication" FileName="VERSIO~1.txt|version.txt" Attributes="0" SourcePath="version.txt" SelfReg="false"/>
+    <ROW File="info.json" Component_="ServiceApplication" FileName="INFO~1.JSO|info.json" Attributes="0" SourcePath="module-definition\info.json" SelfReg="false"/>
+    <ROW File="deDE.json" Component_="LanguageFiles" FileName="deDE~1.JSO|de-DE.json" Attributes="0" SourcePath="module-definition\languages\de-DE.json" SelfReg="false"/>
+    <ROW File="enUS.json" Component_="LanguageFiles" FileName="enUS~1.JSO|en-US.json" Attributes="0" SourcePath="module-definition\languages\en-US.json" SelfReg="false"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
+    <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
+    <ROW BuildKey="DefaultBuild" BuildName="Release" BuildOrder="1" BuildType="0" PackageFolder="output" Languages="en" InstallationType="2" CabsLocation="1" CompressCabs="false" UseLzma="true" LzmaMethod="2" LzmaCompressionLevel="2" PackageType="1" FilesInsideExe="true" ExtractionFolder="[AppDataFolder][OemPartner]\[OemBranding] [OemMajorRelease]\[|OemProductName] - [|ProductVersion]\install" Options="9" UseLargeSchema="true" ExeName="[|SetupName]" MsiPackageType="x64" UACExecutionLevel="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
+    <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
+    <ROW Path="&lt;AI_DICTS&gt;ui_en.ail"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.FirewallExceptionComponent">
+    <ROW FirewallException="ServiceDisplayName" Direction="1" DisplayName="[ServiceDisplayName]" GroupName="[OemBranding] [OemMajorRelease]" Enabled="1" Scope="*" Condition="1" Profiles="7" Port="[DEFAULT_PORT]" Protocol="TCP"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.FragmentComponent">
+    <ROW Fragment="CommonUI.aip" Path="&lt;AI_FRAGS&gt;CommonUI.aip"/>
+    <ROW Fragment="FolderDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\FolderDlg.aip"/>
+    <ROW Fragment="MaintenanceTypeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceTypeDlg.aip"/>
+    <ROW Fragment="MaintenanceWelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceWelcomeDlg.aip"/>
+    <ROW Fragment="SequenceDialogs.aip" Path="&lt;AI_THEMES&gt;classic\fragments\SequenceDialogs.aip"/>
+    <ROW Fragment="Sequences.aip" Path="&lt;AI_FRAGS&gt;Sequences.aip"/>
+    <ROW Fragment="StaticUIStrings.aip" Path="&lt;AI_FRAGS&gt;StaticUIStrings.aip"/>
+    <ROW Fragment="Themes.aip" Path="&lt;AI_FRAGS&gt;Themes.aip"/>
+    <ROW Fragment="UI.aip" Path="&lt;AI_THEMES&gt;classic\fragments\UI.aip"/>
+    <ROW Fragment="Validation.aip" Path="&lt;AI_FRAGS&gt;Validation.aip"/>
+    <ROW Fragment="VerifyRemoveDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRemoveDlg.aip"/>
+    <ROW Fragment="VerifyRepairDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRepairDlg.aip"/>
+    <ROW Fragment="WelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\WelcomeDlg.aip"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.JsonFileComponent">
+    <ROW JsonFile="appsettings.json" FileName="APPSET~1.JSO|appsettings.json" DirProperty="Service_Dir" Component="ServiceApplication" RootProperty="Root" Flags="22" IndentUnits="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.JsonPropertyComponent">
+<ROW JsonProperty="AllowedHosts" Parent="Root" Name="AllowedHosts" Condition="1" Order="2" Flags="41" Value="*"/>
+    <ROW JsonProperty="Args" Parent="__6" Name="Args" Condition="1" Order="1" Flags="60"/>
+    <ROW JsonProperty="Args_1" Parent="__7" Name="Args" Condition="1" Order="1" Flags="60"/>
+    <ROW JsonProperty="Default" Parent="MinimumLevel" Name="Default" Condition="1" Order="0" Flags="57" Value="Verbose"/>
+    <ROW JsonProperty="DisableStringReuse" Parent="Kestrel" Name="DisableStringReuse" Condition="1" Order="2" Flags="42" Value="true"/>
+    <ROW JsonProperty="Endpoints" Parent="Kestrel" Name="Endpoints" Condition="1" Order="0" Flags="44"/>
+    <ROW JsonProperty="Enrich" Parent="Serilog" Name="Enrich" Condition="1" Order="2" Flags="61"/>
+    <ROW JsonProperty="Http" Parent="Endpoints" Name="Http" Condition="1" Order="0" Flags="44"/>
+    <ROW JsonProperty="Kestrel" Parent="Root" Name="Kestrel" Condition="1" Order="1" Flags="44"/>
+    <ROW JsonProperty="Limits" Parent="Kestrel" Name="Limits" Condition="1" Order="1" Flags="60"/>
+    <ROW JsonProperty="MaxConcurrentConnections" Parent="Limits" Name="MaxConcurrentConnections" Condition="1" Order="0" Flags="43" Value="100"/>
+    <ROW JsonProperty="MaxConcurrentUpgradedConnections" Parent="Limits" Name="MaxConcurrentUpgradedConnections" Condition="1" Order="1" Flags="43" Value="100"/>
+    <ROW JsonProperty="Microsoft" Parent="Override" Name="Microsoft" Condition="1" Order="0" Flags="57" Value="Warning"/>
+    <ROW JsonProperty="MinimumLevel" Parent="Serilog" Name="MinimumLevel" Condition="1" Order="1" Flags="60"/>
+    <ROW JsonProperty="Name" Parent="__6" Name="Name" Condition="1" Order="0" Flags="57" Value="Async"/>
+    <ROW JsonProperty="Name_1" Parent="__7" Name="Name" Condition="1" Order="0" Flags="57" Value="File"/>
+    <ROW JsonProperty="Override" Parent="MinimumLevel" Name="Override" Condition="1" Order="1" Flags="60"/>
+    <ROW JsonProperty="PROJECT_SERVICE" Parent="Root" Name="PROJECT_SERVICE" Condition="1" Order="3" Flags="57" Value="[PROJECT_SERVICE_ADDRESS]"/>
+    <ROW JsonProperty="Root" Name="Root" Condition="1" Order="0" Flags="60"/>
+    <ROW JsonProperty="Serilog" Parent="Root" Name="Serilog" Condition="1" Order="0" Flags="44"/>
+    <ROW JsonProperty="System" Parent="Override" Name="System" Condition="1" Order="1" Flags="57" Value="Warning"/>
+    <ROW JsonProperty="UPLOAD_TOKEN" Parent="Root" Name="UPLOAD_TOKEN" Condition="1" Order="4" Flags="57" Value="[TOKEN]"/>
+    <ROW JsonProperty="Url" Parent="Http" Name="Url" Condition="1" Order="0" Flags="57" Value="http://*:[DEFAULT_PORT]"/>
+    <ROW JsonProperty="Using" Parent="Serilog" Name="Using" Condition="1" Order="0" Flags="61"/>
+    <ROW JsonProperty="WriteTo" Parent="Serilog" Name="WriteTo" Condition="1" Order="3" Flags="61"/>
+    <ROW JsonProperty="_" Parent="Using" Name="0" Condition="1" Order="0" Flags="57" Value="Serilog.Sinks.Async"/>
+    <ROW JsonProperty="__1" Parent="Using" Name="1" Condition="1" Order="1" Flags="57" Value="Serilog.Sinks.Console"/>
+    <ROW JsonProperty="__2" Parent="Using" Name="2" Condition="1" Order="2" Flags="57" Value="Serilog.Sinks.File"/>
+    <ROW JsonProperty="__3" Parent="Using" Name="3" Condition="1" Order="3" Flags="57" Value="Serilog.Sinks.EventLog"/>
+    <ROW JsonProperty="__4" Parent="Enrich" Name="0" Condition="1" Order="0" Flags="57" Value="FromLogContext"/>
+    <ROW JsonProperty="__5" Parent="Enrich" Name="1" Condition="1" Order="1" Flags="57" Value="WithClientIp"/>
+    <ROW JsonProperty="__6" Parent="WriteTo" Name="0" Condition="1" Order="0" Flags="60"/>
+    <ROW JsonProperty="__7" Parent="configure" Name="0" Condition="1" Order="0" Flags="60"/>
+    <ROW JsonProperty="buffered" Parent="Args_1" Name="buffered" Condition="1" Order="6" Flags="58" Value="false"/>
+    <ROW JsonProperty="configure" Parent="Args" Name="configure" Condition="1" Order="0" Flags="61"/>
+    <ROW JsonProperty="fileSizeLimitBytes" Parent="Args_1" Name="fileSizeLimitBytes" Condition="1" Order="4" Flags="59" Value="104857600"/>
+    <ROW JsonProperty="outputTemplate" Parent="Args_1" Name="outputTemplate" Condition="1" Order="0" Flags="57" Value="{Timestamp:dd-MM-yyyy HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}"/>
+    <ROW JsonProperty="path" Parent="Args_1" Name="path" Condition="1" Order="1" Flags="57" Value="[Service_Dir]logs\log-.txt"/>
+    <ROW JsonProperty="retainedFileCountLimit" Parent="Args_1" Name="retainedFileCountLimit" Condition="1" Order="3" Flags="59" Value="7"/>
+    <ROW JsonProperty="rollOnFileSizeLimit" Parent="Args_1" Name="rollOnFileSizeLimit" Condition="1" Order="5" Flags="58" Value="true"/>
+    <ROW JsonProperty="rollingInterval" Parent="Args_1" Name="rollingInterval" Condition="1" Order="2" Flags="57" Value="Day"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiActionTextComponent">
+    <ROW Action="AI_DeleteLzma" Description="Deleting files extracted from archive" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
+    <ROW Action="AI_DeleteRLzma" Description="Deleting files extracted from archive" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
+    <ROW Action="AI_ExtractFiles" Description="Extracting files from archive" DescriptionLocId="ActionText.Description.AI_ExtractLzma" TemplateLocId="-"/>
+    <ROW Action="AI_ExtractLzma" Description="Extracting files from archive" DescriptionLocId="ActionText.Description.AI_ExtractLzma" TemplateLocId="-"/>
+    <ROW Action="AI_FwConfig" Description="Executing Windows Firewall configurations" DescriptionLocId="ActionText.Description.AI_FwConfig" Template="Configuring Windows Firewall rule: &quot;[1]&quot;" TemplateLocId="ActionText.Template.AI_FwConfig"/>
+    <ROW Action="AI_FwInstall" Description="Generating actions to configure Windows Firewall" DescriptionLocId="ActionText.Description.AI_FwInstall"/>
+    <ROW Action="AI_FwRemove" Description="Executing Windows Firewall configurations" DescriptionLocId="ActionText.Description.AI_FwRemove" Template="Configuring Windows Firewall rule:  &quot;[1]&quot;" TemplateLocId="ActionText.Template.AI_FwRemove"/>
+    <ROW Action="AI_FwRollback" Description="Rolling back Windows Firewall configurations." DescriptionLocId="ActionText.Description.AI_FwRollback" Template="Rolling back Windows Firewall configurations." TemplateLocId="ActionText.Template.AI_FwRollback"/>
+    <ROW Action="AI_FwUninstall" Description="Generating actions to configure Windows Firewall" DescriptionLocId="ActionText.Description.AI_FwUninstall"/>
+    <ROW Action="AI_JsonCommit" Description="Committing JSON file configurations." DescriptionLocId="ActionText.Description.AI_JsonCommit" Template="Committing JSON file configurations." TemplateLocId="ActionText.Template.AI_JsonCommit"/>
+    <ROW Action="AI_JsonConfig" Description="Executing JSON file configurations" DescriptionLocId="ActionText.Description.AI_JsonConfig" Template="Configuring JSON file: &quot;[1]&quot;" TemplateLocId="ActionText.Template.AI_JsonConfig"/>
+    <ROW Action="AI_JsonInstall" Description="Generating actions to configure JSON files" DescriptionLocId="ActionText.Description.AI_JsonInstall"/>
+    <ROW Action="AI_JsonRemove" Description="Executing JSON file configurations" DescriptionLocId="ActionText.Description.AI_JsonRemove" Template="Configuring JSON file: &quot;[1]&quot;" TemplateLocId="ActionText.Template.AI_JsonRemove"/>
+    <ROW Action="AI_JsonRollback" Description="Rolling back JSON file configurations." DescriptionLocId="ActionText.Description.AI_JsonRollback" Template="Rolling back JSON file configurations." TemplateLocId="ActionText.Template.AI_JsonRollback"/>
+    <ROW Action="AI_JsonUninstall" Description="Generating actions to configure JSON files" DescriptionLocId="ActionText.Description.AI_JsonUninstall"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiAppSearchComponent">
+    <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_LM" Builds="DefaultBuild"/>
+    <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_CU" Builds="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
+    <ROW Name="NetFirewall.dll" SourcePath="&lt;AI_CUSTACTS&gt;NetFirewall.dll"/>
+    <ROW Name="Prereq.dll" SourcePath="&lt;AI_CUSTACTS&gt;Prereq.dll"/>
+    <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
+    <ROW Name="jsonCfg.dll" SourcePath="&lt;AI_CUSTACTS&gt;jsonCfg.dll"/>
+    <ROW Name="lzmaextractor.dll" SourcePath="&lt;AI_CUSTACTS&gt;lzmaextractor.dll"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlComponent">
+    <ROW Dialog_="ServiceSettingsDlg" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="100" Options="1"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="200" Options="1"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Back]" Order="300" Options="1"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Attributes="1048577" Text="[BannerBitmap]" Order="400"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="BannerLine" Type="Line" X="0" Y="44" Width="372" Height="0" Attributes="1" Order="500"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="BottomLine" Type="Line" X="5" Y="234" Width="368" Height="0" Attributes="1" Order="600"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Attributes="196611" Text="Please enter the settings for the service" Order="700"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Advanced Installer" Order="800"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Attributes="196611" Text="Service Settings" TextStyle="[DlgTitleFont]" Order="900"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="LabelDefaultPort" Type="Text" X="18" Y="93" Width="65" Height="11" Attributes="327683" Text="Service Port:" Order="1000"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="EditDefaultPort" Type="Edit" X="90" Y="90" Width="269" Height="18" Attributes="3" Property="DEFAULT_PORT" Text="{260}" Order="1100"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="LabelProjectServiceAddress" Type="Text" X="18" Y="113" Width="65" Height="11" Attributes="327683" Text="Project Service:" Order="1200"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="EditProjectServiceAddress" Type="Edit" X="90" Y="110" Width="269" Height="18" Attributes="3" Property="PROJECT_SERVICE_ADDRESS" Text="{260}" Order="1300"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="LabelToken" Type="Text" X="18" Y="133" Width="65" Height="11" Attributes="327683" Text="Upload Token:" Order="1400"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="EditToken" Type="Edit" X="90" Y="130" Width="269" Height="18" Attributes="2097155" Property="TOKEN" Text="{260}" Order="1500"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
+    <ROW Dialog_="WelcomeDlg" Control_="Next" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="ServiceSettingsDlg" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="FolderDlg" Control_="Back" Event="NewDialog" Argument="WelcomeDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_INSTALL" Ordering="197"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="ServiceSettingsDlg" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="MaintenanceWelcomeDlg" Control_="Next" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="99"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_MAINT" Ordering="101"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_MAINT" Ordering="198"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="202"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="ChangeButton" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="501"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceWelcomeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RemoveButton" Event="NewDialog" Argument="VerifyRemoveDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RepairButton" Event="NewDialog" Argument="VerifyRepairDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="1"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Repair" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="399" Options="1"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Remove" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="299" Options="1"/>
+    <ROW Dialog_="PatchWelcomeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_PATCH" Ordering="201"/>
+    <ROW Dialog_="ResumeDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_RESUME" Ordering="299"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_PATCH" Ordering="199"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="PatchWelcomeDlg" Condition="AI_PATCH" Ordering="203"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control_="Cancel" Event="SpawnDialog" Argument="CancelDlg" Condition="1" Ordering="100"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control_="Back" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
+    <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="true"/>
+    <ROW Directory_="LanguageFiles_Dir" Component_="LanguageFiles" ManualDelete="false"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
+    <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Type="51" Source="AI_SETUPEXEPATH_ORIGINAL" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DATA_SETTER" Type="51" Source="CustomActionData" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DATA_SETTER_1" Type="51" Source="CustomActionData" Target="[~]"/>
+    <ROW Action="AI_DATA_SETTER_2" Type="51" Source="CustomActionData" Target="[~]"/>
+    <ROW Action="AI_DATA_SETTER_3" Type="51" Source="CustomActionData" Target="[~]"/>
+    <ROW Action="AI_DATA_SETTER_4" Type="51" Source="CustomActionData" Target="[~]"/>
+    <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
+    <ROW Action="AI_DeleteCadLzma" Type="51" Source="AI_DeleteLzma" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DeleteLzma" Type="1025" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
+    <ROW Action="AI_DeleteRCadLzma" Type="51" Source="AI_DeleteRLzma" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DeleteRLzma" Type="1281" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
+    <ROW Action="AI_DpiContentScale" Type="1" Source="aicustact.dll" Target="DpiContentScale"/>
+    <ROW Action="AI_EnableDebugLog" Type="321" Source="aicustact.dll" Target="EnableDebugLog"/>
+    <ROW Action="AI_ExtractCadLzma" Type="51" Source="AI_ExtractLzma" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_ExtractFiles" Type="1" Source="Prereq.dll" Target="ExtractSourceFiles" AdditionalSeq="AI_DATA_SETTER"/>
+    <ROW Action="AI_ExtractLzma" Type="1025" Source="lzmaextractor.dll" Target="ExtractLZMAFiles"/>
+    <ROW Action="AI_FindExeLzma" Type="1" Source="lzmaextractor.dll" Target="FindEXE"/>
+    <ROW Action="AI_FwConfig" Type="11265" Source="NetFirewall.dll" Target="OnFwConfig" WithoutSeq="true"/>
+    <ROW Action="AI_FwInstall" Type="1" Source="NetFirewall.dll" Target="OnFwInstall" AdditionalSeq="AI_DATA_SETTER_1"/>
+    <ROW Action="AI_FwRemove" Type="11265" Source="NetFirewall.dll" Target="OnFwRemove" WithoutSeq="true"/>
+    <ROW Action="AI_FwRollback" Type="11521" Source="NetFirewall.dll" Target="OnFwRollback" WithoutSeq="true"/>
+    <ROW Action="AI_FwUninstall" Type="1" Source="NetFirewall.dll" Target="OnFwUninstall" AdditionalSeq="AI_DATA_SETTER_2"/>
+    <ROW Action="AI_InstallModeCheck" Type="1" Source="aicustact.dll" Target="UpdateInstallMode" WithoutSeq="true"/>
+    <ROW Action="AI_JsonCommit" Type="11777" Source="jsonCfg.dll" Target="OnJsonCommit" WithoutSeq="true"/>
+    <ROW Action="AI_JsonConfig" Type="11265" Source="jsonCfg.dll" Target="OnJsonConfig" WithoutSeq="true"/>
+    <ROW Action="AI_JsonInstall" Type="1" Source="jsonCfg.dll" Target="OnJsonInstall" AdditionalSeq="AI_DATA_SETTER_3"/>
+    <ROW Action="AI_JsonRemove" Type="11265" Source="jsonCfg.dll" Target="OnJsonRemove" WithoutSeq="true"/>
+    <ROW Action="AI_JsonRollback" Type="11521" Source="jsonCfg.dll" Target="OnJsonRollback" WithoutSeq="true"/>
+    <ROW Action="AI_JsonUninstall" Type="1" Source="jsonCfg.dll" Target="OnJsonUninstall" AdditionalSeq="AI_DATA_SETTER_4"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
+    <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Type="51" Source="AI_SETUPEXEPATH" Target="[AI_SETUPEXEPATH_ORIGINAL]"/>
+    <ROW Action="AI_RESTORE_LOCATION" Type="65" Source="aicustact.dll" Target="RestoreLocation"/>
+    <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
+    <ROW Action="AI_SHOW_LOG" Type="65" Source="aicustact.dll" Target="LaunchLogFile" WithoutSeq="true"/>
+    <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
+    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFiles64Folder][OemPartner]\[OemBranding] [OemMajorRelease]"/>
+    <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]" MultiBuildTarget="DefaultBuild:[ProgramMenuFolder][OemPartner]\[OemBranding] [OemMajorRelease]"/>
+    <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiDialogComponent">
+    <ROW Dialog="ServiceSettingsDlg" HCentering="50" VCentering="50" Width="370" Height="270" Attributes="3" Title="[ProductName] [Setup]" Control_Default="Next" Control_Cancel="Cancel"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatCompsComponent">
+    <ROW Feature_="Module" Component_="APPDIR"/>
+    <ROW Feature_="Module" Component_="ProductInformation"/>
+    <ROW Feature_="Module" Component_="AI_ExePath"/>
+    <ROW Feature_="Module" Component_="ServiceApplication"/>
+    <ROW Feature_="Module" Component_="LanguageFiles"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
+    <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
+    <ROW Action="AI_STORE_LOCATION" Condition="(Not Installed) OR REINSTALL" Sequence="1501"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Condition="AI_UPGRADE=&quot;No&quot; AND (Not Installed)" Sequence="1397"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+    <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99" Builds="DefaultBuild"/>
+    <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="101" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="199" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteRCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="198" Builds="DefaultBuild"/>
+    <ROW Action="AI_ExtractCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="197" Builds="DefaultBuild"/>
+    <ROW Action="AI_FindExeLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="196" Builds="DefaultBuild"/>
+    <ROW Action="AI_ExtractLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="1549" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteRLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="1548" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="6599" Builds="DefaultBuild"/>
+    <ROW Action="AI_ExtractFiles" Sequence="1399" Builds="DefaultBuild"/>
+    <ROW Action="AI_DATA_SETTER" Sequence="1398"/>
+    <ROW Action="AI_FwInstall" Condition="(VersionNT &gt;= 501) AND (REMOVE &lt;&gt; &quot;ALL&quot;)" Sequence="5802"/>
+    <ROW Action="AI_DATA_SETTER_1" Condition="(VersionNT &gt;= 501) AND (REMOVE &lt;&gt; &quot;ALL&quot;)" Sequence="5801"/>
+    <ROW Action="AI_FwUninstall" Condition="(VersionNT &gt;= 501) AND (REMOVE=&quot;ALL&quot;)" Sequence="1702"/>
+    <ROW Action="AI_DATA_SETTER_2" Condition="(VersionNT &gt;= 501) AND (REMOVE=&quot;ALL&quot;)" Sequence="1701"/>
+    <ROW Action="AI_JsonInstall" Condition="(REMOVE &lt;&gt; &quot;ALL&quot;)" Sequence="5102"/>
+    <ROW Action="AI_DATA_SETTER_3" Condition="(REMOVE &lt;&gt; &quot;ALL&quot;)" Sequence="5101"/>
+    <ROW Action="AI_JsonUninstall" Condition="(REMOVE)" Sequence="3102"/>
+    <ROW Action="AI_DATA_SETTER_4" Condition="(REMOVE)" Sequence="3101"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="53"/>
+    <ROW Action="AI_DpiContentScale" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+    <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99"/>
+    <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="101"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
+    <ROW Condition="((VersionNT &lt;&gt; 501) AND (VersionNT &lt;&gt; 502))" Description="[ProductName] cannot be installed on [WindowsTypeNT5XDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT5X" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT &lt;&gt; 400)" Description="[ProductName] cannot be installed on [WindowsTypeNT40Display]." DescriptionLocId="AI.LaunchCondition.NoNT40" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT &lt;&gt; 500)" Description="[ProductName] cannot be installed on [WindowsTypeNT50Display]." DescriptionLocId="AI.LaunchCondition.NoNT50" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="SETUPEXEDIR OR (REMOVE=&quot;ALL&quot;)" Description="This package can only be run from a bootstrapper." DescriptionLocId="AI.LaunchCondition.RequireBootstrapper" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegLocatorComponent">
+    <ROW Signature_="AI_EXE_PATH_CU" Root="1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="2"/>
+    <ROW Signature_="AI_EXE_PATH_LM" Root="2" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
+    <ROW Registry="AI_ExePath" Root="-1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Value="[AI_SETUPEXEPATH]" Component_="AI_ExePath"/>
+    <ROW Registry="AdvancedInstaller" Root="-1" Key="Software\Caphyon\Advanced Installer" Name="\"/>
+    <ROW Registry="Caphyon" Root="-1" Key="Software\Caphyon" Name="\"/>
+    <ROW Registry="LZMA" Root="-1" Key="Software\Caphyon\Advanced Installer\LZMA" Name="\"/>
+    <ROW Registry="Manufacturer" Root="-1" Key="Software\[Manufacturer]" Name="\"/>
+    <ROW Registry="Path" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
+    <ROW Registry="ProductCode" Root="-1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]" Name="\"/>
+    <ROW Registry="ProductName" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="\"/>
+    <ROW Registry="ProductVersion" Root="-1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="\"/>
+    <ROW Registry="Software" Root="-1" Key="Software" Name="\"/>
+    <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiServCtrlComponent">
+    <ROW ServiceControl="io2moduleiotemplateservice.exe" Name="[ServiceName]" Event="161" Wait="1" Component_="ServiceApplication"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiServInstComponent">
+    <ROW ServiceInstall="io2moduleiotemplateservice.exe" Name="[ServiceName]" DisplayName="[ServiceDisplayName]" ServiceType="16" StartType="2" ErrorControl="1" StartName="NT AUTHORITY\LocalService" Arguments="&quot;[Service_Dir]&quot;" Component_="ServiceApplication" Description="[ServiceDescription]"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
+    <ATTRIBUTE name="UsedTheme" value="classic"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="0.0.1" VersionMax="[|ProductVersion]" Attributes="257" ActionProperty="OLDPRODUCTS"/>
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.SynchronizedFolderComponent">
+    <ROW Directory_="ClientApp_Dir" SourcePath="src\configuration" Feature="Module" ExcludePattern="*~|#*#|%*%|._|CVS|.cvsignore|SCCS|vssver.scc|mssccprj.scc|vssver2.scc|.svn|.DS_Store" ExcludeFlags="6" FileAddOptions="4"/>
+  </COMPONENT>
+</DOCUMENT>
