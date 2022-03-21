@@ -1,17 +1,29 @@
-string? baseDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()?.Location);
+string[] commandLineArgs = args;
+string? baseDirectory = string.Empty;
 
-if (OperatingSystem.IsWindows() == true)
+if (commandLineArgs != null &&
+    commandLineArgs.Length > 0 &&
+    System.IO.Directory.Exists(commandLineArgs[0]) == true)
 {
-    baseDirectory = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
-}
-
-if (baseDirectory == null)
-{
-    baseDirectory = Directory.GetCurrentDirectory();
+    baseDirectory = commandLineArgs[0];
 }
 else
 {
-    baseDirectory = System.IO.Path.GetDirectoryName(baseDirectory);
+    baseDirectory = System.IO.Directory.GetCurrentDirectory();
+}
+
+if (string.IsNullOrWhiteSpace(baseDirectory))
+{
+    baseDirectory = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+
+    if (baseDirectory == null)
+    {
+        baseDirectory = Directory.GetCurrentDirectory();
+    }
+    else
+    {
+        baseDirectory = System.IO.Path.GetDirectoryName(baseDirectory);
+    }
 }
 
 WebApplicationBuilder builder;
