@@ -328,7 +328,7 @@
     <ROW ServiceControl="io2moduleiotemplateservice.exe" Name="[ServiceName]" Event="161" Wait="1" Component_="ServiceApplication"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiServInstComponent">
-    <ROW ServiceInstall="io2moduleiotemplateservice.exe" Name="[ServiceName]" DisplayName="[ServiceDisplayName]" ServiceType="16" StartType="2" ErrorControl="1" Arguments="&quot;[Service_Dir]&quot;" Component_="ServiceApplication" Description="[ServiceDescription]"/>
+    <ROW ServiceInstall="io2moduleiotemplateservice.exe" Name="[ServiceName]" DisplayName="[ServiceDisplayName]" ServiceType="16" StartType="2" ErrorControl="1" Arguments="&quot;[Modules_Dir]\Template&quot;" Component_="ServiceApplication" Description="[ServiceDescription]"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
     <ATTRIBUTE name="UsedTheme" value="classic"/>
