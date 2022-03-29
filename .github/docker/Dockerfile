@@ -1,13 +1,21 @@
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0-bullseye-slim
 
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates
+
+RUN update-ca-certificates
+
 ENV DEFAULT_PORT 30100
 
-COPY ./out .
-COPY ./src/configuration ./ClientApp
-COPY ./iotemplate.zip .
-COPY ./module-definition/info.json .
+WORKDIR /app
+
+COPY ./out /app
+COPY ./src/configuration /app/ClientApp
+COPY ./atlassian.zip /app
+COPY ./module-definition/info.json /app
+COPY ./module-definition/languages /app
 
 EXPOSE 30100
 
-ENTRYPOINT ["dotnet", "io2-module-iotemplate-service.dll"]
+ENTRYPOINT ["dotnet", "/app/io2-module-iotemplate-service.dll"]
