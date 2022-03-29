@@ -14,7 +14,7 @@ COPY ./out /app
 COPY ./src/configuration /app/ClientApp
 COPY ./atlassian.zip /app
 COPY ./module-definition/info.json /app
-COPY ./module-definition/languages /app
+COPY ./module-definition/languages /app/languages
 
 EXPOSE 30100
 
