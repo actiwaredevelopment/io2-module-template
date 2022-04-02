@@ -12,15 +12,8 @@ jobs:
 
         outputs:
             version: ${{ steps.version.outputs.result }}
-            build-version: ${{ steps.build.outputs.formattedTime }}
 
         steps:
-            - name: Get current date
-              id: build
-              uses: josStorer/get-current-time@v2
-              with:
-                  format: MMDD
-
             - name: Set Version
               id: version
               uses: actions/github-script@v3
@@ -44,8 +37,8 @@ jobs:
             repository: ${{ github.repository }}
             branch: ${{ github.ref_name }}
             dotnet-version: 6.0.x
-            project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
-            modulefile: iotemplate.zip
+            project: src/service/service/IO2.Module.Template.Service.csproj
+            modulefile: Template.zip
             dockerfile: ./.github/docker/dockerfile
             ui-build-path: ./src/configuration/build
             rid: 'linux-x64'
@@ -65,10 +58,11 @@ jobs:
             repository: ${{ github.repository }}
             branch: ${{ github.ref_name }}
             dotnet-version: 6.0.x
-            project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
-            modulefile: iotemplate.zip
+            project: src/service/service/IO2.Module.Template.Service.csproj
+            modulefile: Template.zip
             dockerfile: ./.github/docker/dockerfile
             ui-build-path: ./src/configuration/build
+            module-aip-setup: src/setup/setup-module.aip
             rid: 'win-x64'
             create-single-file: true
         secrets:
@@ -84,7 +78,7 @@ jobs:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
         with:
             artifact: ${{ needs.build-linux.outputs.download }}
-            image-name: actiwareio/io-module-iotemplate
+            image-name: actiwareio/io-module-Template
             image-tag: prerelease-${{ needs.version.outputs.version }}
         secrets:
             docker-username: ${{ secrets.DOCKER_HUB_USER }}
@@ -96,9 +90,9 @@ jobs:
         with:
             artifact: BuildOutputWindows
             artifact-setup: IoSetup
-            aip-file: src/setup/setup-module-dotnet.aip
+            aip-file: src/setup/setup-module.aip
             major-version: 2
-            build-version: ${{ needs.version.outputs.build-version }}
+            minor-version: 0
             service-name: 'IoTemplateService'
             setup-name: 'IO - Template Module'
             publish-target: 'pre-release/IO/04 - Modules'
@@ -121,7 +115,6 @@ jobs:
             aip-file: src/setup/setup-module.aip
             major-version: 5
             minor-version: 3
-            build-version: ${{ needs.version.outputs.build-version }}
             service-name: 'BtTemplateService'
             setup-name: 'Business Template - Template Module'
             publish-target: 'pre-release/BT/04 - Modules'
@@ -144,12 +137,11 @@ jobs:
             aip-file: src/setup/setup-module.aip
             major-version: 5
             minor-version: 3
-            build-version: ${{ needs.version.outputs.build-version }}
             service-name: 'BlpTemplateService'
             setup-name: 'Business Logic Provider - Template Module'
             publish-target: 'pre-release/BLP/04 - Modules'
-            manufacture: 'Template Digital Office GmbH'
-            partner: 'Template'
+            manufacture: 'ELO Digital Office GmbH'
+            partner: 'ELO'
             branding: 'Business Logic Provider'
         secrets:
             aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}

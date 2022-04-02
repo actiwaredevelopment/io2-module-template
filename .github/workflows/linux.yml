@@ -11,8 +11,8 @@ jobs:
             version-postfix: '-developer'
             branch: ${{ github.ref_name }}
             dotnet-version: 6.0.x
-            project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
-            modulefile: iotemplate.zip
+            project: src/service/service/IO2.Module.Template.Service.csproj
+            modulefile: Template.zip
             dockerfile: ./.github/docker/dockerfile
             ui-build-path: ./src/configuration/build
             rid: 'linux-x64'
@@ -30,7 +30,7 @@ jobs:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-github-docker.yml@main
         with:
             artifact: ${{ needs.build.outputs.download }}
-            image-name: io2-module-iotemplate
+            image-name: io2-module-Template
             image-tag: developer
         secrets:
             token: ${{ secrets.GITHUB_TOKEN }}
