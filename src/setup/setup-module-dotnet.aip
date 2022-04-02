@@ -14,7 +14,7 @@
     <ROW Property="PROJECT_SERVICE_ADDRESS" Value="http://localhost:30002"/>
     <ROW Property="TOKEN" Value="demo"/>
     <ROW Property="Manufacturer" Value="ACTIWARE Development GmbH"/>
-    <ROW Property="ModuleName" Value="Template"/>
+    <ROW Property="ModuleName" Value="IOTemplate"/>
     <ROW Property="OemBranding" Value="IO"/>
     <ROW Property="OemMajorRelease" Value="2"/>
     <ROW Property="OemPartner" Value="ACTIWARE"/>
@@ -26,7 +26,7 @@
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="ServiceDescription" Value="This module provides access to external data sources e.g. OLEDB or SQL."/>
     <ROW Property="ServiceDisplayName" Value="[|OemBranding] [|OemMajorRelease] - [|OemProductName]"/>
-    <ROW Property="ServiceName" Value="IoTemplate"/>
+    <ROW Property="ServiceName" Value="IoIOTemplate"/>
     <ROW Property="SetupName" Value="[|OemBranding] - [|ModuleName]"/>
     <ROW Property="UpgradeCode" Value="{00000000-0000-0000-0000-000000000001}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -42,7 +42,7 @@
     <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
     <ROW Directory="ClientApp_Dir" Directory_Parent="Service_Dir" DefaultDir="CLIENT~1|ClientApp"/>
     <ROW Directory="Modules_Dir" Directory_Parent="APPDIR" DefaultDir="Modules"/>
-    <ROW Directory="Service_Dir" Directory_Parent="Modules_Dir" DefaultDir="DATACO~1|Template"/>
+    <ROW Directory="Service_Dir" Directory_Parent="Modules_Dir" DefaultDir="MODULE~1|IOTemplate"/>
     <ROW Directory="LanguageFiles_Dir" Directory_Parent="Service_Dir" DefaultDir="LANGUA~1|languages"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
   </COMPONENT>
@@ -50,7 +50,7 @@
     <ROW Component="AI_ExePath" ComponentId="{ADA84252-56B2-4A3C-B603-CBD0C92416B5}" Directory_="APPDIR" Attributes="260" KeyPath="AI_ExePath"/>
     <ROW Component="APPDIR" ComponentId="{86D73F8D-2E5E-4851-997A-17B8AEAA2FF5}" Directory_="APPDIR" Attributes="256"/>
     <ROW Component="ProductInformation" ComponentId="{66A4B35F-FC92-47A7-A46B-002EB47BA177}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
-    <ROW Component="ServiceApplication" ComponentId="{1CAC4FEB-8790-4155-91D0-82E8E55C3BB5}" Directory_="Service_Dir" Attributes="256" KeyPath="IO.Module.Template.Service.exe"/>
+    <ROW Component="ServiceApplication" ComponentId="{1CAC4FEB-8790-4155-91D0-82E8E55C3BB5}" Directory_="Service_Dir" Attributes="256" KeyPath="IO.Module.IOTemplate.Service.exe"/>
     <ROW Component="LanguageFiles" ComponentId="{E29AE921-C3F8-45AE-9E9C-81C535F8BE1C}" Directory_="LanguageFiles_Dir" Attributes="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
@@ -58,8 +58,8 @@
     <ATTRIBUTE name="CurrentFeature" value="Module"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
-    <ROW File="IO.Module.Template.Service.exe" Component_="ServiceApplication" FileName="IO2MOD~1.EXE|IO.Module.Template.Service.exe" Attributes="0" SourcePath="out\IO.Module.Template.Service.exe" SelfReg="false" DigSign="true"/>
-    <ROW File="Template.zip" Component_="ServiceApplication" FileName="DATACO~1.ZIP|Template.zip" Attributes="0" SourcePath="Template.zip" SelfReg="false"/>
+    <ROW File="IO.Module.IOTemplate.Service.exe" Component_="ServiceApplication" FileName="IO2MOD~1.EXE|IO.Module.IOTemplate.Service.exe" Attributes="0" SourcePath="out\IO.Module.Template.Service.exe" SelfReg="false" DigSign="true"/>
+    <ROW File="IOTemplate.zip" Component_="ServiceApplication" FileName="MODULE~1.ZIP|IOTemplate.zip" Attributes="0" SourcePath="IOTemplate.zip" SelfReg="false"/>
     <ROW File="sni.dll" Component_="ServiceApplication" FileName="sni.dll" Attributes="0" SourcePath="..\..\references\sni.dll" SelfReg="false"/>
     <ROW File="version.txt" Component_="ServiceApplication" FileName="version.txt" Attributes="0" SourcePath="version.txt" SelfReg="false"/>
     <ROW File="info.json" Component_="ServiceApplication" FileName="INFO~1.JSO|info.json" Attributes="0" SourcePath="module-definition\info.json" SelfReg="false"/>
@@ -326,10 +326,10 @@
     <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiServCtrlComponent">
-    <ROW ServiceControl="IO.Module.Template.Service.exe" Name="[ServiceName]" Event="161" Wait="1" Component_="ServiceApplication"/>
+    <ROW ServiceControl="IO.Module.IOTemplate.Service.exe" Name="[ServiceName]" Event="161" Wait="1" Component_="ServiceApplication"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiServInstComponent">
-    <ROW ServiceInstall="IO.Module.Template.Service.exe" Name="[ServiceName]" DisplayName="[ServiceDisplayName]" ServiceType="16" StartType="2" ErrorControl="1" Arguments="&quot;[Modules_Dir]\Template&quot;" Component_="ServiceApplication" Description="[ServiceDescription]"/>
+    <ROW ServiceInstall="IO.Module.IOTemplate.Service.exe" Name="[ServiceName]" DisplayName="[ServiceDisplayName]" ServiceType="16" StartType="2" ErrorControl="1" Arguments="&quot;[Modules_Dir]\IOTemplate&quot;" Component_="ServiceApplication" Description="[ServiceDescription]"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
     <ATTRIBUTE name="UsedTheme" value="classic"/>

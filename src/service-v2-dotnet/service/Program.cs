@@ -46,7 +46,7 @@ else
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
     loggerConfiguration.ReadFrom.Configuration(context.Configuration);
-    loggerConfiguration.SetLoggerSettings("io-module-template", "/io/module/template", "2.0.0");
+    loggerConfiguration.SetLoggerSettings("io-module-iotemplate", "/io/module/iotemplate", "2.0.0");
 });
 
 // Check if os is windows the use windows service
@@ -117,8 +117,19 @@ builder.Services.AddSpaStaticFiles(configuration =>
 });
 
 // Add controllers
-builder.Services.AddControllers();
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
+    //options.SerializerSettings.Converters.Add(new StringEnumConverter());
+    options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+});
+
+builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
+    //options.SerializerSettings.Converters.Add(new StringEnumConverter());
+    options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+});
 
 // Upload module file to project service (attention: the file must be in the project root directory and case sensitiv is necessary)
 builder.Configuration.UploadModuleDefinition(System.IO.Path.Combine(baseDirectory ?? System.AppDomain.CurrentDomain.BaseDirectory, "iotemplate.zip"));
@@ -174,7 +185,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger(config =>
     {
-        config.RouteIOTemplate = "docs/api/{documentName}/swagger.json";
+        config.RouteTemplate = "docs/api/{documentName}/swagger.json";
     });
 
     app.UseSwaggerUI(config =>

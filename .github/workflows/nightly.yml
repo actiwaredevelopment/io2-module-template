@@ -24,7 +24,7 @@ jobs:
             branch: ${{ github.ref_name }}
             dotnet-version: 6.0.x
             project: src/service/service-v2-dotnet/io2-module-iotemplate-service.csproj
-            modulefile: Template.zip
+            modulefile: IOTemplate.zip
             dockerfile: ./.github/docker/dockerfile
             ui-build-path: ./src/configuration/build
             rid: 'linux-x64'
@@ -48,7 +48,7 @@ jobs:
             branch: ${{ github.ref_name }}
             dotnet-version: 6.0.x
             project: src/service/service-v2-dotnet/io2-module-iotemplate-service.csproj
-            modulefile: Template.zip
+            modulefile: IOTemplate.zip
             dockerfile: ./.github/docker/dockerfile
             ui-build-path: ./src/configuration/build
             module-aip-setup: src/setup/setup-module-dotnet.aip
@@ -68,7 +68,7 @@ jobs:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
         with:
             artifact: ${{ needs.build.outputs.download }}
-            image-name: actiwareio/io-module-Template
+            image-name: actiwareio/io-module-iotemplate
             image-tag: 2-nightly
         secrets:
             docker-username: ${{ secrets.DOCKER_HUB_USER }}
@@ -83,8 +83,8 @@ jobs:
             artifact-setup: IoSetup
             aip-file: src/setup/setup-module-dotnet.aip
             major-version: 2
-            service-name: 'IoTemplateService'
-            setup-name: 'IO - Template Module'
+            service-name: 'IoIOTemplateService'
+            setup-name: 'IO - IOTemplate Module'
             publish-target: 'nightly/IO/04 - Modules'
             manufacture: 'ACTIWARE Development GmbH'
             partner: 'ACTIWARE'
@@ -106,8 +106,8 @@ jobs:
             aip-file: src/setup/setup-module-dotnet.aip
             major-version: 5
             minor-version: 3
-            service-name: 'BtTemplateService'
-            setup-name: 'Business Template - Template Module'
+            service-name: 'BtIOTemplateService'
+            setup-name: 'Business Template - IOTemplate Module'
             publish-target: 'nightly/BT/04 - Modules'
             manufacture: 'ACTIWARE GmbH'
             partner: 'ACTIWARE'
@@ -129,8 +129,8 @@ jobs:
             aip-file: src/setup/setup-module-dotnet.aip
             major-version: 5
             minor-version: 3
-            service-name: 'BlpTemplateService'
-            setup-name: 'Business Logic Provider - Template Module'
+            service-name: 'BlpIOTemplateService'
+            setup-name: 'Business Logic Provider - IOTemplate Module'
             publish-target: 'nightly/BLP/04 - Modules'
             manufacture: 'ELO Digital Office GmbH'
             partner: 'ELO'
