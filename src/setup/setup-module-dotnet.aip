@@ -50,7 +50,7 @@
     <ROW Component="AI_ExePath" ComponentId="{ADA84252-56B2-4A3C-B603-CBD0C92416B5}" Directory_="APPDIR" Attributes="260" KeyPath="AI_ExePath"/>
     <ROW Component="APPDIR" ComponentId="{86D73F8D-2E5E-4851-997A-17B8AEAA2FF5}" Directory_="APPDIR" Attributes="256"/>
     <ROW Component="ProductInformation" ComponentId="{66A4B35F-FC92-47A7-A46B-002EB47BA177}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
-    <ROW Component="ServiceApplication" ComponentId="{1CAC4FEB-8790-4155-91D0-82E8E55C3BB5}" Directory_="Service_Dir" Attributes="256" KeyPath="IO.Module.IOTemplate.Service.exe"/>
+    <ROW Component="ServiceApplication" ComponentId="{1CAC4FEB-8790-4155-91D0-82E8E55C3BB5}" Directory_="Service_Dir" Attributes="256" KeyPath="io2moduleiotemplateservice.exe"/>
     <ROW Component="LanguageFiles" ComponentId="{E29AE921-C3F8-45AE-9E9C-81C535F8BE1C}" Directory_="LanguageFiles_Dir" Attributes="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
@@ -58,7 +58,7 @@
     <ATTRIBUTE name="CurrentFeature" value="Module"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
-    <ROW File="IO.Module.IOTemplate.Service.exe" Component_="ServiceApplication" FileName="IO2MOD~1.EXE|IO.Module.IOTemplate.Service.exe" Attributes="0" SourcePath="out\IO.Module.Template.Service.exe" SelfReg="false" DigSign="true"/>
+    <ROW File="io2moduleiotemplateservice.exe" Component_="ServiceApplication" FileName="IO2MOD~1.EXE|io2-module-iotemplate-service.exe" Attributes="0" SourcePath="out\io2-module-iotemplate-service.exe" SelfReg="false" DigSign="true"/>
     <ROW File="IOTemplate.zip" Component_="ServiceApplication" FileName="MODULE~1.ZIP|IOTemplate.zip" Attributes="0" SourcePath="IOTemplate.zip" SelfReg="false"/>
     <ROW File="sni.dll" Component_="ServiceApplication" FileName="sni.dll" Attributes="0" SourcePath="..\..\references\sni.dll" SelfReg="false"/>
     <ROW File="version.txt" Component_="ServiceApplication" FileName="version.txt" Attributes="0" SourcePath="version.txt" SelfReg="false"/>
@@ -326,10 +326,10 @@
     <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiServCtrlComponent">
-    <ROW ServiceControl="IO.Module.IOTemplate.Service.exe" Name="[ServiceName]" Event="161" Wait="1" Component_="ServiceApplication"/>
+    <ROW ServiceControl="io2moduleiotemplateservice.exe" Name="[ServiceName]" Event="161" Wait="1" Component_="ServiceApplication"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiServInstComponent">
-    <ROW ServiceInstall="IO.Module.IOTemplate.Service.exe" Name="[ServiceName]" DisplayName="[ServiceDisplayName]" ServiceType="16" StartType="2" ErrorControl="1" Arguments="&quot;[Modules_Dir]\IOTemplate&quot;" Component_="ServiceApplication" Description="[ServiceDescription]"/>
+    <ROW ServiceInstall="io2moduleiotemplateservice.exe" Name="[ServiceName]" DisplayName="[ServiceDisplayName]" ServiceType="16" StartType="2" ErrorControl="1" Arguments="&quot;[Modules_Dir]\IOTemplate&quot;" Component_="ServiceApplication" Description="[ServiceDescription]"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
     <ATTRIBUTE name="UsedTheme" value="classic"/>
