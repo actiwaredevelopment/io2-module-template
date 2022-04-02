@@ -36,7 +36,7 @@ jobs:
             repository: ${{ github.repository }}
             branch: tags/${{ github.ref_name }}
             dotnet-version: 6.0.x
-            project: src/service/service/IO2.Module.Template.Service.csproj
+            project: src/service/service-v2-dotnet/io2-module-iotemplate-service.csproj
             modulefile: Template.zip
             dockerfile: ./.github/docker/dockerfile
             ui-build-path: ./src/configuration/build
@@ -57,11 +57,11 @@ jobs:
             repository: ${{ github.repository }}
             branch: tags/${{ github.ref_name }}
             dotnet-version: 6.0.x
-            project: src/service/service/IO2.Module.Template.Service.csproj
+            project: src/service/service-v2-dotnet/io2-module-iotemplate-service.csproj
             modulefile: Template.zip
             dockerfile: ./.github/docker/dockerfile
             ui-build-path: ./src/configuration/build
-            module-aip-setup: src/setup/setup-module.aip
+            module-aip-setup: src/setup/setup-module-dotnet.aip
             rid: 'win-x64'
             create-single-file: true
         secrets:
@@ -91,7 +91,7 @@ jobs:
         with:
             artifact: BuildOutputWindows
             artifact-setup: IoSetup
-            aip-file: src/setup/setup-module.aip
+            aip-file: src/setup/setup-module-dotnet.aip
             major-version: 2
             service-name: 'IoTemplateService'
             setup-name: 'IO - Template Module'
@@ -112,7 +112,7 @@ jobs:
         with:
             artifact: BuildOutputWindows
             artifact-setup: BtSetup
-            aip-file: src/setup/setup-module.aip
+            aip-file: src/setup/setup-module-dotnet.aip
             major-version: 5
             minor-version: 3
             service-name: 'BtTemplateService'
@@ -134,7 +134,7 @@ jobs:
         with:
             artifact: BuildOutputWindows
             artifact-setup: BlpSetup
-            aip-file: src/setup/setup-module.aip
+            aip-file: src/setup/setup-module-dotnet.aip
             major-version: 5
             minor-version: 3
             service-name: 'BlpTemplateService'
