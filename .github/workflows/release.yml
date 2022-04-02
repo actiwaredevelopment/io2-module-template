@@ -31,6 +31,7 @@ jobs:
 
     build-linux:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
+        needs: [version]
         with:
             artifact-name: BuildOutputLinux
             repository: ${{ github.repository }}
@@ -51,6 +52,7 @@ jobs:
 
     build-windows:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
+        needs: [version]
         with:
             artifact-name: BuildOutputWindows
             version-postfix: ''
