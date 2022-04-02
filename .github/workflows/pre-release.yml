@@ -151,3 +151,24 @@ jobs:
             action-token: ${{ secrets.GH_ACTION_TOKEN }}
             aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
             aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
+
+    send-mail-to-qa:
+        needs:
+            [
+                build-setup-for-io,
+                build-setup-for-bt,
+                build-setup-for-blp,
+                docker,
+                version,
+            ]
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Send Mail to QA
+              uses: actiwaredevelopment/action-send-grid-mail@v0.1
+              with:
+                  TOKEN: ${{ secrets.SEND_GRID_TOKEN }}
+                  TEMPLATE_ID: 'd-ec4fb5e968ff4e6992b604f265e8492f'
+                  SENDER_MAIL: 'development@actiware-development.com'
+                  SEND_TO: ${{ secrets.SEND_GRID_QA_MAILS }}
+                  TEMPLATE_DATA: setup=Object Storage Module;version=${{ needs.version.outputs.version }}
