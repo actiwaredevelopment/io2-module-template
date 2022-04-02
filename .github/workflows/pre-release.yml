@@ -171,4 +171,4 @@ jobs:
                   TEMPLATE_ID: 'd-ec4fb5e968ff4e6992b604f265e8492f'
                   SENDER_MAIL: 'development@actiware-development.com'
                   SEND_TO: ${{ secrets.SEND_GRID_QA_MAILS }}
-                  TEMPLATE_DATA: setup=Object Storage Module;version=${{ needs.version.outputs.version }}
+                  TEMPLATE_DATA: setup=IOTemplate Module;version=${{ needs.version.outputs.version }}
