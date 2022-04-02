@@ -41,7 +41,7 @@ public class Information
 
     #region Fields
 
-    private string _exceptionCode = "TEMPLATE-{0}";
+    private string _exceptionCode = "IOTEMPLATE-{0}";
 
     #endregion
 

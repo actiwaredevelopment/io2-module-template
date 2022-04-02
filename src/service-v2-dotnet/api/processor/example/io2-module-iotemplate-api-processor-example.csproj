@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>Module.IOTemplate.Api.Processor.Example</RootNamespace>
+    <Product>ACTIWARE: IO</Product>
+    <ProductName>Module: IOTemplate</ProductName>		
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+    <ProductVersion>2.0.0</ProductVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>Library</OutputType>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Development.SDK.Logging" Version="2.0.6" />
+    <PackageReference Include="Development.SDK.Module" Version="2.0.68" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\shared\utils\io2-module-iotemplate-utils.csproj" />
+  </ItemGroup>
+</Project>

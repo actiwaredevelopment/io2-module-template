@@ -54,3 +54,4 @@ The following changes need to be made:
 * Adjustment of the ProductCode for the identification of the product below the Windows-Setups.
 * Adaptation of the UpgradeCode for the identification of the product in order to update it with newer versions.
 * Replacing the IOTemplate name with the name of the new module.
+* Replacing the property DefaultPort 30100 with module default port.

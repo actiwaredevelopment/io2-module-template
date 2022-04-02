@@ -10,7 +10,7 @@
     <ROW Property="ARPHELPTELEPHONE" Value="+49 (6464) 91 31 0"/>
     <ROW Property="ARPNOREPAIR" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="ARPURLINFOABOUT" Value="http://www.actiware.com"/>
-    <ROW Property="DEFAULT_PORT" Value="30108"/>
+    <ROW Property="DEFAULT_PORT" Value="30100"/>
     <ROW Property="PROJECT_SERVICE_ADDRESS" Value="http://localhost:30002"/>
     <ROW Property="TOKEN" Value="demo"/>
     <ROW Property="Manufacturer" Value="ACTIWARE Development GmbH"/>

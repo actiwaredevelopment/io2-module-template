@@ -103,6 +103,7 @@ builder.Services.AddInfoApiScope();
 // Add scope for actions
 
 // Add scope for processors
+builder.Services.AddProcessorExampleScope();
 
 // Add scope for data-query addins
 
