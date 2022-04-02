@@ -60,7 +60,6 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
     <ROW File="io2moduleiotemplateservice.exe" Component_="ServiceApplication" FileName="IO2MOD~1.EXE|io2-module-iotemplate-service.exe" Attributes="0" SourcePath="out\io2-module-iotemplate-service.exe" SelfReg="false" DigSign="true"/>
     <ROW File="IOTemplate.zip" Component_="ServiceApplication" FileName="MODULE~1.ZIP|IOTemplate.zip" Attributes="0" SourcePath="IOTemplate.zip" SelfReg="false"/>
-    <ROW File="sni.dll" Component_="ServiceApplication" FileName="sni.dll" Attributes="0" SourcePath="..\..\references\sni.dll" SelfReg="false"/>
     <ROW File="version.txt" Component_="ServiceApplication" FileName="version.txt" Attributes="0" SourcePath="version.txt" SelfReg="false"/>
     <ROW File="info.json" Component_="ServiceApplication" FileName="INFO~1.JSO|info.json" Attributes="0" SourcePath="module-definition\info.json" SelfReg="false"/>
     <ROW File="deDE.json" Component_="LanguageFiles" FileName="deDE~1.JSO|de-DE.json" Attributes="0" SourcePath="module-definition\languages\de-DE.json" SelfReg="false"/>
