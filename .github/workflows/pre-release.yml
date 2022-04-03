@@ -12,6 +12,7 @@ jobs:
 
         outputs:
             version: ${{ steps.version.outputs.result }}
+            build-version: ${{ steps.build.outputs.formattedTime }}
 
         steps:
             - name: Set Version
@@ -28,6 +29,12 @@ jobs:
                       }
 
                       return '${{ github.event.inputs.releaseversion }}'
+
+            - name: Get current date
+              id: build
+              uses: josStorer/get-current-time@v2
+              with:
+                  format: MMDD
 
     build-linux:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
@@ -171,4 +178,4 @@ jobs:
                   TEMPLATE_ID: 'd-ec4fb5e968ff4e6992b604f265e8492f'
                   SENDER_MAIL: 'development@actiware-development.com'
                   SEND_TO: ${{ secrets.SEND_GRID_QA_MAILS }}
-                  TEMPLATE_DATA: setup=IOTemplate Module;version=${{ needs.version.outputs.version }}
+                  TEMPLATE_DATA: setup=IOTemplate Module;version=${{ needs.version.outputs.version }}.${{ needs.version.outputs.build-version }}
