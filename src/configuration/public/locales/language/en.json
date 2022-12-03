@@ -1,0 +1,82 @@
+{
+    "culture_info": "en-US",
+    "text": {
+        "LABEL_LOGIN_PROFILE": "Which login profile should be used?",
+        "PLACEHOLDER_LOGIN_PROFILE": "Select a login profile here",
+        "TOOLTIP_ADD_LOGIN_PROFILE": "Add a new login profile",
+        "LABEL_BASE_ADDRESS": "Address",
+        "LABEL_TENANT": "Tenant",
+        "LABEL_RESOURCE": "Resource",
+        "LABEL_GRANT_TYPE": "Grand Type",
+        "LABEL_CLIENT_ID": "Client Id",
+        "LABEL_SOURCE_NAME": "How should the source for the system be named?",
+        "PLACEHOLDER_SOURCE_NAME": "Enter the name of the source here",
+        "TITLE_DATA_QUERY_MANAGEMENT": "Data Query Management",
+        "TITLE_CLONE_SOURCE": "Duplicate Source",
+        "TITLE_ADD_SOURCE": "Add Source",
+        "TITLE_MODIFY_SOURCE": "Modify Source",
+        "TITLE_QUERY": "Query",
+        "TITLE_NEW_SEARCH_QUERY_SETTINGS": "Create new data query",
+        "TITLE_MODIFY_SEARCH_QUERY_SETTINGS": "Modify data query: {{name}}",
+        "TAB_ITEM_QUERY_SETTINGS": "Query Settings",
+        "TAB_ITEM_FIELD_MAPPING": "Field Mapping",
+        "BUTTON_ADD": "Add",
+        "BUTTON_DUPLICATE": "Duplicate",
+        "BUTTON_SAVE": "Save",
+        "BUTTON_CANCEL": "Cancel",
+        "BUTTON_DELETE": "Delete",
+        "BUTTON_REMOVE": "Remove",
+        "BUTTON_CLOSE": "Close",
+        "BUTTON_TEST_QUERY": "Test Query",
+        "BUTTON_ADD_SOURCE": "Add Source",
+        "BUTTON_EDIT": "Edit",
+        "BUTTON_ADD_QUERY": "Add Query",
+        "WARNING_NO_DATA_QUERIES": "No data queries were found or configured. Start the configuration by adding a new data query",
+        "WARNING_NO_DATA_SOURCES": "No data sources were found or configured. Start the configuration by adding a new data source"
+    },
+    "variable": {},
+    "exception": {
+        "ERROR_NO_LOGIN_PROFILE_SELECTED": "No login profile selected, please select a login profile.",
+        "ERROR_DATA_QUERY_INVALID_CHAR_IN_NAME": "The entered name cannot be used because an invalid character has been used. Please make sure that none of the following characters are used in the name: {{chars}} is used.",
+        "ERROR_DATA_QUERY_SOURCE_NAME_MISSING": "No name entered for the source,  please enter a name for the source.",
+        "ERROR_DATA_QUERY_SOURCE_LOGIN_PROFILE_MISSING": "No login profile selected for the source, please select a login profile for the source.",
+        "ERROR_DATA_QUERY_SOURCE_ALREADY_EXISTS": "A source with the specified name already exists",
+        "ERROR_DATA_QUERY_SOURCE_WITH_LOGIN_PROFILE_ALREADY_EXISTS": "A source with the selected login profile already exists",
+        "ERROR_DATA_QUERY_NAME_MISSING": "No name entered for the query,  please enter a name for the query.",
+        "ERROR_DATA_QUERY_NAME_ALREADY_EXISTS": "A query with the specified name already exists",
+        "ERROR_DATA_QUERY_ALREADY_EXISTS": "A query with the specified name already exists",
+        "ERROR_DATA_QUERY_STATEMENT_MISSING": "No statement entered for the query, please enter a statement for the query.",
+        "ERROR_FIELD_MAPPING_NO_NAME": "No name entered for the field mapping, please enter a name for the field mapping.",
+        "ERROR_FIELD_MAPPING_NO_VALUE": "No value entered for the field mapping, please enter a value for the field mapping."
+    },
+    "message": {
+        "WINDOW_DELETE_MULTIPLE_SOURCES": {
+            "caption": "Delete sources?",
+            "description": "<p>Do you really want to remove the selected sources and all its data queries?</p><p>Please note that the sources and its queries cannot be restored after removing the source and saving the settings.</p>"
+        },
+        "WINDOW_DELETE_SINGLE_SOURCE": {
+            "caption": "Delete source?",
+            "description": "<p>Do you really want to remove the selected source <strong>{{source}}</strong> and all its data queries?</p><p>Please note that the source and its queries cannot be restored after removing the source and saving the settings.</p>"
+        },
+        "WINDOW_DELETE_MULTIPLE_QUERIES": {
+            "caption": "Delete queries?",
+            "description": "<p>Do you really want to remove the selected queries?</p><p>Please note that the queries cannot be restored after removing and saving the settings.</p>"
+        },
+        "WINDOW_DELETE_SINGLE_QUERY": {
+            "caption": "Delete query?",
+            "description": "<p>Do you really want to remove the selected query <strong>{{query}}</strong> and all its data queries?</p><p>Please note that the query cannot be restored after removing and saving the settings.</p>"
+        },
+        "QUESTION_DELETE_DATA_QUERY": {
+            "caption": "Delete Query?",
+            "description": "<p>Do you really want to remove the selected query <strong>{{name}}</strong>?</p><p>Please note that the query cannot be restored after removing and saving the settings.</p>"
+        },
+        "QUESTION_EXECUTE_QUERY_FOR_PARSING": {
+            "caption": "Execute query?",
+            "description": "<p>To determine the columns for the query, the system must execute the query.</p><p>Should the system execute the query to determine the columns?</p>"
+        },
+        "QUESTION_CLEAR_FIELD_MAPPING": {
+            "caption": "Clear field mapping?",
+            "description": "<p>Do you really want to clear the field mapping?</p><p>Please note that the field mapping cannot be restored after clearing and saving the settings.</p>"
+        }
+    }
+}

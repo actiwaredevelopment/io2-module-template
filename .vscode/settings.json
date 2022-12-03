@@ -1,9 +1,7 @@
 {
-    "editor.formatOnSave": true,
+    "typescript.tsdk": "src\\configuration\\node_modules\\typescript\\lib",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
-    },
+    "editor.formatOnSave": true,
     "markdownlint.config": {
         "MD028": false,
         "MD025": {

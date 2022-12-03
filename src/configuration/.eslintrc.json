@@ -14,7 +14,8 @@
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",
         "plugin:react-hooks/recommended",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:@typescript-eslint/recommended",
+        "prettier"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -24,41 +25,9 @@
         "ecmaVersion": 13,
         "sourceType": "module"
     },
-    "plugins": [
-        "react",
-        "@typescript-eslint"
-    ],
+    "plugins": ["react", "@typescript-eslint"],
     "rules": {
         "no-else-return": "error",
-        "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-non-null-assertion": "off",
-        "space-before-blocks": [
-            "error",
-            "always"
-        ],
-        "object-curly-spacing": [
-            "error",
-            "always"
-        ],
-        "object-curly-newline": [
-            "error",
-            {
-                "ObjectExpression": {
-                    "minProperties": 1
-                },
-                "ObjectPattern": {
-                    "consistent": true
-                },
-                "ImportDeclaration": {
-                    "multiline": true,
-                    "minProperties": 2
-                },
-                "ExportDeclaration": {
-                    "multiline": true,
-                    "minProperties": 2
-                }
-            }
-        ],
         "padding-line-between-statements": [
             "error",
             {
@@ -68,37 +37,22 @@
             },
             {
                 "blankLine": "always",
-                "prev": [
-                    "const",
-                    "let",
-                    "var"
-                ],
+                "prev": ["const", "let", "var"],
                 "next": "*"
             },
             {
                 "blankLine": "any",
-                "prev": [
-                    "const",
-                    "let",
-                    "var"
-                ],
-                "next": [
-                    "const",
-                    "let",
-                    "var"
-                ]
+                "prev": ["const", "let", "var"],
+                "next": ["const", "let", "var"]
             }
         ],
+        "react/prop-types": "off",
         "@typescript-eslint/naming-convention": [
             "error",
             {
                 "selector": "interface",
-                "format": [
-                    "PascalCase"
-                ],
-                "prefix": [
-                    "I"
-                ]
+                "format": ["PascalCase"],
+                "prefix": ["I"]
             }
         ],
         "@typescript-eslint/no-empty-interface": [
@@ -107,15 +61,5 @@
                 "allowSingleExtends": true
             }
         ]
-    },
-    "overrides": [
-        {
-            "files": [
-                "*.js"
-            ],
-            "rules": {
-                "@typescript-eslint/no-var-requires": "off"
-            }
-        }
-    ]
+    }
 }

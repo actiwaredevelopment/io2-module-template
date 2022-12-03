@@ -4,3 +4,4 @@
 type NestedRequired<T> = {
     [P in keyof T]-?: NestedRequired<T[P]>;
 };
+

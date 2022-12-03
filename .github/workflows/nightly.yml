@@ -22,7 +22,7 @@ jobs:
             repository: ${{ github.repository }}
             version-postfix: '-nightly'
             branch: ${{ github.ref_name }}
-            dotnet-version: 6.0.x
+            dotnet-version: 7.0.x
             project: src/service/service-v2-dotnet/io2-module-iotemplate-service.csproj
             modulefile: IOTemplate.zip
             dockerfile: ./.github/docker/dockerfile
@@ -46,7 +46,7 @@ jobs:
             version-postfix: '-pre-release'
             repository: ${{ github.repository }}
             branch: ${{ github.ref_name }}
-            dotnet-version: 6.0.x
+            dotnet-version: 7.0.x
             project: src/service/service-v2-dotnet/io2-module-iotemplate-service.csproj
             modulefile: IOTemplate.zip
             dockerfile: ./.github/docker/dockerfile

@@ -1,0 +1,7 @@
+export const ENCRYPTION_KEY = "V6e+z1Wp601Q9lLcmOQoPtwiQQ8bE49lxe2LpH9rEBY=";
+
+export const MODULE_ID = "00000000-0000-0000-0000-000000000000";
+
+export const CREDENTIAL_STORE_ID = "A84C08F6-170E-4F85-A610-1BE60ECCD9C6";
+export const CREDENTIAL_STORE_CONFIG_KEY =
+    "Module.Communication.Credential.Http";

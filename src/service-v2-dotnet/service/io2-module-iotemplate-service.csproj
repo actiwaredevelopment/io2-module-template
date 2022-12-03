@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Module.IOTemplate.Service</RootNamespace>
     <Product>ACTIWARE: IO</Product>
     <ProductName>Module: IOTemplate</ProductName>	
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-		<FileVersion>2.0.0.0</FileVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+		<FileVersion>2.0.0</FileVersion>
 		<ProductVersion>2.0.0</ProductVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -14,20 +14,20 @@
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <IsPackable>false</IsPackable>
     <OutputPath>..\..\..\build-service</OutputPath>
-    <SpaRoot>..\..\configuration</SpaRoot>
+    <SpaRoot>..\..\configuration\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Console' " />
-
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'io2_module_iotemplate_service' " />
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
+  
   <ItemGroup>
     <PackageReference Include="Development.SDK.Logging" Version="2.0.6" />
-    <PackageReference Include="Development.SDK.Module" Version="2.0.68" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="6.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="Development.SDK.Module" Version="2.0.76" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
 	<ItemGroup>
@@ -66,14 +66,12 @@
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
     <Message Importance="high" Text="Restoring dependencies using 'yarn'. This may take several minutes..." />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn install" />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn postinstall" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn" />
   </Target>
 
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
-    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn install" />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn postinstall" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn build" />
 
     <!-- Include the newly-built files in the publish output -->

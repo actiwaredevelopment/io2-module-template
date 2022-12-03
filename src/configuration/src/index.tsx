@@ -1,27 +1,15 @@
-import { registerIcons } from '@fluentui/react';
+import { FullSpinner } from '@actiwaredevelopment/io-sdk-react';
 
-import React from 'react';
+import { initializeIcons } from '@fluentui/font-icons-mdl2';
+import { initializeCustomIcons } from './custom-icons';
+
+import { ThemeProvider } from '@fluentui/react';
+
+import { StrictMode, Suspense } from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
 
-import { App } from './App';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import {
-    faPlus,
-    faTrash,
-    faCircleTrash,
-    faPen,
-    faSave,
-    faPlay,
-    faCopy,
-    faPaste,
-    faClone,
-    faCircleQuestion,
-    faExclamationTriangle,
-    faSync,
-    faListAlt
-} from '@fortawesome/pro-light-svg-icons';
+import { App } from './app/App';
 
 import '@actiwaredevelopment/io-sdk-react/dist/index.css';
 
@@ -32,38 +20,39 @@ import i18n from './i18n';
 import sdkDE from '@actiwaredevelopment/io-sdk-react/public/locals/language/sdk/de.json';
 import sdkEN from '@actiwaredevelopment/io-sdk-react/public/locals/language/sdk/en.json';
 
-registerIcons({
-    fontFace: {
-        fontFamily: `"Font Awesome 6 Pro"`
-    },
-    icons: {
-        'fa-sync': <FontAwesomeIcon icon={faSync} />,
-        'fa-save': <FontAwesomeIcon icon={faSave} />,
-        'fa-plus': <FontAwesomeIcon icon={faPlus} />,
-        'fa-play': <FontAwesomeIcon icon={faPlay} />,
-        'fa-trash': <FontAwesomeIcon icon={faTrash} />,
-        'fa-circle-trash': <FontAwesomeIcon icon={faCircleTrash} />,
-        'fa-clone': <FontAwesomeIcon icon={faClone} />,
-        'fa-pen': <FontAwesomeIcon icon={faPen} />,
-        'fa-copy': <FontAwesomeIcon icon={faCopy} />,
-        'fa-paste': <FontAwesomeIcon icon={faPaste} />,
-        'fa-exclamation-triangle': <FontAwesomeIcon icon={faExclamationTriangle} />,
-        'fa-circle-question': <FontAwesomeIcon icon={faCircleQuestion} />,
-        'fa-list-alt': <FontAwesomeIcon icon={faListAlt} />
-    }
-});
+initializeIcons('/fonts/font-icons-mdl2/');
+initializeCustomIcons();
 
 // register SDK transaltions
-i18n.addResourceBundle('de', 'dynamic', {
-    sdkDE
-}, true, false);
-i18n.addResourceBundle('en', 'dynamic', {
-    sdkEN
-}, true, false);
+i18n.addResourceBundle(
+    'de',
+    'dynamic',
+    {
+        sdkDE
+    },
+    true,
+    false
+);
+i18n.addResourceBundle(
+    'en',
+    'dynamic',
+    {
+        sdkEN
+    },
+    true,
+    false
+);
 
 ReactDOM.render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>,
+    <StrictMode>
+        <ThemeProvider id='root-theme'>
+            <Suspense fallback={<FullSpinner />}>
+                <BrowserRouter>
+                    <App />
+                </BrowserRouter>
+            </Suspense>
+        </ThemeProvider>
+    </StrictMode>,
     document.getElementById('root')
 );
+

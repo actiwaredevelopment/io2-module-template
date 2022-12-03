@@ -10,16 +10,17 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/build-service/net6.0/io2-module-iotemplate-service.dll",
+            "program": "${workspaceFolder}/build-service/net7.0/io2-module-iotemplate-service.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/service-v2-dotnet/service",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\\\bNow listening on:\\\\s+(https?://\\\\S+)"
+            },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
             }
         },
         {
@@ -34,6 +35,14 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/src/service-v2-go/cmd/service/main.go"
+        },
+        {
+            "name": "Attach to Chrome Localhost",
+            "port": 9222,
+            "request": "attach",
+            "targetSelection": "pick",
+            "type": "chrome",
+            "urlFilter": "http://*"
         }
     ]
 }

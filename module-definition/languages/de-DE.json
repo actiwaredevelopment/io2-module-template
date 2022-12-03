@@ -1,0 +1,74 @@
+{
+    "culture_info": "de-DE",
+    "text": {
+        "LABEL_LOGIN_PROFILE": "Welches Anmeldeprofil soll verwendet werden?",
+        "PLACEHOLDER_LOGIN_PROFILE": "Wähle hier ein Anmeldeprofil aus",
+        "TOOLTIP_ADD_LOGIN_PROFILE": "Neues Anmeldeprofil hinzufügen",
+        "LABEL_BASE_ADDRESS": "Adresse",
+        "LABEL_TENANT": "Tenant",
+        "LABEL_RESOURCE": "Resource",
+        "LABEL_GRANT_TYPE": "Grand Type",
+        "LABEL_CLIENT_ID": "Client Id",
+        "LABEL_SOURCE_NAME": "Wie soll die Quelle für das System benannt werden?",
+        "PLACEHOLDER_SOURCE_NAME": "Gebe hier den Namen der Quelle an",
+        "TITLE_DATA_QUERY_MANAGEMENT": "Verwaltung von Datenabfragen",
+        "TITLE_CLONE_SOURCE": "Quelle duplizieren",
+        "TITLE_ADD_SOURCE": "Quelle hinzufügen",
+        "TITLE_MODIFY_SOURCE": "Quelle bearbeiten",
+        "TITLE_NEW_SEARCH_QUERY_SETTINGS": "Neue Datenabfrage erstellen",
+        "TITLE_MODIFY_SEARCH_QUERY_SETTINGS": "Bearbeiten der Datenabfrage: {{name}}",
+        "TITLE_QUERY": "Abfrage",
+        "TAB_ITEM_QUERY_SETTINGS": "Abfrageeinstellungen",
+        "TAB_ITEM_FIELD_MAPPING": "Feldzuordnung",
+        "BUTTON_ADD": "Hinzufügen",
+        "BUTTON_DUPLICATE": "Duplizieren",
+        "BUTTON_SAVE": "Speicher",
+        "BUTTON_CANCEL": "Abbrechen",
+        "BUTTON_DELETE": "Löschen",
+        "BUTTON_REMOVE": "Entfernen",
+        "BUTTON_CLOSE": "Schließen",
+        "BUTTON_TEST_QUERY": "Abfrage testen",
+        "BUTTON_ADD_SOURCE": "Quelle hinzufügen",
+        "BUTTON_EDIT": "Bearbeiten",
+        "BUTTON_ADD_QUERY": "Abfrage hinzufügen Query",
+        "WARNING_NO_DATA_QUERIES": "Es wurden keine Datenabfragen gefunden oder konfiguriert. Starte die Konfiguration, indem du eine neue Datenabfrage hinzufügst",
+        "WARNING_NO_DATA_SOURCES": "Es wurden keine Datenquellen gefunden oder konfiguriert. Starte die Konfiguration, indem du eine neue Datenquelle hinzufügst"
+    },
+    "variable": {},
+    "exception": {
+        "ERROR_NO_LOGIN_PROFILE_SELECTED": "Es wurde kein Anmeldeprofil ausgewählt, bitte wähle ein Anmeldeprofil aus.",
+        "ERROR_DATA_QUERY_INVALID_CHAR_IN_NAME": "Die angegebene Bezeichnung kann nicht verwendet werden, weil ein ungültiges Zeichen verwendet wurde. Bitte achte darauf, dass in der Bezeichnung keines der folgenden Zeichen: {{chars}} verwendet wird.",
+        "ERROR_DATA_QUERY_SOURCE_NAME_MISSING": "Es wurde kein Name für die Quelle eingegeben, bitte gebe einen Namen für die Quelle ein.",
+        "ERROR_DATA_QUERY_SOURCE_LOGIN_PROFILE_MISSING": "Es wurde kein Anmeldeprofil für die Quelle ausgewählt, bitte wähle ein Anmeldeprofil für die Quelle aus.",
+        "ERROR_DATA_QUERY_SOURCE_ALREADY_EXISTS": "Eine Quelle mit dieser Bezeichnung existiert bereits.",
+        "ERROR_DATA_QUERY_SOURCE_WITH_LOGIN_PROFILE_ALREADY_EXISTS": "Eine Quelle mit dem ausgewählten Anmeldeprofil existiert bereits.",
+        "ERROR_DATA_QUERY_NAME_MISSING": "Es wurde kein Name für die Abfrage eingegeben, bitte gebe einen Namen für die Abfrage ein.",
+        "ERROR_DATA_QUERY_NAME_ALREADY_EXISTS": "Eine Abfrage mit dem angegebenen Namen existiert bereits",
+        "ERROR_DATA_QUERY_ALREADY_EXISTS": "Eine Abfrage mit dieser Bezeichnung existiert bereits",
+        "ERROR_DATA_QUERY_STATEMENT_MISSING": "Keine Statement eingegeben, bitte gebe eine Statement für die Abfrage ein.",
+        "ERROR_FIELD_MAPPING_NO_NAME": "Kein Name für die Feldzuordnung eingegeben, bitte geben Sie einen Namen für die Feldzuordnung ein.",
+        "ERROR_FIELD_MAPPING_NO_VALUE": "Kein Wert für die Feldzuordnung eingegeben, bitte geben Sie einen Wert für die Feldzuordnung ein."
+    },
+    "message": {
+        "WINDOW_DELETE_MULTIPLE_SOURCES": {
+            "caption": "Quellen löschen?",
+            "description": "<p>Möchtest du wirklich die ausgewählten Quellen und allen enthaltenten Datenabfragen entfernen?</p><p>Bitte beachte, dass die Quellen und deren Abfragen nicht wiederhergestellt werden können nachdem die Quelle entfernt und die Einstellungen gespeichert wurden.</p>"
+        },
+        "WINDOW_DELETE_SINGLE_SOURCE": {
+            "caption": "Quelle löschen?",
+            "description": "<p>Möchtest du wirklich die ausgewählte Quelle <strong>{{source}}</strong> und allen enthaltenten Datenabfragen entfernen?</p><p>Bitte beachte, dass die Quelle und deren Abfragen nicht wiederhergestellt werden können nachdem die Quelle entfernt und die Einstellungen gespeichert wurden.</p>"
+        },
+        "QUESTION_DELETE_DATA_QUERY": {
+            "caption": "Abfrage löschen?",
+            "description": "<p>Möchtest du wirklich die ausgewählte Abfrage <strong>{{name}}</strong> entfernen?</p><p>Bitte beachte, dass die Abfrage nicht wiederhergestellt werden kann nachdem diese entfernt und die Einstellungen gespeichert wurden.</p>"
+        },
+        "QUESTION_EXECUTE_QUERY_FOR_PARSING": {
+            "caption": "Abfrage ausführen?",
+            "description": "<p>Um die Spalten für die Abfrage zu ermitteln, muss das System die Abfrage ausführen.</p><p>Soll das System die Abfrage zur Ermittlung der Spalten ausführen?</p>"
+        },
+        "QUESTION_CLEAR_FIELD_MAPPING": {
+            "caption": "Feldzuordnung löschen?",
+            "description": "<p>Möchtest du wirklich die Feldzuorndung löschen?</p><p>Bitte beachte, dass die Feldzuordnung nicht wiederhergestellt werden kann nachdem diese entfernt und die Einstellungen gespeichert wurden.</p>"
+        }
+    }
+}

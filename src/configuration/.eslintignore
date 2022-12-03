@@ -3,6 +3,8 @@
 # dependencies
 .pnp/*
 .pnp.js
+.yalc/*
+yalc.lock
 
 # assets
 public/fonts/font-icons-mdl2/*

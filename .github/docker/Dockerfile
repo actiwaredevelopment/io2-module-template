@@ -1,5 +1,5 @@
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-bullseye-slim
+FROM mcr.microsoft.com/dotnet/aspnet:7.0-bullseye-slim
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates
@@ -12,7 +12,7 @@ WORKDIR /app
 
 COPY ./out /app
 COPY ./src/configuration /app/ClientApp
-COPY ./atlassian.zip /app
+COPY ./IOTemplate.zip /app
 COPY ./module-definition/info.json /app
 COPY ./module-definition/languages /app/languages
 

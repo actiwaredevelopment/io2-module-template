@@ -43,10 +43,15 @@ else
     builder = WebApplication.CreateBuilder();
 }
 
+if (string.IsNullOrWhiteSpace(baseDirectory) == false)
+{
+    builder.Configuration.SetBasePath(baseDirectory);
+}
+
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
     loggerConfiguration.ReadFrom.Configuration(context.Configuration);
-    loggerConfiguration.SetLoggerSettings("io-module-iotemplate", "/io/module/iotemplate", "2.0.0");
+    loggerConfiguration.SetLoggerSettings("io-module-template", "/io/module/iotemplate", "2.0.0");
 });
 
 // Check if os is windows the use windows service
@@ -93,7 +98,7 @@ builder.Services.AddSingleton<Development.SDK.Module.Controller.LanguageManager>
         return new Development.SDK.Module.Controller.LanguageManager("languages", false);
     }
 });
-builder.Services.AddSingleton<Module.IOTemplate.Utils.Data.Common.Information>();
+builder.Services.AddSingleton<Module.ApacheSolr.Utils.Data.Common.Information>();
 
 // Add scope for api's
 builder.Services.AddInfoApiScope();
@@ -133,7 +138,7 @@ builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
 });
 
 // Upload module file to project service (attention: the file must be in the project root directory and case sensitiv is necessary)
-builder.Configuration.UploadModuleDefinition(System.IO.Path.Combine(baseDirectory ?? System.AppDomain.CurrentDomain.BaseDirectory, "iotemplate.zip"));
+builder.Configuration.UploadModuleDefinition(System.IO.Path.Combine(baseDirectory ?? "", "iotemplate.zip"));
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -145,7 +150,7 @@ builder.Services.AddSwaggerGen(config =>
     config.SwaggerDoc("v2", new Microsoft.OpenApi.Models.OpenApiInfo()
     {
         Version = "v2",
-        Title = "Module: IOTemplate",
+        Title = "Module: Solr",
         Description = "",
         TermsOfService = new Uri("https://actiware-development.atlassian.net/wiki/spaces/AWIO/pages/1957101656"),
         Contact = new Microsoft.OpenApi.Models.OpenApiContact()
@@ -212,7 +217,7 @@ app.UseSpa(spa =>
 
     if (app.Environment.IsDevelopment())
     {
-        spa.Options.SourcePath = System.IO.Path.GetFullPath(System.IO.Path.Combine(baseDirectory ?? System.AppDomain.CurrentDomain.BaseDirectory, "../../src/configuration"));
+        spa.Options.SourcePath = System.IO.Path.GetFullPath(System.IO.Path.Combine(baseDirectory ?? System.AppDomain.CurrentDomain.BaseDirectory, "../../configuration"));
         spa.UseReactDevelopmentServer(npmScript: "start");
     }
 });
