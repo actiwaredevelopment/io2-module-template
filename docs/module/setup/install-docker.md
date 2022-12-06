@@ -11,7 +11,7 @@ Für den Betrieb als Docker-Image kann folgendes Beispiel verwendet werden:
 
 ```yml
 io-module-iotemplate:
-    image: actiwareio/io-module-iotemplate:1-latest
+    image: actiwareio/io-module-iotemplate:2-latest
     restart: always
     ports:
       - 30100:30100

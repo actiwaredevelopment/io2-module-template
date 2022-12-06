@@ -5,6 +5,7 @@ Nachfolgend sind die Mindestanforderungen für den Designer aufgeführt:
 Das System kann unter folgenden Betriebssystemen installiert und ausgeführt werden: 
 
 * Windows 10, Version 1703 oder höher: Home, Professional, Education und Enterprise
+* Windows Server 2019: Standard
 * Windows Server 2016: Standard
 * Windows Server 2012 R2 (mit Update 2919355): Essentials, Standard
 
