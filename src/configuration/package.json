@@ -5,10 +5,10 @@
     "installTypes": true,
     "dependencies": {
         "@actiwaredevelopment/io-sdk-react": "^0.0.122",
-        "@actiwaredevelopment/io-sdk-typescript-designer": "^0.0.34",
-        "@actiwaredevelopment/io-sdk-typescript-models": "^0.0.88",
+        "@actiwaredevelopment/io-sdk-typescript-designer": "^0.0.35",
+        "@actiwaredevelopment/io-sdk-typescript-models": "^0.0.90",
         "@fluentui/font-icons-mdl2": "^8.5.4",
-        "@fluentui/react": "^8.103.2",
+        "@fluentui/react": "^8.103.5",
         "@fortawesome/fontawesome-pro": "^6.2.1",
         "@fortawesome/fontawesome-svg-core": "^6.2.1",
         "@fortawesome/pro-light-svg-icons": "^6.2.1",
