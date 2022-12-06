@@ -11,7 +11,7 @@ jobs:
             version-postfix: '-developer'
             branch: ${{ github.ref_name }}
             dotnet-version: 7.0.x
-            project: src/service/service-v2-dotnet/io2-module-iotemplate-service.csproj
+            project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
             modulefile: IOTemplate.zip
             dockerfile: ./.github/docker/dockerfile
             ui-build-path: ./src/configuration/build
