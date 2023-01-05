@@ -4,9 +4,9 @@
     "private": true,
     "installTypes": true,
     "dependencies": {
-        "@actiwaredevelopment/io-sdk-react": "^0.0.122",
-        "@actiwaredevelopment/io-sdk-typescript-designer": "^0.0.35",
-        "@actiwaredevelopment/io-sdk-typescript-models": "^0.0.90",
+        "@actiwaredevelopment/io-sdk-react": "^0.0.125",
+        "@actiwaredevelopment/io-sdk-typescript-designer": "^0.0.37",
+        "@actiwaredevelopment/io-sdk-typescript-models": "^0.0.91",
         "@fluentui/font-icons-mdl2": "^8.5.4",
         "@fluentui/react": "^8.103.5",
         "@fortawesome/fontawesome-pro": "^6.2.1",
