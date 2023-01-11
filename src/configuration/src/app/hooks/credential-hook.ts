@@ -1,18 +1,13 @@
-import {
-    ICredentialStoreItem,
-    IHttpCredential,
-} from "@actiwaredevelopment/io-sdk-typescript-models";
-import { ISystemInfoResponse } from "@actiwaredevelopment/io-sdk-typescript-designer";
+import { ICredentialStoreItem, IHttpCredential } from '@actiwaredevelopment/io-sdk-typescript-models';
+import { ISystemInfoResponse } from '@actiwaredevelopment/io-sdk-typescript-designer';
 
-import { CREDENTIAL_STORE_CONFIG_KEY } from "../models/constants";
+import { CREDENTIAL_STORE_CONFIG_KEY } from '../models/constants';
 
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
-import { IDropdownOption } from "@fluentui/react";
+import { IDropdownOption } from '@fluentui/react';
 
-export function useCredentials(
-    systemInfo: ISystemInfoResponse
-): IHttpCredential[] {
+export function useCredentials(systemInfo: ISystemInfoResponse): IHttpCredential[] {
     const items = useMemo<ReturnType<typeof useCredentials>>(() => {
         const items: IHttpCredential[] = [];
 
@@ -24,13 +19,11 @@ export function useCredentials(
             if (
                 credential !== undefined &&
                 credential.parameters !== undefined &&
-                credential.parameters?.[CREDENTIAL_STORE_CONFIG_KEY] !==
-                    undefined
+                credential.parameters?.[CREDENTIAL_STORE_CONFIG_KEY] !== undefined
             ) {
                 try {
                     const loginProfile = JSON.parse(
-                        credential?.parameters?.[CREDENTIAL_STORE_CONFIG_KEY] ??
-                            ""
+                        credential?.parameters?.[CREDENTIAL_STORE_CONFIG_KEY] ?? ''
                     ) as IHttpCredential;
 
                     if (loginProfile) {
@@ -48,10 +41,7 @@ export function useCredentials(
     return items;
 }
 
-export function useCredentialsAsOptions(
-    systemInfo: ISystemInfoResponse,
-    withEmptyOption = false
-): IDropdownOption[] {
+export function useCredentialsAsOptions(systemInfo: ISystemInfoResponse, withEmptyOption = false): IDropdownOption[] {
     const options = useMemo<ReturnType<typeof useCredentialsAsOptions>>(() => {
         const options: IDropdownOption[] = [];
 
@@ -63,27 +53,17 @@ export function useCredentialsAsOptions(
             if (
                 credential !== undefined &&
                 credential.parameters !== undefined &&
-                credential.parameters?.[CREDENTIAL_STORE_CONFIG_KEY] !==
-                    undefined
+                credential.parameters?.[CREDENTIAL_STORE_CONFIG_KEY] !== undefined
             ) {
                 try {
                     const loginProfile = JSON.parse(
-                        credential?.parameters?.[CREDENTIAL_STORE_CONFIG_KEY] ??
-                            ""
+                        credential?.parameters?.[CREDENTIAL_STORE_CONFIG_KEY] ?? ''
                     ) as IHttpCredential;
 
                     if (loginProfile) {
                         options.push({
-                            key:
-                                loginProfile.id ??
-                                credential.id ??
-                                loginProfile.name ??
-                                "",
-                            text:
-                                loginProfile.name ??
-                                loginProfile.id ??
-                                credential.id ??
-                                "",
+                            key: loginProfile.id ?? credential._id ?? loginProfile.name ?? '',
+                            text: loginProfile.name ?? loginProfile.id ?? credential._id ?? ''
                         });
                     }
                 } catch (error) {
@@ -94,8 +74,8 @@ export function useCredentialsAsOptions(
 
         if (withEmptyOption === true) {
             options.unshift({
-                key: "",
-                text: "",
+                key: '',
+                text: ''
             });
         }
 
@@ -104,3 +84,4 @@ export function useCredentialsAsOptions(
 
     return options;
 }
+

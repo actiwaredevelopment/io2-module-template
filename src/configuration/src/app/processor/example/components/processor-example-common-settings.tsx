@@ -1,12 +1,9 @@
 import { IProcessorExampleConfigProps } from './processor-example-config';
-import { CREDENTIAL_STORE_ID } from '../../../models/constants';
 
 import { useTranslation } from 'react-i18next';
 
 import { Stack } from '@fluentui/react';
 import { SyntaxComboBox } from '@actiwaredevelopment/io-sdk-react';
-
-import * as DesignerAPI from '@actiwaredevelopment/io-sdk-typescript-designer';
 
 import { useCredentialsAsOptions } from '../../../hooks';
 
@@ -15,11 +12,7 @@ export const ProcessorExampleCommonSettings: React.FunctionComponent<IProcessorE
 
     const credentialOptions = useCredentialsAsOptions(props.systemInfo ?? {}, true);
 
-    function handleOpenCredentialWizard() {
-        DesignerAPI.system.openCredentialWizard([CREDENTIAL_STORE_ID]);
-    }
-
-    function handleInputChange(property?: string, newValue?: string) {
+    function handleInputChange(property?: string, newValue?: string | number | boolean) {
         if (!property?.length) {
             return;
         }
@@ -30,10 +23,13 @@ export const ProcessorExampleCommonSettings: React.FunctionComponent<IProcessorE
         });
     }
 
-    // function handleToggleChanged(property: string, newValue?: boolean) {
-    //     props.onChange?.({
-    //         ...props.config,
-    //         [property]: newValue === true,
+    // function handleOpenSyntax(property?: string, value?: string) {
+    //     if (!property?.length) {
+    //         return;
+    //     }
+
+    //     DesignerAPI.system.openSyntaxWizard(value ?? '', undefined, (newValue) => {
+    //         handleInputChange(property, newValue);
     //     });
     // }
 
@@ -44,7 +40,7 @@ export const ProcessorExampleCommonSettings: React.FunctionComponent<IProcessorE
                     childrenGap: '0.5rem'
                 }}>
                 <SyntaxComboBox
-                    onSyntax={handleOpenCredentialWizard}
+                    onSyntax={props.onAddCredential}
                     options={credentialOptions}
                     label={translate('text.LABEL_LOGIN_PROFILE', 'Which login profile should be used?')}
                     placeholder={translate('text.PLACEHOLDER_LOGIN_PROFILE', 'Select a login profile here')}
@@ -66,11 +62,29 @@ export const ProcessorExampleCommonSettings: React.FunctionComponent<IProcessorE
                     }}
                 />
 
+                {/* <SyntaxTextField
+                    label={translate(
+                        'text.LABEL_ANALYZE_AGAINST_MODERATION_CATEGORIES',
+                        'Which text should be analyze against moderation categories?'
+                    )}
+                    placeholder={translate(
+                        'text.PLACEHOLDER_ANALYZE_AGAINST_MODERATION_CATEGORIES',
+                        'Please enter the input text here'
+                    )}
+                    errorMessage={props.errors?.input ?? ''}
+                    value={props.config?.input ?? ''}
+                    syntaxFields={props.systemInfo?.context_menus}
+                    onSyntax={() => {
+                        handleOpenSyntax('input', props.config?.input);
+                    }}
+                    onChange={(_, value) => handleInputChange('input', value ?? '')}
+                /> */}
+
                 {/* <Toggle
                     inlineLabel
                     checked={props.config?.remove_json_files === true}
                     onChange={(_, checked) =>
-                        handleToggleChanged(
+                        handleInputChange(
                             "remove_json_files",
                             checked === true
                         )

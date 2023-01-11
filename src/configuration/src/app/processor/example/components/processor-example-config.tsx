@@ -1,4 +1,4 @@
-import { IItemConfig } from '@actiwaredevelopment/io-sdk-typescript-models';
+import { FieldType, IItemConfig } from '@actiwaredevelopment/io-sdk-typescript-models';
 import { ISystemInfoRequest, ISystemInfoResponse, SystemInfo } from '@actiwaredevelopment/io-sdk-typescript-designer';
 import { CREDENTIAL_STORE_ID } from '../../../models';
 
@@ -10,9 +10,10 @@ import * as DesignerAPI from '@actiwaredevelopment/io-sdk-typescript-designer';
 import { Stack, ActionButton } from '@fluentui/react';
 import { FullSpinner } from '@actiwaredevelopment/io-sdk-react';
 
-import { CONFIG_KEY, IProcessorExampleConfig } from '../models';
+import { IProcessorExampleConfig } from '../models';
 
-import { convertToItemConfig, upgradeConfig } from '../utils';
+import { credentialUtils } from '../../../utils';
+import { convertFromItemConfig, convertToItemConfig, defaultConfig, upgradeConfig } from '../utils';
 
 import { validateConfig } from '../validation';
 
@@ -20,11 +21,9 @@ import { ProcessorExampleCommonSettings } from './processor-example-common-setti
 
 const SYSTEM_INFO_REQUEST: ISystemInfoRequest = {
     mode: SystemInfo.ContextMenuItems | SystemInfo.Credentials,
-    credential_store_filter: [CREDENTIAL_STORE_ID]
-};
-
-const defaultConfig: IProcessorExampleConfig = {
-    login_profile: ''
+    credential_store_filter: [CREDENTIAL_STORE_ID],
+    context_menu_items:
+        FieldType.Parameter | FieldType.DataField | FieldType.Variable | FieldType.NodeField | FieldType.Plugins
 };
 
 export interface IProcessorExampleConfigProps {
@@ -33,6 +32,7 @@ export interface IProcessorExampleConfigProps {
     errors?: Record<string, string>;
 
     onChange?: (config: IProcessorExampleConfig) => void;
+    onAddCredential?: () => void;
 }
 
 export const ProcessorExampleConfig: React.FunctionComponent = () => {
@@ -50,16 +50,7 @@ export const ProcessorExampleConfig: React.FunctionComponent = () => {
 
     const handleLoad = useCallback(
         (configItem?: IItemConfig, systemInfo?: DesignerAPI.ISystemInfoResponse) => {
-            let config: IProcessorExampleConfig | undefined;
-            const configParameter = configItem?.parameters?.[CONFIG_KEY];
-
-            if (configParameter) {
-                try {
-                    config = JSON.parse(configParameter);
-                } catch (error) {
-                    console.error(error);
-                }
-            }
+            const config: IProcessorExampleConfig | undefined = convertFromItemConfig(configItem ?? {});
 
             if (isDebug) {
                 console.log({ config, configItem, systemInfo });
@@ -163,6 +154,29 @@ export const ProcessorExampleConfig: React.FunctionComponent = () => {
         }
     }
 
+    function handleAddCredential() {
+        if (!apiInitialized) {
+            return;
+        }
+
+        DesignerAPI.system.openCredentialWizard([CREDENTIAL_STORE_ID], (newCredentials) => {
+            if (!newCredentials?.length) {
+                return;
+            }
+
+            const newCredential = credentialUtils.getCredentialData(newCredentials[0]);
+
+            if (!newCredential) {
+                return;
+            }
+
+            setConfig({
+                ...config,
+                login_profile: newCredential.id
+            });
+        });
+    }
+
     if (apiInitialized === false && !isDebug) {
         return <FullSpinner />;
     }
@@ -193,6 +207,7 @@ export const ProcessorExampleConfig: React.FunctionComponent = () => {
                     errors={errors}
                     systemInfo={systemInfo}
                     onChange={handleConfigChange}
+                    onAddCredential={handleAddCredential}
                 />
             </Stack>
         </Fragment>
