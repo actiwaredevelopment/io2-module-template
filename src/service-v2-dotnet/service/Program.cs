@@ -98,7 +98,7 @@ builder.Services.AddSingleton<Development.SDK.Module.Controller.LanguageManager>
         return new Development.SDK.Module.Controller.LanguageManager("languages", false);
     }
 });
-builder.Services.AddSingleton<Module.ApacheSolr.Utils.Data.Common.Information>();
+builder.Services.AddSingleton<Module.IOTemplate.Utils.Data.Common.Information>();
 
 // Add scope for api's
 builder.Services.AddInfoApiScope();
