@@ -114,28 +114,8 @@ jobs:
             action-token: ${{ secrets.GH_ACTION_TOKEN }}
             aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
             aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
-
-    build-setup-for-bt:
-        needs: [build-windows]
-        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
-        with:
-            artifact: BuildOutputWindows
-            artifact-setup: BtSetup
-            aip-file: src/setup/setup-module-dotnet.aip
-            major-version: 5
-            minor-version: 3
-            service-name: 'BtIOTemplateService'
-            setup-name: 'Business Template - IOTemplate Module'
-            publish-target: 'pre-release/BT/04 - Modules'
-            manufacture: 'ACTIWARE GmbH'
-            partner: 'ACTIWARE'
-            branding: 'Business Template'
-        secrets:
-            aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
-            action-user: ${{ secrets.GH_ACTION_USER }}
-            action-token: ${{ secrets.GH_ACTION_TOKEN }}
-            aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
-            aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
+            certificate-file: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX }}
+            certificate-pwd: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX_PWD }}
 
     build-setup-for-blp:
         needs: [build-windows]
@@ -144,11 +124,11 @@ jobs:
             artifact: BuildOutputWindows
             artifact-setup: BlpSetup
             aip-file: src/setup/setup-module-dotnet.aip
-            major-version: 5
-            minor-version: 3
+            major-version: 6
+            minor-version: 0
             service-name: 'BlpIOTemplateService'
             setup-name: 'Business Logic Provider - IOTemplate Module'
-            publish-target: 'pre-release/BLP/04 - Modules'
+            publish-target: 'pre-release/BLP6/04 - Modules'
             manufacture: 'ELO Digital Office GmbH'
             partner: 'ELO'
             branding: 'Business Logic Provider'
@@ -158,16 +138,11 @@ jobs:
             action-token: ${{ secrets.GH_ACTION_TOKEN }}
             aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
             aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
+            certificate-file: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX }}
+            certificate-pwd: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX_PWD }}
 
     send-mail-to-qa:
-        needs:
-            [
-                build-setup-for-io,
-                build-setup-for-bt,
-                build-setup-for-blp,
-                docker,
-                version,
-            ]
+        needs: [build-setup-for-io, build-setup-for-blp, docker, version]
         runs-on: ubuntu-latest
 
         steps:

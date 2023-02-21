@@ -95,29 +95,8 @@ jobs:
             action-token: ${{ secrets.GH_ACTION_TOKEN }}
             aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
             aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
-
-    build-setup-for-bt:
-        if: ${{ needs.check-last-commits.outputs.has-changes == 'true' }}
-        needs: [build-windows]
-        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
-        with:
-            artifact: BuildOutputWindows
-            artifact-setup: BtSetup
-            aip-file: src/setup/setup-module-dotnet.aip
-            major-version: 5
-            minor-version: 3
-            service-name: 'BtIOTemplateService'
-            setup-name: 'Business Template - IOTemplate Module'
-            publish-target: 'nightly/BT/04 - Modules'
-            manufacture: 'ACTIWARE GmbH'
-            partner: 'ACTIWARE'
-            branding: 'Business Template'
-        secrets:
-            aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
-            action-user: ${{ secrets.GH_ACTION_USER }}
-            action-token: ${{ secrets.GH_ACTION_TOKEN }}
-            aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
-            aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
+            certificate-file: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX }}
+            certificate-pwd: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX_PWD }}
 
     build-setup-for-blp:
         if: ${{ needs.check-last-commits.outputs.has-changes == 'true' }}
@@ -127,11 +106,11 @@ jobs:
             artifact: BuildOutputWindows
             artifact-setup: BlpSetup
             aip-file: src/setup/setup-module-dotnet.aip
-            major-version: 5
-            minor-version: 3
+            major-version: 6
+            minor-version: 0
             service-name: 'BlpIOTemplateService'
             setup-name: 'Business Logic Provider - IOTemplate Module'
-            publish-target: 'nightly/BLP/04 - Modules'
+            publish-target: 'nightly/BLP6/04 - Modules'
             manufacture: 'ELO Digital Office GmbH'
             partner: 'ELO'
             branding: 'Business Logic Provider'
@@ -141,3 +120,5 @@ jobs:
             action-token: ${{ secrets.GH_ACTION_TOKEN }}
             aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
             aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
+            certificate-file: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX }}
+            certificate-pwd: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX_PWD }}
