@@ -29,7 +29,7 @@ jobs:
 
                       return '${{ github.event.inputs.releaseversion }}'
 
-    build-linux:
+    build-container:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
         needs: [version]
         with:
@@ -50,35 +50,12 @@ jobs:
             npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
             npmrc-config: ${{ secrets.NPMRC_CONFIG }}
 
-    build-windows:
-        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
-        needs: [version]
-        with:
-            artifact-name: BuildOutputWindows
-            version-postfix: ''
-            repository: ${{ github.repository }}
-            branch: tags/${{ github.ref_name }}
-            dotnet-version: 7.0.x
-            project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
-            modulefile: IOTemplate.zip
-            dockerfile: ./.github/docker/dockerfile
-            ui-build-path: ./src/configuration/build
-            module-aip-setup: src/setup/setup-module-dotnet.aip
-            rid: 'win-x64'
-            create-single-file: true
-        secrets:
-            action-user: ${{ secrets.GH_ACTION_USER }}
-            action-token: ${{ secrets.GH_ACTION_TOKEN }}
-            awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
-            npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
-            npmrc-config: ${{ secrets.NPMRC_CONFIG }}
-
-    docker-latest:
-        needs: [version, build-linux]
+    docker:
+        needs: [version, build-container]
 
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
         with:
-            artifact: ${{ needs.build-linux.outputs.download }}
+            artifact: ${{ needs.build-container.outputs.download }}
             image-name: actiwareio/io-module-iotemplate
             image-tag: 2-latest,actiwareio/io-module-iotemplate:${{ needs.version.outputs.version }}
             remove-tags: prerelease-${{ needs.version.outputs.version }}
@@ -86,50 +63,3 @@ jobs:
         secrets:
             docker-username: ${{ secrets.DOCKER_HUB_USER }}
             docker-password: ${{ secrets.DOCKER_HUB_SECRET }}
-
-    build-setup-for-io:
-        needs: [build-windows, version]
-        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
-        with:
-            artifact: BuildOutputWindows
-            artifact-setup: IoSetup
-            aip-file: src/setup/setup-module-dotnet.aip
-            major-version: 2
-            service-name: 'IoIOTemplateService'
-            setup-name: 'IO - IOTemplate Module'
-            publish-target: 'release/IO/04 - Modules'
-            manufacture: 'ACTIWARE Development GmbH'
-            partner: 'ACTIWARE'
-            branding: 'IO'
-        secrets:
-            aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
-            action-user: ${{ secrets.GH_ACTION_USER }}
-            action-token: ${{ secrets.GH_ACTION_TOKEN }}
-            aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
-            aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
-            certificate-file: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX }}
-            certificate-pwd: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX_PWD }}
-
-    build-setup-for-blp:
-        needs: [build-windows, version]
-        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
-        with:
-            artifact: BuildOutputWindows
-            artifact-setup: BlpSetup
-            aip-file: src/setup/setup-module-dotnet.aip
-            major-version: 6
-            minor-version: 0
-            service-name: 'BlpIOTemplateService'
-            setup-name: 'Business Logic Provider - IOTemplate Module'
-            publish-target: 'release/BLP6/04 - Modules'
-            manufacture: 'ELO Digital Office GmbH'
-            partner: 'ELO'
-            branding: 'Business Logic Provider'
-        secrets:
-            aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
-            action-user: ${{ secrets.GH_ACTION_USER }}
-            action-token: ${{ secrets.GH_ACTION_TOKEN }}
-            aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
-            aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
-            certificate-file: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX }}
-            certificate-pwd: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX_PWD }}

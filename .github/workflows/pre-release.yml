@@ -1,9 +1,10 @@
-name: 'Pre-Release Build (Auto)'
+name: 'Pre-Release and Hotfix Build (Auto)'
 
 on:
     push:
         branches:
             - 'prerelease/*'
+            - 'hotfix/*'
 
 jobs:
     version:
@@ -12,31 +13,69 @@ jobs:
 
         outputs:
             version: ${{ steps.version.outputs.result }}
+            setup-tag: ${{ steps.setup_tag.outputs.result }}
+            docker-tag: ${{ steps.docker_tag.outputs.result }}
             build-version: ${{ steps.build.outputs.formattedTime }}
 
         steps:
             - name: Set Version
               id: version
-              uses: actions/github-script@v3
+              uses: actions/github-script@v6
               with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  result-encoding: string
-                  script: |
-                      const version = context.payload.ref.replace(/refs\/heads\/prerelease\//gi, '')
+              github-token: ${{ secrets.GITHUB_TOKEN }}
+              result-encoding: string
+              script: |
+                  let version = ''
 
-                      if (version !== '' && version !== 'refs/heads/master') {
-                        return version
-                      }
+                  if (context.payload.ref.indexOf('prerelease') > -1) {
+                    version = context.payload.ref.replace(/refs\/heads\/prerelease\//gi, '')
+                  } else {
+                    version = context.payload.ref.replace(/refs\/heads\/hotfix\//gi, '')
+                  }
 
-                      return '${{ github.event.inputs.releaseversion }}'
+                  if (version !== '' && version !== 'refs/heads/master') {
+                  return version
+                  }
+
+                  return '${{ github.event.inputs.releaseversion }}'
+
+            - name: Set Setup Tag
+              id: setup_tag
+              uses: actions/github-script@v6
+              with:
+              github-token: ${{ secrets.GITHUB_TOKEN }}
+              result-encoding: string
+              script: |
+                  if (context.payload.ref.indexOf('prerelease') > -1) {
+                    return 'Pre-Release'
+                  } else {
+                    return 'Hotfix'
+                  }
+
+                  return ''
+
+            - name: Set Docker Tag
+              id: docker_tag
+              uses: actions/github-script@v6
+              with:
+              github-token: ${{ secrets.GITHUB_TOKEN }}
+              result-encoding: string
+              script: |
+                  if (context.payload.ref.indexOf('prerelease') > -1) {
+                    return 'prerelease'
+                  } else {
+                    return 'hotfix'
+                  }
+
+                  return ''
 
             - name: Get current date
               id: build
               uses: josStorer/get-current-time@v2
               with:
-                  format: MMDD
+              format: MMDD
 
-    build-linux:
+    build-container:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
         needs: [version]
         with:
@@ -82,19 +121,19 @@ jobs:
             npmrc-config: ${{ secrets.NPMRC_CONFIG }}
 
     docker:
-        needs: [version, build-linux]
+        needs: [version, build-container]
 
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
         with:
-            artifact: ${{ needs.build-linux.outputs.download }}
+            artifact: ${{ needs.build-container.outputs.download }}
             image-name: actiwareio/io-module-iotemplate
-            image-tag: prerelease-${{ needs.version.outputs.version }}
+            image-tag: ${{ needs.version.outputs.docker-tag }}-${{ needs.version.outputs.version }}
         secrets:
             docker-username: ${{ secrets.DOCKER_HUB_USER }}
             docker-password: ${{ secrets.DOCKER_HUB_SECRET }}
 
     build-setup-for-io:
-        needs: [build-windows]
+        needs: [version, build-windows]
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
         with:
             artifact: BuildOutputWindows
@@ -104,7 +143,9 @@ jobs:
             minor-version: 0
             service-name: 'IoIOTemplateService'
             setup-name: 'IO - IOTemplate Module'
-            publish-target: 'pre-release/IO/04 - Modules'
+            setup-name-postfix: ' - ${{ needs.version.outputs.setup-tag }} - ${{ needs.version.outputs.version }}'
+            s3-bucket: 'io-setups'
+            publish-target: '2.x/Modules/IOTemplate Module'
             manufacture: 'ACTIWARE Development GmbH'
             partner: 'ACTIWARE'
             branding: 'IO'
@@ -118,7 +159,7 @@ jobs:
             certificate-pwd: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX_PWD }}
 
     build-setup-for-blp:
-        needs: [build-windows]
+        needs: [version, build-windows]
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
         with:
             artifact: BuildOutputWindows
@@ -128,7 +169,9 @@ jobs:
             minor-version: 0
             service-name: 'BlpIOTemplateService'
             setup-name: 'Business Logic Provider - IOTemplate Module'
-            publish-target: 'pre-release/BLP6/04 - Modules'
+            setup-name-postfix: ' - ${{ needs.version.outputs.setup-tag }} - ${{ needs.version.outputs.version }}'
+            s3-bucket: 'blp-setups'
+            publish-target: '6.x/Modules/IOTemplate Module'
             manufacture: 'ELO Digital Office GmbH'
             partner: 'ELO'
             branding: 'Business Logic Provider'
