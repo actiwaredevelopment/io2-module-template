@@ -22,52 +22,52 @@ jobs:
               id: version
               uses: actions/github-script@v6
               with:
-              github-token: ${{ secrets.GITHUB_TOKEN }}
-              result-encoding: string
-              script: |
-                  let version = ''
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  result-encoding: string
+                  script: |
+                      let version = ''
 
-                  if (context.payload.ref.indexOf('prerelease') > -1) {
-                    version = context.payload.ref.replace(/refs\/heads\/prerelease\//gi, '')
-                  } else {
-                    version = context.payload.ref.replace(/refs\/heads\/hotfix\//gi, '')
-                  }
+                      if (context.payload.ref.indexOf('prerelease') > -1) {
+                        version = context.payload.ref.replace(/refs\/heads\/prerelease\//gi, '')
+                      } else {
+                        version = context.payload.ref.replace(/refs\/heads\/hotfix\//gi, '')
+                      }
 
-                  if (version !== '' && version !== 'refs/heads/master') {
-                  return version
-                  }
+                      if (version !== '' && version !== 'refs/heads/master') {
+                      return version
+                      }
 
-                  return '${{ github.event.inputs.releaseversion }}'
+                      return '${{ github.event.inputs.releaseversion }}'
 
             - name: Set Setup Tag
               id: setup_tag
               uses: actions/github-script@v6
               with:
-              github-token: ${{ secrets.GITHUB_TOKEN }}
-              result-encoding: string
-              script: |
-                  if (context.payload.ref.indexOf('prerelease') > -1) {
-                    return 'Pre-Release'
-                  } else {
-                    return 'Hotfix'
-                  }
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  result-encoding: string
+                  script: |
+                      if (context.payload.ref.indexOf('prerelease') > -1) {
+                        return 'Pre-Release'
+                      } else {
+                        return 'Hotfix'
+                      }
 
-                  return ''
+                      return ''
 
             - name: Set Docker Tag
               id: docker_tag
               uses: actions/github-script@v6
               with:
-              github-token: ${{ secrets.GITHUB_TOKEN }}
-              result-encoding: string
-              script: |
-                  if (context.payload.ref.indexOf('prerelease') > -1) {
-                    return 'prerelease'
-                  } else {
-                    return 'hotfix'
-                  }
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  result-encoding: string
+                  script: |
+                      if (context.payload.ref.indexOf('prerelease') > -1) {
+                        return 'prerelease'
+                      } else {
+                        return 'hotfix'
+                      }
 
-                  return ''
+                      return ''
 
             - name: Get current date
               id: build
