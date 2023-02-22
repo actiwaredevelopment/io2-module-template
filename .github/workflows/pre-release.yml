@@ -136,7 +136,7 @@ jobs:
         needs: [version, build-windows]
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
         with:
-            artifact: BuildOutputWindows
+            artifact: ${{ needs.build-windows.outputs.download }}
             artifact-setup: IoSetup
             aip-file: src/setup/setup-module-dotnet.aip
             major-version: 2
@@ -162,7 +162,7 @@ jobs:
         needs: [version, build-windows]
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
         with:
-            artifact: BuildOutputWindows
+            artifact: ${{ needs.build-windows.outputs.download }}
             artifact-setup: BlpSetup
             aip-file: src/setup/setup-module-dotnet.aip
             major-version: 6
