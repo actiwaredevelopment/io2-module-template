@@ -143,7 +143,7 @@ jobs:
             minor-version: 0
             service-name: 'IoIOTemplateService'
             setup-name: 'IO - IOTemplate Module'
-            setup-name-postfix: ' - ${{ needs.version.outputs.setup-tag }} - ${{ needs.version.outputs.version }}'
+            setup-name-postfix: ' - ${{ needs.version.outputs.setup-tag }}'
             s3-bucket: 'io-setups'
             publish-target: '2.x/Modules/IOTemplate Module'
             manufacture: 'ACTIWARE Development GmbH'
@@ -169,7 +169,7 @@ jobs:
             minor-version: 0
             service-name: 'BlpIOTemplateService'
             setup-name: 'Business Logic Provider - IOTemplate Module'
-            setup-name-postfix: ' - ${{ needs.version.outputs.setup-tag }} - ${{ needs.version.outputs.version }}'
+            setup-name-postfix: ' - ${{ needs.version.outputs.setup-tag }}'
             s3-bucket: 'blp-setups'
             publish-target: '6.x/Modules/IOTemplate Module'
             manufacture: 'ELO Digital Office GmbH'
