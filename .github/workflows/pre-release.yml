@@ -73,7 +73,7 @@ jobs:
               id: build
               uses: josStorer/get-current-time@v2
               with:
-              format: MMDD
+                  format: MMDD
 
     build-container:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
