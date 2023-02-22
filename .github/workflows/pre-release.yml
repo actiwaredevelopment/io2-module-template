@@ -102,7 +102,7 @@ jobs:
         needs: [version]
         with:
             artifact-name: BuildOutputWindows
-            version-postfix: '-pre-release'
+            version-postfix: ${{ needs.version.outputs.setup-tag }}
             repository: ${{ github.repository }}
             branch: ${{ github.ref_name }}
             dotnet-version: 7.0.x
