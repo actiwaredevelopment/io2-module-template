@@ -149,6 +149,7 @@ jobs:
             manufacture: 'ACTIWARE Development GmbH'
             partner: 'ACTIWARE'
             branding: 'IO'
+            sign-external: false
         secrets:
             aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
             action-user: ${{ secrets.GH_ACTION_USER }}
@@ -175,6 +176,7 @@ jobs:
             manufacture: 'ELO Digital Office GmbH'
             partner: 'ELO'
             branding: 'Business Logic Provider'
+            sign-external: false
         secrets:
             aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
             action-user: ${{ secrets.GH_ACTION_USER }}
