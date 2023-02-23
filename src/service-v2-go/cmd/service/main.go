@@ -122,12 +122,13 @@ func uploadModuleFile(config *models.Config) {
 		return
 	}
 
-	request, err := utils.NewFileUploadRequest(fmt.Sprintf("%s/api/v1/module", projectService), "file", "iotemplate.zip")
+	multipart, request, err := utils.NewFileUploadRequest(fmt.Sprintf("%s/api/v1/module", projectService), "file", "iotemplate.zip")
 
 	if err != nil {
 		log.Error.Println(err.Error())
 	} else {
 		request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", uploadToken))
+		request.Header.Set("Content-Type", multipart.FormDataContentType())
 
 		log.Message.Printf("Try to upload the module definition file: iotemplate.zip to the project service: %s/api/v1/module", projectService)
 
