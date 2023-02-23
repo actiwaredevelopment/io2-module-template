@@ -185,7 +185,7 @@
     <ROW Dialog_="ServiceSettingsDlg" Control="LabelProjectServiceAddress" Type="Text" X="18" Y="113" Width="65" Height="11" Attributes="327683" Text="Project Service:" Order="1200"/>
     <ROW Dialog_="ServiceSettingsDlg" Control="EditProjectServiceAddress" Type="Edit" X="90" Y="110" Width="269" Height="18" Attributes="3" Property="PROJECT_SERVICE_ADDRESS" Text="{260}" Order="1300"/>
     <ROW Dialog_="ServiceSettingsDlg" Control="LabelToken" Type="Text" X="18" Y="133" Width="65" Height="11" Attributes="327683" Text="Upload Token:" Order="1400"/>
-    <ROW Dialog_="ServiceSettingsDlg" Control="EditToken" Type="Edit" X="90" Y="130" Width="269" Height="18" Attributes="3" Property="TOKEN" Text="{260}" Order="1500"/>
+    <ROW Dialog_="ServiceSettingsDlg" Control="EditToken" Type="Edit" X="90" Y="130" Width="269" Height="18" Attributes="2097155" Property="TOKEN" Text="{260}" Order="1500"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
     <ROW Dialog_="WelcomeDlg" Control_="Next" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>

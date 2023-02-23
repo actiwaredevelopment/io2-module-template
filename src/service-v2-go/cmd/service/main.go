@@ -114,7 +114,7 @@ func uploadModuleFile(config *models.Config) {
 	}
 
 	if len(uploadToken) <= 0 {
-		uploadToken = config.ProjectService
+		uploadToken = config.UploadToken
 	}
 
 	if len(projectService) <= 0 && len(uploadToken) <= 0 {
