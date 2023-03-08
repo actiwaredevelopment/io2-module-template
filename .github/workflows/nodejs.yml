@@ -15,6 +15,7 @@ jobs:
             dockerfile: ./.github/docker/dockerfile-nodejs
             build-path: ./build-service/nodejs
             build-ui-path: ./src/configuration/build
+            use-cache: true
         secrets:
             action-user: ${{ secrets.GH_ACTION_USER }}
             action-token: ${{ secrets.GH_ACTION_TOKEN }}
@@ -30,5 +31,6 @@ jobs:
             artifact: ${{ needs.build.outputs.download }}
             image-name: io2-module-iotemplate
             image-tag: developer
+            use-cache: true
         secrets:
             token: ${{ secrets.GITHUB_TOKEN }}

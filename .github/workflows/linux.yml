@@ -17,6 +17,7 @@ jobs:
             ui-build-path: ./src/configuration/build
             rid: 'linux-x64'
             create-single-file: false
+            use-cache: true
         secrets:
             action-user: ${{ secrets.GH_ACTION_USER }}
             action-token: ${{ secrets.GH_ACTION_TOKEN }}
@@ -32,5 +33,6 @@ jobs:
             artifact: ${{ needs.build.outputs.download }}
             image-name: io2-module-Template
             image-tag: developer
+            use-cache: true
         secrets:
             token: ${{ secrets.GITHUB_TOKEN }}

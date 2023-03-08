@@ -17,6 +17,7 @@ jobs:
             dockerfile: ./.github/docker/dockerfile-go
             go-os: 'linux'
             go-arch: 'amd64'
+            use-cache: true
         secrets:
             action-user: ${{ secrets.GH_ACTION_USER }}
             action-token: ${{ secrets.GH_ACTION_TOKEN }}
@@ -32,5 +33,6 @@ jobs:
             artifact: ${{ needs.build.outputs.download }}
             image-name: io2-module-iotemplate
             image-tag: developer
+            use-cache: true
         secrets:
             token: ${{ secrets.GITHUB_TOKEN }}

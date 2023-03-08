@@ -43,6 +43,7 @@ jobs:
             ui-build-path: ./src/configuration/build
             rid: 'linux-x64'
             create-single-file: false
+            use-cache: true
         secrets:
             action-user: ${{ secrets.GH_ACTION_USER }}
             action-token: ${{ secrets.GH_ACTION_TOKEN }}
@@ -60,6 +61,7 @@ jobs:
             image-tag: 2-latest,actiwareio/io-module-iotemplate:${{ needs.version.outputs.version }}
             remove-tags: prerelease-${{ needs.version.outputs.version }}
             force-remove: true
+            use-cache: true
         secrets:
             docker-username: ${{ secrets.DOCKER_HUB_USER }}
             docker-password: ${{ secrets.DOCKER_HUB_SECRET }}

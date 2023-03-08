@@ -13,6 +13,9 @@ WORKDIR /home/node/app
 
 COPY ./build-service/nodejs ./
 COPY ./src/configuration/build ./build
+COPY ./module-definition ./
+COPY ./iotemplate.zip ./
+COPY ./version.txt ./
 COPY ./src/service-v2-nodejs/node_modules ./node_modules
 
 USER node
@@ -21,4 +24,4 @@ COPY --chown=node:node . .
 
 EXPOSE 30100
 
-CMD [ "node", "build-service/nodejs/service-v2-nodejs/index.js" ]
+CMD [ "node", "index.js" ]

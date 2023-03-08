@@ -177,6 +177,7 @@ jobs:
             partner: 'ELO'
             branding: 'Business Logic Provider'
             sign-external: false
+            use-cache: true
         secrets:
             aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
             action-user: ${{ secrets.GH_ACTION_USER }}
