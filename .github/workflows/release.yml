@@ -29,6 +29,44 @@ jobs:
 
                       return '${{ github.event.inputs.releaseversion }}'
 
+    clean-up-old-cache:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Cleanup
+              run: |
+                  gh extension install actions/gh-actions-cache
+
+                  REPO=${{ github.repository }}
+                  BRANCH="${{ github.ref_name }}"
+
+                  echo "Fetching list of cache key"
+                  cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH | cut -f 1 )
+
+                  ## Setting this to not fail the workflow while deleting cache keys. 
+                  set +e
+                  echo "Deleting caches..."
+                  for cacheKey in $cacheKeysForPR
+                  do
+                      gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
+                  done
+                  echo "Done"
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    build-ui:
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-ui-io-module.yml@main
+        needs: [version, clean-up-old-cache]
+        with:
+            repository: ${{ github.repository }}
+            branch: ${{ github.ref_name }}
+        secrets:
+            action-user: ${{ secrets.GH_ACTION_USER }}
+            action-token: ${{ secrets.GH_ACTION_TOKEN }}
+            awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
+            npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
+            npmrc-config: ${{ secrets.NPMRC_CONFIG }}
+
     build-container:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
         needs: [version]
@@ -41,6 +79,8 @@ jobs:
             modulefile: IOTemplate.zip
             dockerfile: ./.github/docker/dockerfile
             ui-build-path: ./src/configuration/build
+            ui-build-cache-key: ${{ needs.build-ui.outputs.cache-key }}
+            ui-build-cache-path: ${{ needs.build-ui.outputs.cache-path }}
             rid: 'linux-x64'
             create-single-file: false
             use-cache: true
@@ -62,6 +102,7 @@ jobs:
             remove-tags: prerelease-${{ needs.version.outputs.version }}
             force-remove: true
             use-cache: true
+            cache-path: ${{ needs.build-container.outputs.cache-path }}
         secrets:
             docker-username: ${{ secrets.DOCKER_HUB_USER }}
             docker-password: ${{ secrets.DOCKER_HUB_SECRET }}

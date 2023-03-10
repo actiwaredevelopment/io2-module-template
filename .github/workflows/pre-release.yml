@@ -75,6 +75,44 @@ jobs:
               with:
                   format: MMDD
 
+    clean-up-old-cache:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Cleanup
+              run: |
+                  gh extension install actions/gh-actions-cache
+
+                  REPO=${{ github.repository }}
+                  BRANCH="${{ github.ref_name }}"
+
+                  echo "Fetching list of cache key"
+                  cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH | cut -f 1 )
+
+                  ## Setting this to not fail the workflow while deleting cache keys. 
+                  set +e
+                  echo "Deleting caches..."
+                  for cacheKey in $cacheKeysForPR
+                  do
+                      gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
+                  done
+                  echo "Done"
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    build-ui:
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-ui-io-module.yml@main
+        needs: [version, clean-up-old-cache]
+        with:
+            repository: ${{ github.repository }}
+            branch: ${{ github.ref_name }}
+        secrets:
+            action-user: ${{ secrets.GH_ACTION_USER }}
+            action-token: ${{ secrets.GH_ACTION_TOKEN }}
+            awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
+            npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
+            npmrc-config: ${{ secrets.NPMRC_CONFIG }}
+
     build-container:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
         needs: [version]
@@ -88,8 +126,11 @@ jobs:
             modulefile: IOTemplate.zip
             dockerfile: ./.github/docker/dockerfile
             ui-build-path: ./src/configuration/build
+            ui-build-cache-key: ${{ needs.build-ui.outputs.cache-key }}
+            ui-build-cache-path: ${{ needs.build-ui.outputs.cache-path }}
             rid: 'linux-x64'
             create-single-file: false
+            use-cache: true
         secrets:
             action-user: ${{ secrets.GH_ACTION_USER }}
             action-token: ${{ secrets.GH_ACTION_TOKEN }}
@@ -110,9 +151,12 @@ jobs:
             modulefile: IOTemplate.zip
             dockerfile: ./.github/docker/dockerfile
             ui-build-path: ./src/configuration/build
+            ui-build-cache-key: ${{ needs.build-ui.outputs.cache-key }}
+            ui-build-cache-path: ${{ needs.build-ui.outputs.cache-path }}
             module-aip-setup: src/setup/setup-module-dotnet.aip
             rid: 'win-x64'
             create-single-file: true
+            use-cache: true
         secrets:
             action-user: ${{ secrets.GH_ACTION_USER }}
             action-token: ${{ secrets.GH_ACTION_TOKEN }}
@@ -128,6 +172,8 @@ jobs:
             artifact: ${{ needs.build-container.outputs.download }}
             image-name: actiwareio/io-module-iotemplate
             image-tag: ${{ needs.version.outputs.docker-tag }}-${{ needs.version.outputs.version }}
+            use-cache: true
+            cache-path: ${{ needs.build-linux.outputs.cache-path }}
         secrets:
             docker-username: ${{ secrets.DOCKER_HUB_USER }}
             docker-password: ${{ secrets.DOCKER_HUB_SECRET }}
@@ -137,6 +183,7 @@ jobs:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
         with:
             artifact: ${{ needs.build-windows.outputs.download }}
+            cache-path: ${{ needs.build-windows.outputs.cache-path }}
             artifact-setup: IoSetup
             aip-file: src/setup/setup-module-dotnet.aip
             major-version: 2
@@ -150,6 +197,7 @@ jobs:
             partner: 'ACTIWARE'
             branding: 'IO'
             sign-external: false
+            use-cache: true
         secrets:
             aip-license: ${{ secrets.ADVANCED_INSTALLER_LICENSE_KEY }}
             action-user: ${{ secrets.GH_ACTION_USER }}
@@ -164,6 +212,7 @@ jobs:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
         with:
             artifact: ${{ needs.build-windows.outputs.download }}
+            cache-path: ${{ needs.build-windows.outputs.cache-path }}
             artifact-setup: BlpSetup
             aip-file: src/setup/setup-module-dotnet.aip
             major-version: 6
@@ -186,6 +235,32 @@ jobs:
             aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
             certificate-file: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX }}
             certificate-pwd: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX_PWD }}
+
+    clean-up-cache:
+        needs: [build-setup-for-io, build-setup-for-blp, docker]
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Cleanup
+              run: |
+                  gh extension install actions/gh-actions-cache
+
+                  REPO=${{ github.repository }}
+                  BRANCH="${{ github.ref_name }}"
+
+                  echo "Fetching list of cache key"
+                  cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH | cut -f 1 )
+
+                  ## Setting this to not fail the workflow while deleting cache keys. 
+                  set +e
+                  echo "Deleting caches..."
+                  for cacheKey in $cacheKeysForPR
+                  do
+                      gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
+                  done
+                  echo "Done"
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     send-mail-to-qa:
         needs: [build-setup-for-io, build-setup-for-blp, docker, version]
