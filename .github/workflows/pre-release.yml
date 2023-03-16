@@ -5,6 +5,13 @@ on:
         branches:
             - 'prerelease/*'
             - 'hotfix/*'
+    workflow_dispatch:
+        inputs:
+            release:
+                description: 'The release version'
+                required: true
+                type: string
+                default: ''
 
 jobs:
     version:
@@ -33,11 +40,13 @@ jobs:
                         version = context.payload.ref.replace(/refs\/heads\/hotfix\//gi, '')
                       }
 
-                      if (version !== '' && version !== 'refs/heads/master') {
-                      return version
+                      if (version !== '' && version !== 'refs/heads/master' && version !== 'refs/heads/main') {
+                        return version
                       }
 
-                      return '${{ github.event.inputs.releaseversion }}'
+                      version = '${{ github.event.inputs.release }}';
+
+                      return version.replace('/prerelease/gi', '').replace('/hotfix/gi', '')
 
             - name: Set Setup Tag
               id: setup_tag
@@ -46,7 +55,13 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   result-encoding: string
                   script: |
-                      if (context.payload.ref.indexOf('prerelease') > -1) {
+                      let version = context.payload.ref;
+
+                      if (version === '' || version === 'refs/heads/master' || version === 'refs/heads/main') {
+                        version = '${{ github.event.inputs.release }}';
+                      }
+
+                      if (version.indexOf('prerelease') > -1) {
                         return 'Pre-Release'
                       } else {
                         return 'Hotfix'
@@ -61,7 +76,13 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   result-encoding: string
                   script: |
-                      if (context.payload.ref.indexOf('prerelease') > -1) {
+                      let version = context.payload.ref;
+
+                      if (version === '' || version === 'refs/heads/master' || version === 'refs/heads/main') {
+                        version = '${{ github.event.inputs.release }}';
+                      }
+
+                      if (version.indexOf('prerelease') > -1) {
                         return 'prerelease'
                       } else {
                         return 'hotfix'
@@ -74,31 +95,6 @@ jobs:
               uses: josStorer/get-current-time@v2
               with:
                   format: MMDD
-
-    clean-up-old-cache:
-        runs-on: ubuntu-latest
-
-        steps:
-            - name: Cleanup
-              run: |
-                  gh extension install actions/gh-actions-cache
-
-                  REPO=${{ github.repository }}
-                  BRANCH="${{ github.ref_name }}"
-
-                  echo "Fetching list of cache key"
-                  cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH | cut -f 1 )
-
-                  ## Setting this to not fail the workflow while deleting cache keys. 
-                  set +e
-                  echo "Deleting caches..."
-                  for cacheKey in $cacheKeysForPR
-                  do
-                      gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
-                  done
-                  echo "Done"
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     build-ui:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-ui-io-module.yml@main

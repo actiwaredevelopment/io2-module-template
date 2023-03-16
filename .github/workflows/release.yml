@@ -4,6 +4,13 @@ on:
     push:
         tags:
             - 'release-*'
+    workflow_dispatch:
+        inputs:
+            release:
+                description: 'The release version'
+                required: true
+                type: string
+                default: ''
 
 jobs:
     version:
@@ -23,13 +30,83 @@ jobs:
                   script: |
                       const version = context.payload.ref.replace(/refs\/tags\/release-/gi, '')
 
-                      if (version !== '' && version !== 'refs/heads/master') {
+                      if (version !== '' && version !== 'refs/heads/master' && version !== 'refs/heads/main') {
                         return version
                       }
 
-                      return '${{ github.event.inputs.releaseversion }}'
+                      return '${{ github.event.inputs.release }}'
 
-    clean-up-old-cache:
+    # build-windows-ui-elements:
+    #     name: 'Build UI Elements for Windows'
+    #     needs: [version]
+    #     uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-desktop-app.yml@main
+    #     with:
+    #         use-cache: true
+    #         sln-file: src/desktop-plugins/io2-module-template-desktop-plugins.sln
+    #         artifact-name: BuildUiElements
+    #         artifact-files: |
+    #             ./module-definition/functions/io2-module-template**.dll
+    #     secrets:
+    #         action-user: ${{ secrets.GH_ACTION_USER }}
+    #         action-token: ${{ secrets.GH_ACTION_TOKEN }}
+    #         awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
+
+    build-ui:
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-ui-io-module.yml@main
+        needs: [version]
+        with:
+            repository: ${{ github.repository }}
+            branch: ${{ github.ref_name }}
+        secrets:
+            action-user: ${{ secrets.GH_ACTION_USER }}
+            action-token: ${{ secrets.GH_ACTION_TOKEN }}
+            awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
+            npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
+            npmrc-config: ${{ secrets.NPMRC_CONFIG }}
+
+    build-linux:
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
+        needs: [build-ui, version]
+        with:
+            repository: ${{ github.repository }}
+            branch: tags/${{ github.ref_name }}
+            dotnet-version: 7.0.x
+            project: src/service/service/io2-module-elo-service.csproj
+            ui-build-cache-key: ${{ needs.build-ui.outputs.cache-key }}
+            ui-build-cache-path: ${{ needs.build-ui.outputs.cache-path }}
+            module-artifact: ${{ needs.build-windows-ui-elements.outputs.download }}
+            module-artifact-path: ./module-definition/functions/io2-module-elo**.dll
+            modulefile: elo.zip
+            dockerfile: ./.github/docker/dockerfile
+            ui-build-path: ./src/configuration/build
+            rid: 'linux-x64'
+            create-single-file: false
+            use-cache: true
+        secrets:
+            action-user: ${{ secrets.GH_ACTION_USER }}
+            action-token: ${{ secrets.GH_ACTION_TOKEN }}
+            awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
+            npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
+            npmrc-config: ${{ secrets.NPMRC_CONFIG }}
+
+    docker-latest:
+        needs: [version, build-linux]
+
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
+        with:
+            artifact: ${{ needs.build-linux.outputs.download }}
+            image-name: actiwareio/io-module-template
+            image-tag: 2-latest,actiwareio/io-module-template:${{ needs.version.outputs.version }}
+            remove-tags: prerelease-${{ needs.version.outputs.version }}
+            force-remove: true
+            use-cache: true
+            cache-path: ${{ needs.build-linux.outputs.cache-path }}
+        secrets:
+            docker-username: ${{ secrets.DOCKER_HUB_USER }}
+            docker-password: ${{ secrets.DOCKER_HUB_SECRET }}
+
+    clean-up-cache:
+        needs: [version, build-linux, docker-latest]
         runs-on: ubuntu-latest
 
         steps:
@@ -53,56 +130,3 @@ jobs:
                   echo "Done"
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    build-ui:
-        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-ui-io-module.yml@main
-        needs: [version, clean-up-old-cache]
-        with:
-            repository: ${{ github.repository }}
-            branch: ${{ github.ref_name }}
-        secrets:
-            action-user: ${{ secrets.GH_ACTION_USER }}
-            action-token: ${{ secrets.GH_ACTION_TOKEN }}
-            awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
-            npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
-            npmrc-config: ${{ secrets.NPMRC_CONFIG }}
-
-    build-container:
-        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
-        needs: [version]
-        with:
-            artifact-name: BuildOutputLinux
-            repository: ${{ github.repository }}
-            branch: tags/${{ github.ref_name }}
-            dotnet-version: 7.0.x
-            project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
-            modulefile: IOTemplate.zip
-            dockerfile: ./.github/docker/dockerfile
-            ui-build-path: ./src/configuration/build
-            ui-build-cache-key: ${{ needs.build-ui.outputs.cache-key }}
-            ui-build-cache-path: ${{ needs.build-ui.outputs.cache-path }}
-            rid: 'linux-x64'
-            create-single-file: false
-            use-cache: true
-        secrets:
-            action-user: ${{ secrets.GH_ACTION_USER }}
-            action-token: ${{ secrets.GH_ACTION_TOKEN }}
-            awdev-nuget-source: ${{ secrets.AWDEV_NUGET_URL }}
-            npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
-            npmrc-config: ${{ secrets.NPMRC_CONFIG }}
-
-    docker:
-        needs: [version, build-container]
-
-        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
-        with:
-            artifact: ${{ needs.build-container.outputs.download }}
-            image-name: actiwareio/io-module-iotemplate
-            image-tag: 2-latest,actiwareio/io-module-iotemplate:${{ needs.version.outputs.version }}
-            remove-tags: prerelease-${{ needs.version.outputs.version }}
-            force-remove: true
-            use-cache: true
-            cache-path: ${{ needs.build-container.outputs.cache-path }}
-        secrets:
-            docker-username: ${{ secrets.DOCKER_HUB_USER }}
-            docker-password: ${{ secrets.DOCKER_HUB_SECRET }}
