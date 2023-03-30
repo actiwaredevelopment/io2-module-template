@@ -1,23 +1,15 @@
-import { CONFIG_KEY, IProcessorExampleConfig } from "./models";
-import { IItemConfig } from "@actiwaredevelopment/io-sdk-typescript-models";
+import { CONFIG_KEY, IProcessorExampleConfig } from './models';
+import { IItemConfig } from '@actiwaredevelopment/io-sdk-typescript-models';
 
 export const defaultConfig: IProcessorExampleConfig = {
-    login_profile: '',
+    login_profile: ''
 };
 
-export function upgradeConfig(
-    config: IProcessorExampleConfig
-): IProcessorExampleConfig {
-    if (config === undefined) {
-        config = {};
-    }
-
+export function upgradeConfig(config: IProcessorExampleConfig): IProcessorExampleConfig {
     return config;
 }
 
-export function convertToItemConfig(
-    config: IProcessorExampleConfig
-): IItemConfig {
+export function convertToItemConfig(config: IProcessorExampleConfig): IItemConfig {
     const itemConfig: IItemConfig = {};
 
     const nodeFields = ['MyField1', 'MyField2'];
@@ -28,7 +20,7 @@ export function convertToItemConfig(
     // Note: Use automatic formatting and set the individual values as alternate
     (itemConfig.parameters ??= {}).login_profile = config.login_profile ?? '';
 
-    // Fields returned by the processor    
+    // Fields returned by the processor
     (itemConfig.parameters ??= {})['project.useditems'] = JSON.stringify(nodeFields);
 
     return itemConfig;
@@ -50,6 +42,6 @@ export function convertFromItemConfig(itemConfig?: IItemConfig): IProcessorExamp
     }
 
     return {
-        login_profile: itemConfig?.parameters?.login_profile ?? '',
+        login_profile: itemConfig?.parameters?.login_profile ?? ''
     };
 }

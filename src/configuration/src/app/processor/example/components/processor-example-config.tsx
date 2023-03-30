@@ -15,7 +15,7 @@ import { IProcessorExampleConfig } from '../models';
 import { credentialUtils } from '../../../utils';
 import { convertFromItemConfig, convertToItemConfig, defaultConfig, upgradeConfig } from '../utils';
 
-import { validateConfig } from '../validation';
+import { ConfigErrorType, validateConfig } from '../validation';
 
 import { ProcessorExampleCommonSettings } from './processor-example-common-settings';
 
@@ -27,9 +27,9 @@ const SYSTEM_INFO_REQUEST: ISystemInfoRequest = {
 };
 
 export interface IProcessorExampleConfigProps {
-    config?: IProcessorExampleConfig;
-    systemInfo?: ISystemInfoResponse;
-    errors?: Record<string, string>;
+    config: IProcessorExampleConfig;
+    systemInfo: ISystemInfoResponse;
+    errors?: ConfigErrorType;
 
     onChange?: (config: IProcessorExampleConfig) => void;
     onAddCredential?: () => void;
@@ -46,7 +46,7 @@ export const ProcessorExampleConfig: React.FunctionComponent = () => {
 
     const [systemInfo, setSystemInfo] = useState<ISystemInfoResponse | undefined>();
 
-    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [errors, setErrors] = useState<ConfigErrorType>({});
 
     const handleLoad = useCallback(
         (configItem?: IItemConfig, systemInfo?: DesignerAPI.ISystemInfoResponse) => {
@@ -205,7 +205,7 @@ export const ProcessorExampleConfig: React.FunctionComponent = () => {
                 <ProcessorExampleCommonSettings
                     config={config}
                     errors={errors}
-                    systemInfo={systemInfo}
+                    systemInfo={systemInfo ?? {}}
                     onChange={handleConfigChange}
                     onAddCredential={handleAddCredential}
                 />

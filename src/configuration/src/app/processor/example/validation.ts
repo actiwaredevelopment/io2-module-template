@@ -4,12 +4,15 @@ import { TFunction } from 'i18next';
 
 const ERROR_NO_LOGIN_PROFILE_SELECTED = 'No login profile was selected, please select a login profile.';
 
+type ConfigErrorProperties = keyof Partial<Pick<IProcessorExampleConfig, 'login_profile'>>;
+export type ConfigErrorType = Partial<Record<ConfigErrorProperties, string>>;
+
 export function validateConfig(
     config: IProcessorExampleConfig,
     translate?: TFunction,
-    callback?: (error?: Record<string, string>) => void
+    callback?: (error?: ConfigErrorType) => void
 ): boolean {
-    const errors: Record<string, string> = {};
+    const errors: ConfigErrorType = {};
 
     if (!config) {
         return false;
