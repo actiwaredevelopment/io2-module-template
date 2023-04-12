@@ -8,50 +8,10 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
-}
-
 #root,
 #root-theme {
     height: 100%;
     width: 100%;
 }
 
-.e-pane > div {
-    height: 100%;
-}
-
-.noselect {
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Old versions of Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Edge, Opera and Firefox */
-}
-
-.splitter-layout {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.layout-pane > div {
-    height: 100%;
-}
-
-.separator-v {
-    width: 1px;
-    height: 100%;
-    margin-left: 2px;
-    margin-right: 2px;
-    background-color: var(--neutralLight);
-}
-
 @import '../node_modules/monaco-editor/min/vs/editor/editor.main.css';
-

@@ -1,206 +1,157 @@
-import { CREDENTIAL_STORE_ID, MODULE_ID } from '../../../models/constants';
-import { IDataQueryStates, IDataQueryExampleSource, IDataQueryExampleQuery } from '../models';
-
-import {
-    ADD_IN_ID,
-    CONFIG_KEY,
-    DATA_SOURCE_QUERY_DELIMITER,
-    IDataQueryExampleConfig
-} from '../models/data-query-example-config';
-import {
-    FieldType,
-    IItemConfig,
-    IQueryItem,
-    IResultTable,
-    QueryType
-} from '@actiwaredevelopment/io-sdk-typescript-models';
-import { ISystemInfoRequest, ISystemInfoResponse, SystemInfo } from '@actiwaredevelopment/io-sdk-typescript-designer';
-
-import { Fragment, useEffect, useCallback, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-
-import * as DesignerAPI from '@actiwaredevelopment/io-sdk-typescript-designer';
-
-import { ContextualMenuItemType, ICommandBarItemProps, PanelType, Stack, Text } from '@fluentui/react';
 import {
     AddInContentLayout,
     AddInContentWithItemList,
+    FullSpinner,
     commandBarUtils,
-    sdkHelper
+    sdkHelper,
+    stringUtils
 } from '@actiwaredevelopment/io-sdk-react';
-
-import { convertToItemConfig, upgradeConfig, getTooltip } from '../utils';
+import * as DesignerAPI from '@actiwaredevelopment/io-sdk-typescript-designer';
+import {
+    FieldType,
+    IHttpCredential,
+    IItemConfig,
+    IQueryItem,
+    ISyntaxFieldCategory,
+    QueryType,
+    ReportLevel
+} from '@actiwaredevelopment/io-sdk-typescript-models';
+import { ContextualMenuItemType, ICommandBarItemProps, PanelType, Stack, Text, useTheme } from '@fluentui/react';
+import { cloneDeep } from 'lodash';
+import { useEffect, useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
 
-import { useCredentials } from '../../../hooks';
+import { HTTP_CREDENTIAL_STORE_ID, MODULE_ID } from '../../../models';
+import { credentialUtils } from '../../../utils';
+import {
+    ADD_IN_ID,
+    ALTERNATIVE_CONFIG_KEY,
+    CONFIG_KEY,
+    convertToItemConfig,
+    DATA_SOURCE_QUERY_DELIMITER,
+    getDefaultDataQueryConfig,
+    getDefaultSourceConfig,
+    upgradeConfig
+} from '../config';
+import {
+    DataQuerySourceDeleteDialog,
+    DataQueryDeleteDialog,
+    DataQuerySourceDialog,
+    IDataQuerySourceDeleteDialogConfig,
+    IDataQueryDeleteDialogConfig,
+    IDataQuerySourceDialogConfig
+} from '../dialogs';
+import { IDataQueryExampleConfig, IDataQueryExampleQuery, IDataQueryExampleSource, IDataQueryStates } from '../models';
 import { useDataQuerySourceNav } from '../hooks';
+import { DataQueryConfigPanel, IDataQueryConfigPanelConfig } from '../panels';
+import { DataQueryQueries } from './data-query-example-queries';
+import { DataQuerySourceTooltip } from './data-query-example-source-tooltip';
 
-import {
-    DataQueryExampleSourceDialog,
-    IDataQueryExampleSourceDialogConfig
-} from '../dialogs/data-query-example-source-dialog';
-
-import { DataQueryExampleQueries } from './data-query-example-queries';
-
-import {
-    DataQueryExampleDeleteDialog,
-    IDataQueryExampleDeleteDialogConfig
-} from '../dialogs/data-query-example-delete-dialog';
-
-import {
-    IDataQueryExampleQueryConfigStatePanelConfig,
-    DataQueryExampleQueryConfigStatePanel
-} from '../dialogs/data-query-example-query-config-panel';
-
-import {
-    DataQueryExampleQueryDeleteDialog,
-    IDataQueryExampleQueryDeleteDialogConfig
-} from '../dialogs/data-query-example-query-delete-dialog';
-
-const SYSTEM_INFO_REQUEST: ISystemInfoRequest = {
-    mode: SystemInfo.ContextMenuItems | SystemInfo.Credentials,
-    credential_store_filter: [CREDENTIAL_STORE_ID],
+const EXAMPLE_QUERY_FIELDS = ['First Field', 'Second Field', 'Third Field'];
+const SYSTEM_INFO_REQUEST: DesignerAPI.ISystemInfoRequest = {
+    mode: DesignerAPI.SystemInfo.ContextMenuItems | DesignerAPI.SystemInfo.Credentials,
+    credential_store_filter: [HTTP_CREDENTIAL_STORE_ID],
     context_menu_items:
         FieldType.Parameter | FieldType.DataField | FieldType.Variable | FieldType.NodeField | FieldType.Plugins
 };
 
-const defaultConfig: IDataQueryExampleConfig = {
-    sources: []
-};
-
-const defaultQueryConfig: IDataQueryExampleQuery = {
-    id: uuidv4(),
-    name: '',
-    query: '',
-    field_mappings: []
-};
-
-export interface IDataQueryExampleConfigProps {
-    config?: IDataQueryExampleConfig;
-    systemInfo?: ISystemInfoResponse;
-
-    selectedSource?: IDataQueryExampleSource;
-    selectedItemIds?: string[];
-    selectionCommands?: ICommandBarItemProps[];
-
-    onOpen?: () => void;
-    onChange?: (config: IDataQueryExampleConfig) => void;
-    onValidate?: (config?: IDataQueryExampleConfig, callback?: (error?: Record<string, string>) => void) => void;
-
-    onChangeDataQuerySelection?: (ids: string[]) => void;
-
-    onGetQueryCommands?: (
-        item?: IDataQueryExampleQuery,
-        callback?: (commands?: ICommandBarItemProps[]) => void
-    ) => void;
-}
-
-export const DataQueryExampleConfig: React.FunctionComponent = () => {
+export const DataQueryConfig: React.FunctionComponent = () => {
+    const theme = useTheme();
     const { t: translate } = useTranslation();
 
-    const isDebug = location.search.toLowerCase().includes('debug');
-
-    const [sourceDeleteDialogConfig, setSourceDeleteDialogConfig] = useState<IDataQueryExampleDeleteDialogConfig>();
-    const [dataQuerySearchSourceDialogConfig, setDataQueryExampleSourceDialogConfig] =
-        useState<IDataQueryExampleSourceDialogConfig>();
-
-    const [queryDeleteDialogConfig, setQueryDeleteDialogConfig] = useState<IDataQueryExampleQueryDeleteDialogConfig>();
-    const [dataQuerySearchQueryPanelConfig, setDataQueryExampleQueryPanelConfig] =
-        useState<IDataQueryExampleQueryConfigStatePanelConfig>();
-
     const [apiInitialized, setApiInitialized] = useState<boolean>(false);
-    const [config, setConfig] = useState<IDataQueryExampleConfig>(defaultConfig);
-    const [systemInfo, setSystemInfo] = useState<ISystemInfoResponse | undefined>();
-
-    const credentials = useCredentials(systemInfo ?? {});
-
-    const dataQuerySourceNav = useDataQuerySourceNav(config);
-    const [selectedSource, setSelectedSource] = useState<IDataQueryExampleSource | undefined>(undefined);
-
-    const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
+    const [config, setConfig] = useState<IDataQueryExampleConfig>(() => getDefaultDataQueryConfig());
+    const [contextMenuItems, setContextMenuItems] = useState<ISyntaxFieldCategory[]>([]);
+    const [dataQuerySearchQueryPanelConfig, setDataQueryExampleQueryPanelConfig] =
+        useState<IDataQueryConfigPanelConfig>();
+    const [dataQuerySearchSourceDialogConfig, setDataQueryExampleSourceDialogConfig] =
+        useState<IDataQuerySourceDialogConfig>();
     const [dataQueryStates, setDataQueryStates] = useState<IDataQueryStates>({});
+    const [loginProfiles, setLoginProfiles] = useState<IHttpCredential[]>([]);
+    const [queryDeleteDialogConfig, setQueryDeleteDialogConfig] = useState<IDataQueryDeleteDialogConfig>();
+    const [isSaving, setSaving] = useState<boolean>(false);
+    const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
+    const [selectedSource, setSelectedSource] = useState<IDataQueryExampleSource | undefined>();
+    const [sourceDeleteDialogConfig, setSourceDeleteDialogConfig] = useState<IDataQuerySourceDeleteDialogConfig>();
 
-    const [stillSaving, setStillSaving] = useState<boolean>(false);
+    const dataQuerySourceNav = useDataQuerySourceNav(config.sources ?? []);
 
-    const handleLoad = useCallback(
-        (configItem?: IItemConfig, systemInfo?: DesignerAPI.ISystemInfoResponse) => {
-            let config: IDataQueryExampleConfig | undefined;
-            const configParameter = configItem?.parameters?.[CONFIG_KEY];
+    const handleLoad = useCallback((configItem?: IItemConfig, systemInfo?: DesignerAPI.ISystemInfoResponse) => {
+        let config: IDataQueryExampleConfig = getDefaultDataQueryConfig();
+        const configStr = configItem?.parameters?.[CONFIG_KEY] ?? configItem?.parameters?.[ALTERNATIVE_CONFIG_KEY];
 
-            if (configParameter) {
-                try {
-                    config = JSON.parse(configParameter);
-                } catch (error) {
-                    console.error(error);
-                }
+        if (configStr) {
+            try {
+                config = JSON.parse(configStr);
+            } catch (error) {
+                console.error(error);
             }
+        }
 
-            if (isDebug) {
-                console.log({ config, configItem, systemInfo });
-            }
+        const contextMenuItems = systemInfo?.context_menus ?? [];
+        const httpLoginProfiles = credentialUtils.parseHttpCredentials(systemInfo?.credentials ?? []);
+        const upgradedConfig = upgradeConfig(config);
 
-            setConfig(upgradeConfig(config ?? {}));
-            setSystemInfo(systemInfo);
-        },
-        [isDebug]
-    );
+        setApiInitialized(true);
+        setConfig(upgradedConfig);
+        setContextMenuItems(contextMenuItems);
+        setLoginProfiles(httpLoginProfiles);
+    }, []);
 
     const handleSave = useCallback(() => {
-        if (stillSaving === true) {
+        setSaving(true);
+
+        let itemConfig: IItemConfig | undefined;
+
+        try {
+            itemConfig = convertToItemConfig(config);
+        } catch {
+            console.error('Error while serializing configration');
+        }
+
+        // If we do not have an ItemConfig at this point, the serialization must have failed.
+        // We can display the error in the IO Web Designer.
+        if (!itemConfig) {
+            DesignerAPI.system.sendNotification({
+                errorCode: 'CONFIG_SERIALIZATION_ERROR',
+                level: ReportLevel.Error,
+                text: translate('text.ITEMCONFIG_NOT_PRESENT', 'Config could not be created. Serialization failed.'),
+                title: translate('text.SERIALIZATION_ERROR', 'Serialization Error')
+            });
+
             return;
         }
 
-        const itemConfig = convertToItemConfig(config);
+        DesignerAPI.dataQueryAddin.saveConfig(itemConfig, () => setSaving(false));
+    }, [config, translate]);
 
-        setStillSaving(true);
-
-        if (isDebug) {
-            console.log({ config, itemConfig });
-            console.log(JSON.stringify(itemConfig));
-
-            setStillSaving(false);
+    const handleSystemInfoUpdate = useCallback((updateEvent?: DesignerAPI.IUpdateEvent) => {
+        if (!updateEvent?.result) {
+            return;
         }
 
-        if (apiInitialized && !isDebug) {
-            DesignerAPI.dataQueryAddin.saveConfig(itemConfig, () => {
-                setStillSaving(false);
-            });
+        const systemInfo = updateEvent.result;
+
+        if (systemInfo.mode === DesignerAPI.SystemInfo.ContextMenuItems) {
+            setContextMenuItems(systemInfo.context_menus ?? []);
         }
-    }, [apiInitialized, config, stillSaving, isDebug]);
 
-    const handleSystemInfoUpdate = useCallback(
-        (updateEvent?: DesignerAPI.IUpdateEvent) => {
-            const systemInfo = updateEvent?.result as DesignerAPI.ISystemInfoResponse;
+        if (systemInfo.mode === DesignerAPI.SystemInfo.Credentials) {
+            const httpLoginProfiles = credentialUtils.parseHttpCredentials(systemInfo.credentials ?? []);
 
-            if (isDebug) {
-                console.log({ systemInfo });
-            }
-
-            if (systemInfo) {
-                setSystemInfo(systemInfo);
-            }
-        },
-        [isDebug]
-    );
-
-    useEffect(() => {
-        if (selectedItemIds.length > 0) {
-            console.log(dataQueryStates[selectedItemIds[0]]);
+            setLoginProfiles(httpLoginProfiles);
         }
-    }, [dataQueryStates, selectedItemIds]);
+    }, []);
 
     // Load Designer API and credential store config
     useEffect(() => {
-        if (isDebug || apiInitialized) {
+        if (apiInitialized) {
             return;
         }
 
-        DesignerAPI.initialize(() => {
-            DesignerAPI.dataQueryAddin.loadConfig(SYSTEM_INFO_REQUEST, handleLoad);
-
-            setApiInitialized(true);
-        });
-    }, [apiInitialized, handleLoad, isDebug]);
+        DesignerAPI.initialize(() => DesignerAPI.dataQueryAddin.loadConfig(SYSTEM_INFO_REQUEST, handleLoad));
+    }, [apiInitialized, handleLoad]);
 
     // Update save handler
     useEffect(() => {
@@ -220,81 +171,83 @@ export const DataQueryExampleConfig: React.FunctionComponent = () => {
         DesignerAPI.system.registerOnUpdateHandler(handleSystemInfoUpdate);
     }, [apiInitialized, handleSystemInfoUpdate]);
 
+    // Preselect first source
     useEffect(() => {
-        if (selectedSource === undefined && config?.sources?.length) {
-            setSelectedSource(config.sources[0]);
+        if (selectedSource || !config?.sources?.[0]) {
+            return;
         }
+
+        setSelectedSource(config.sources[0]);
     }, [config, selectedSource]);
 
     const topNavigation: ICommandBarItemProps[] = [
         {
+            disabled: isSaving,
             key: 'save',
+            onClick: handleSave,
+            onRenderIcon: commandBarUtils.renderCommandBarItemIconWithSpinner,
+            showSpinner: isSaving,
             text: translate('text.BUTTON_SAVE', 'Save'),
             iconProps: {
-                iconName: stillSaving ? 'fa-spinner' : 'fa-save'
-            },
-            onClick: handleSave
+                iconName: 'fa-save',
+                styles: {
+                    root: {
+                        minWidth: '1rem'
+                    }
+                }
+            }
         },
         {
-            key: 'divider_save',
             itemType: ContextualMenuItemType.Divider,
+            key: 'divider_save',
             onRender: commandBarUtils.renderDivider
         },
         {
+            disabled: isSaving,
             key: 'add-source',
+            onClick: handleAddSource,
             text: translate('text.BUTTON_ADD_SOURCE', 'Add Source'),
             iconProps: {
                 iconName: 'fa-plus'
-            },
-            onClick: () => {
-                handleActions('ADD-SOURCE');
             }
         },
         {
+            disabled: !selectedSource || isSaving,
             key: 'edit-source',
-            disabled: !selectedSource,
+            onClick: handleEditSource,
             text: translate('text.BUTTON_EDIT', 'Edit'),
             iconProps: {
                 iconName: 'fa-pen'
-            },
-            onClick: () => {
-                handleActions('EDIT-SOURCE');
             }
         },
         {
+            disabled: !selectedSource || isSaving,
             key: 'clone-source',
-            disabled: !selectedSource,
+            onClick: handleCloneSource,
             text: translate('text.BUTTON_DUPLICATE', 'Duplicate'),
             iconProps: {
                 iconName: 'fa-clone'
-            },
-            onClick: () => {
-                handleActions('CLONE-SOURCE');
             }
         },
         {
+            disabled: !selectedSource || isSaving,
             key: 'remove-source',
-            disabled: !selectedSource,
+            onClick: handleRemoveSource,
             text: translate('text.BUTTON_REMOVE', 'Remove'),
             iconProps: {
                 iconName: 'fa-trash'
-            },
-            onClick: () => {
-                handleActions('REMOVE-SOURCE');
             }
         },
         {
-            key: 'divider_source',
             itemType: ContextualMenuItemType.Divider,
+            key: 'divider_source',
             onRender: commandBarUtils.renderDivider
         },
         {
+            disabled: !selectedSource || isSaving,
             key: 'add-query',
+            onClick: handleAddQuery,
             text: translate('text.BUTTON_ADD_QUERY', 'Add Query'),
-            disabled: !selectedSource,
-            onClick: () => {
-                handleActions('ADD-QUERY');
-            },
             iconProps: {
                 iconName: 'fa-plus'
             }
@@ -303,106 +256,116 @@ export const DataQueryExampleConfig: React.FunctionComponent = () => {
 
     let selectionCommands: ICommandBarItemProps[] = [];
 
-    if (selectedSource) {
-        if (selectedItemIds && selectedItemIds?.length === 1) {
-            const dataQuery = selectedSource?.queries?.find((element) => {
-                return element.id?.toLowerCase() === selectedItemIds?.[0]?.toLowerCase();
-            });
+    if (selectedSource?.queries) {
+        if (selectedItemIds.length === 1) {
+            const dataQuery = selectedSource.queries.find((query) => query.id === selectedItemIds?.[0]);
 
             selectionCommands = getSingleSelectionCommands(dataQuery);
-        } else if (selectedItemIds && selectedItemIds?.length > 1) {
-            const dataQueries = selectedSource?.queries?.filter((element) => {
-                return selectedItemIds?.some((search) => search.toLowerCase() === element.id?.toLowerCase());
-            });
+        } else if (selectedItemIds.length > 1) {
+            const dataQueries = selectedSource.queries.filter((query) =>
+                selectedItemIds?.some((search) => search === query.id)
+            );
 
-            selectionCommands = getMultiSelectionCommands(dataQueries ?? []);
+            selectionCommands = getMultiSelectionCommands(dataQueries);
+        }
+
+        if (selectionCommands.length) {
+            topNavigation.push({
+                itemType: ContextualMenuItemType.Divider,
+                key: 'divider_selection',
+                onRender: commandBarUtils.renderDivider
+            });
         }
 
         topNavigation.push(...selectionCommands);
     }
 
-    function renderDataSourceTooltip(item: unknown): string | JSX.Element | JSX.Element[] {
-        if (!item) {
-            return '';
+    function executeQueryTest(queryItem?: IDataQueryExampleQuery, ignoreMapping?: boolean) {
+        if (!queryItem?.id || !queryItem.name || !queryItem.query || !selectedSource?.name) {
+            return;
         }
 
-        const source = item as IDataQueryExampleSource;
+        const isTesting = !!dataQueryStates[queryItem.id]?.isTesting;
 
-        if (!source) {
-            return '';
+        if (isTesting) {
+            return;
         }
 
-        return getTooltip(source, credentials, translate);
-    }
+        const queryState = (dataQueryStates[queryItem.id] ??= {});
 
-    function getSingleSelectionCommands(item?: IDataQueryExampleQuery): ICommandBarItemProps[] {
-        if (!item?.id) {
-            return [];
-        }
+        queryState.isTesting = true;
 
-        const isTesting = !!dataQueryStates?.[item.id]?.isTesting;
-        // const isDialogOpen = !!creationDialogConfig?.show || !!stateCreateDialogConfig?.show;
-        const isDialogOpen = false;
+        setDataQueryStates((current) => ({
+            ...current,
+            [queryItem.id ?? '']: queryState
+        }));
 
-        // `isDialogOpen`:
-        // The duplicate dialog uses the isLoading flag while retrieving the current version.
-        // The spinner would therefore be displayed in the wrong context.
-        const editHasSpinner = isTesting && !isDialogOpen;
-        const inProgress = editHasSpinner;
+        try {
+            // First define query item for execution
+            const sdkQueryItem: IQueryItem = {
+                addin_id: ADD_IN_ID,
+                module_id: MODULE_ID,
+                module: 'Template Module',
+                type: QueryType.Reader,
+                name: `${selectedSource.name}${DATA_SOURCE_QUERY_DELIMITER}${queryItem.name}`,
+                condition_fields: [],
+                fields: []
+            };
 
-        const itemCommands: ICommandBarItemProps[] = [];
+            // Set condition fields
+            sdkQueryItem.condition_fields = [...sdkHelper.getIdxFields(queryItem.query)];
 
-        itemCommands.push(
-            {
-                key: 'edit-query',
-                text: translate('text.BUTTON_EDIT', 'Edit'),
-                onClick: () => {
-                    handleActions('EDIT-QUERY');
-                },
-                iconProps: {
-                    iconName: editHasSpinner ? 'fa-spinner' : 'fa-pen'
-                }
-            },
-            {
-                key: 'duplicate',
-                text: translate('text.BUTTON_DUPLICATE', 'Duplicate'),
-                disabled: inProgress,
-                onClick: () => {
-                    handleActions('DUPLICATE-QUERY');
-                },
-                iconProps: {
-                    iconName: 'fa-clone'
-                }
-            },
-            {
-                key: 'delete',
-                text: translate('text.BUTTON_REMOVE', 'Remove'),
-                disabled: inProgress,
-                onClick: () => {
-                    handleActions('REMOVE-QUERY');
-                },
-                iconProps: {
-                    iconName: 'fa-trash'
-                }
-            },
-            {
-                key: 'divider_query',
-                itemType: ContextualMenuItemType.Divider,
-                onRender: commandBarUtils.renderDivider
-            },
-            {
-                key: 'test-query',
-                text: translate('text.BUTTON_TEST_QUERY', 'Test Query'),
-                onClick: () => {
-                    handleActions('TEST-QUERY');
-                },
-                iconProps: {
-                    iconName: editHasSpinner ? 'fa-spinner' : 'fa-play'
-                }
+            // Set fields
+            if (!ignoreMapping) {
+                const fields = (queryItem.field_mappings ?? []).flatMap((field) => (field.name ? [field.name] : []));
+
+                sdkQueryItem.fields = fields;
             }
-        );
 
-        return itemCommands;
+            const testSource: IDataQueryExampleSource = {
+                ...selectedSource,
+                queries: []
+            };
+
+            if (ignoreMapping) {
+                testSource.queries?.push({
+                    ...queryItem,
+                    field_mappings: []
+                });
+            } else {
+                testSource.queries?.push(queryItem);
+            }
+
+            const testConfig: IDataQueryExampleConfig = {
+                ...config,
+                sources: [testSource]
+            };
+
+            const configItem: IItemConfig = {
+                credentials: [],
+                parameters: {
+                    [CONFIG_KEY]: JSON.stringify(testConfig)
+                }
+            };
+
+            DesignerAPI.dataQueryAddin.test(sdkQueryItem, configItem, () => {
+                queryState.isTesting = false;
+
+                setDataQueryStates((current) => ({
+                    ...current,
+                    [queryItem.id ?? '']: queryState
+                }));
+            });
+        } catch (error) {
+            console.error(error);
+
+            queryState.isTesting = false;
+
+            setDataQueryStates((current) => ({
+                ...current,
+                [queryItem.id ?? '']: queryState
+            }));
+        }
     }
 
     function getMultiSelectionCommands(items: IDataQueryExampleQuery[]): ICommandBarItemProps[] {
@@ -417,20 +380,21 @@ export const DataQueryExampleConfig: React.FunctionComponent = () => {
                 continue;
             }
 
-            if (!inProgress) {
-                inProgress = !!dataQueryStates?.[item.id]?.isTesting;
+            inProgress = !!dataQueryStates?.[item.id]?.isTesting || isSaving;
+
+            // We only need one item to indicate progress
+            if (inProgress) {
+                break;
             }
         }
 
         const itemCommands: ICommandBarItemProps[] = [];
 
         itemCommands.push({
-            key: 'delete',
-            text: translate('text.BUTTON_REMOVE', 'Remove'),
             disabled: inProgress,
-            onClick: () => {
-                handleActions('REMOVE-QUERY');
-            },
+            key: 'delete',
+            onClick: handleRemoveQuery,
+            text: translate('text.BUTTON_REMOVE', 'Remove'),
             iconProps: {
                 iconName: 'fa-trash'
             }
@@ -439,466 +403,344 @@ export const DataQueryExampleConfig: React.FunctionComponent = () => {
         return itemCommands;
     }
 
-    function handleConfigChange(newConfig?: IDataQueryExampleConfig) {
-        if (!newConfig) {
-            return;
+    function getSingleSelectionCommands(item?: IDataQueryExampleQuery): ICommandBarItemProps[] {
+        if (!item?.id) {
+            return [];
         }
 
-        setConfig(newConfig);
-    }
+        const isTesting = !!dataQueryStates?.[item.id]?.isTesting;
+        const inProgress = isTesting || isSaving;
 
-    function handleActions(
-        type:
-            | 'ADD-SOURCE'
-            | 'EDIT-SOURCE'
-            | 'CLONE-SOURCE'
-            | 'REMOVE-SOURCE'
-            | 'ADD-QUERY'
-            | 'EDIT-QUERY'
-            | 'DUPLICATE-QUERY'
-            | 'REMOVE-QUERY'
-            | 'TEST-QUERY'
-    ) {
-        switch (type) {
-            case 'ADD-SOURCE':
-                setDataQueryExampleSourceDialogConfig({
-                    show: true,
-                    actionType: 'NEW',
-                    systemInfo,
-                    config: {
-                        id: uuidv4()
-                    },
-                    blockedNames: config.sources?.flatMap((source) => source.name ?? ''),
-                    sources: config.sources
-                });
+        const itemCommands: ICommandBarItemProps[] = [];
 
-                break;
-
-            case 'CLONE-SOURCE':
-                setDataQueryExampleSourceDialogConfig({
-                    show: true,
-                    actionType: 'DUPLICATE',
-                    systemInfo,
-                    config: {
-                        ...selectedSource,
-                        id: uuidv4(),
-                        name: ''
-                    },
-                    blockedNames: config.sources?.flatMap((source) => source.name ?? ''),
-                    sources: config.sources
-                });
-
-                break;
-
-            case 'EDIT-SOURCE':
-                setDataQueryExampleSourceDialogConfig({
-                    show: true,
-                    actionType: 'EDIT',
-                    systemInfo,
-                    config: selectedSource,
-                    blockedNames: config.sources
-                        ?.filter((source) => source.id?.toLowerCase() !== selectedSource?.id?.toLowerCase())
-                        ?.flatMap((source) => source.name ?? ''),
-                    sources: config.sources?.filter(
-                        (source) => source.id?.toLowerCase() !== selectedSource?.id?.toLowerCase()
-                    )
-                });
-
-                break;
-
-            case 'REMOVE-SOURCE':
-                {
-                    if (!selectedSource) {
-                        return;
-                    }
-
-                    setSourceDeleteDialogConfig({
-                        show: true,
-                        items: [selectedSource]
-                    });
+        itemCommands.push(
+            {
+                disabled: inProgress,
+                key: 'edit-query',
+                onClick: handleEditQuery,
+                text: translate('text.BUTTON_EDIT', 'Edit'),
+                iconProps: {
+                    iconName: 'fa-pen'
                 }
-                break;
-
-            case 'ADD-QUERY':
-                {
-                    if (!selectedSource) {
-                        return;
-                    }
-
-                    setDataQueryExampleQueryPanelConfig({
-                        show: true,
-                        actionType: 'NEW',
-                        source: selectedSource,
-                        config: {
-                            ...defaultQueryConfig,
-                            id: uuidv4()
-                        },
-                        blockedNames: selectedSource?.queries?.flatMap((item) => item.name ?? '')
-                    });
+            },
+            {
+                disabled: inProgress,
+                key: 'duplicate',
+                onClick: handleCloneQuery,
+                text: translate('text.BUTTON_DUPLICATE', 'Duplicate'),
+                iconProps: {
+                    iconName: 'fa-clone'
                 }
-                break;
-
-            case 'DUPLICATE-QUERY':
-                {
-                    if (!selectedItemIds.length || selectedItemIds.length > 1) {
-                        return;
-                    }
-
-                    const query = selectedSource?.queries?.find(
-                        (query) => query.id?.toLowerCase() === selectedItemIds[0]?.toLowerCase()
-                    );
-
-                    if (!query) {
-                        return;
-                    }
-
-                    setDataQueryExampleQueryPanelConfig({
-                        show: true,
-                        actionType: 'DUPLICATE',
-                        source: selectedSource,
-                        config: {
-                            ...query,
-                            id: uuidv4(),
-                            name: ''
-                        },
-                        blockedNames: selectedSource?.queries?.flatMap((item) => item.name ?? '')
-                    });
+            },
+            {
+                disabled: inProgress,
+                key: 'delete',
+                onClick: handleRemoveQuery,
+                text: translate('text.BUTTON_REMOVE', 'Remove'),
+                iconProps: {
+                    iconName: 'fa-trash'
                 }
-                break;
-
-            case 'EDIT-QUERY':
-                {
-                    if (!selectedItemIds.length || selectedItemIds.length > 1) {
-                        return;
+            },
+            {
+                itemType: ContextualMenuItemType.Divider,
+                key: 'divider_query',
+                onRender: commandBarUtils.renderDivider
+            },
+            {
+                disabled: inProgress,
+                key: 'test-query',
+                onClick: handleTestQuery,
+                onRenderIcon: commandBarUtils.renderCommandBarItemIconWithSpinner,
+                showSpinner: isTesting,
+                text: translate('text.BUTTON_TEST_QUERY', 'Test Query'),
+                iconProps: {
+                    iconName: 'fa-play',
+                    styles: {
+                        root: {
+                            minWidth: '1rem'
+                        }
                     }
-
-                    const query = selectedSource?.queries?.find(
-                        (query) => query.id?.toLowerCase() === selectedItemIds[0]?.toLowerCase()
-                    );
-
-                    if (!query) {
-                        return;
-                    }
-
-                    setDataQueryExampleQueryPanelConfig({
-                        show: true,
-                        actionType: 'OPEN',
-                        source: selectedSource,
-                        config: query,
-                        blockedNames: selectedSource?.queries
-                            ?.filter((search) => search.id?.toLowerCase() !== query.id?.toLowerCase())
-                            .flatMap((item) => item.name ?? '')
-                    });
                 }
-                break;
-
-            case 'REMOVE-QUERY':
-                {
-                    if (!selectedItemIds.length || selectedItemIds.length > 1) {
-                        return;
-                    }
-
-                    const queries = selectedSource?.queries?.filter((query) =>
-                        selectedItemIds.some((searchId) => searchId.toLowerCase() === query.id?.toLowerCase())
-                    );
-
-                    if (!queries?.length) {
-                        return;
-                    }
-
-                    setQueryDeleteDialogConfig({
-                        show: true,
-                        items: queries
-                    });
-                }
-                break;
-
-            case 'TEST-QUERY':
-                {
-                    if (!selectedItemIds.length || selectedItemIds.length > 1) {
-                        return;
-                    }
-
-                    const query = selectedSource?.queries?.find(
-                        (query) => query.id?.toLowerCase() === selectedItemIds[0]?.toLowerCase()
-                    );
-
-                    if (!query) {
-                        return;
-                    }
-
-                    handleTestQuery(query);
-                }
-                break;
-        }
-    }
-
-    function handleSourceDeleteDialogDismissed() {
-        setSourceDeleteDialogConfig(undefined);
-    }
-
-    function handleSourceDeleteDialogDismiss() {
-        setSourceDeleteDialogConfig({
-            show: false,
-            items: undefined
-        });
-
-        handleSourceDeleteDialogDismissed();
-    }
-
-    function handleSourceDeleteDialogSubmit(items?: IDataQueryExampleSource[]) {
-        handleSourceDeleteDialogDismiss();
-
-        if (!items?.length) {
-            return;
-        }
-
-        const newSource = [...(config.sources ?? [])];
-
-        items?.forEach((item) => {
-            const index = newSource.findIndex((source) => source.id?.toLowerCase() === item.id?.toLowerCase());
-
-            if (index > -1) {
-                newSource.splice(index, 1);
             }
-        });
+        );
 
-        setConfig({
-            ...config,
-            sources: newSource
-        });
-
-        setSelectedSource(undefined);
+        return itemCommands;
     }
 
-    function handleDataQueryExampleSourceDialogDismissed() {
-        setDataQueryExampleSourceDialogConfig(undefined);
-    }
-
-    function handleDataQueryExampleSourceDialogDismiss() {
-        setDataQueryExampleSourceDialogConfig({
-            show: false,
-            config: undefined
-        });
-
-        handleDataQueryExampleSourceDialogDismissed();
-    }
-
-    function handleDataQueryExampleSourceDialogSubmit(newConfig?: IDataQueryExampleSource) {
-        if (!newConfig) {
-            return;
-        }
-
-        const newSources = [...(config.sources ?? [])];
-
-        const index = newSources.findIndex((source) => source.id?.toLowerCase() === newConfig.id?.toLowerCase());
-
-        if (index >= 0) {
-            newSources[index] = {
-                ...newConfig
-            };
-        } else {
-            newSources.push(newConfig);
-        }
-
-        setConfig({
-            ...config,
-            sources: newSources
-        });
-
-        handleDataQueryExampleSourceDialogDismiss();
-    }
-
-    function handleDataQueryExampleQueryPanelDismiss() {
-        setDataQueryExampleQueryPanelConfig(undefined);
-    }
-
-    function handleTestQuery(
-        queryItem?: IDataQueryExampleQuery,
-        ignoreMapping?: boolean,
-        callback?: (status: boolean, reason?: string, result?: IResultTable) => void
-    ) {
-        if (!queryItem) {
-            return;
-        }
-
-        const isTesting = !!dataQueryStates[queryItem?.id ?? '']?.isTesting;
-
-        if (isTesting) {
-            return;
-        }
-
-        const queryState = (dataQueryStates[queryItem?.id ?? ''] ??= {});
-
-        queryState.isTesting = true;
-
-        setDataQueryStates({
-            ...dataQueryStates,
-            [queryItem?.id ?? '']: queryState
-        });
-
-        try {
-            // First define query item for execution
-            const sdkQueryItem: IQueryItem = {
-                addin_id: ADD_IN_ID,
-                module_id: MODULE_ID,
-                module: 'Example',
-                type: QueryType.Reader,
-                name: `${selectedSource?.name || ''}${DATA_SOURCE_QUERY_DELIMITER}${queryItem.name || ''}`,
-                condition_fields: [],
-                fields: []
-            };
-
-            // Set condition fields
-            sdkQueryItem.condition_fields = [...sdkHelper.getIdxFields(queryItem.query || '')];
-
-            // Set fields
-            if (!ignoreMapping) {
-                sdkQueryItem.fields = [
-                    ...(queryItem?.field_mappings?.map((field) => {
-                        return field?.name || '';
-                    }) || [])
-                ];
-            }
-
-            const testSource: IDataQueryExampleSource = {
-                ...selectedSource,
-                queries: []
-            };
-
-            if (ignoreMapping === true) {
-                testSource.queries?.push({
-                    ...queryItem,
-                    field_mappings: []
-                });
-            } else {
-                testSource.queries?.push(queryItem);
-            }
-
-            const testConfig = {
-                ...config,
-                sources: [testSource]
-            };
-
-            const configItem = {
-                credentials: systemInfo?.credentials,
-                parameters: {
-                    [CONFIG_KEY]: JSON.stringify(testConfig)
-                }
-            };
-
-            DesignerAPI.dataQueryAddin.test(
-                sdkQueryItem,
-                configItem,
-                (status: boolean, reason?: string, result?: IResultTable) => {
-                    callback?.(status, reason, result);
-
-                    queryState.isTesting = false;
-
-                    setDataQueryStates({
-                        ...dataQueryStates,
-                        [queryItem?.id ?? '']: queryState
-                    });
-                }
-            );
-        } catch (ex) {
-            console.error(ex);
-            callback?.(false, undefined, undefined);
-
-            queryState.isTesting = false;
-
-            setDataQueryStates({
-                ...dataQueryStates,
-                [queryItem?.id ?? '']: queryState
-            });
-        }
-    }
-
-    function handleDataQueryExampleQueryPanelSubmit(newConfig: IDataQueryExampleQuery) {
-        handleDataQueryExampleQueryPanelDismiss();
-
-        if (!newConfig) {
-            return;
-        }
-
+    function handleAddQuery() {
         if (!selectedSource) {
             return;
         }
 
-        const newQueries = [...(selectedSource.queries ?? [])];
-        const index = newQueries.findIndex((query) => query.id?.toLowerCase() === newConfig.id?.toLowerCase());
+        const blockedNames = (selectedSource.queries ?? []).flatMap((query) => (query.name ? [query.name] : []));
+        const newConfig = getDefaultSourceConfig();
+
+        setDataQueryExampleQueryPanelConfig({
+            show: true,
+            panelType: 'NEW',
+            config: newConfig,
+            blockedNames: blockedNames
+        });
+    }
+
+    function handleAddSource() {
+        const blockedNames = (config.sources ?? []).flatMap((source) => (source.name ? [source.name] : []));
+        const newConfig = getDefaultSourceConfig();
+
+        setDataQueryExampleSourceDialogConfig({
+            show: true,
+            actionType: 'NEW',
+            config: newConfig,
+            blockedNames: blockedNames,
+            sources: config.sources ?? []
+        });
+    }
+
+    function handleCloneQuery() {
+        if (selectedItemIds.length !== 1 || !selectedSource?.queries) {
+            return;
+        }
+
+        const query = selectedSource.queries.find((query) => query.id === selectedItemIds[0]);
+
+        if (!query) {
+            return;
+        }
+
+        // Use cloneDeep to prevent a shallow copy of the object. A shallow copy might produce unexpected behaviour.
+        const queryCopy = cloneDeep(query);
+        const blockedNames = selectedSource.queries.flatMap((item) => (item.name ? [item.name] : []));
+        const newName = stringUtils.uniqueName(query.name ?? '', blockedNames);
+
+        queryCopy.id = uuidv4();
+        queryCopy.name = newName;
+
+        setDataQueryExampleQueryPanelConfig({
+            blockedNames: blockedNames,
+            config: queryCopy,
+            panelType: 'DUPLICATE',
+            show: true
+        });
+    }
+
+    function handleCloneSource() {
+        if (!selectedSource) {
+            return;
+        }
+
+        const sources = config.sources ?? [];
+        const blockedNames = sources.flatMap((source) => (source.name ? [source.name] : []));
+        const newName = stringUtils.uniqueName(selectedSource.name ?? '', blockedNames);
+
+        // Use cloneDeep to prevent a shallow copy of the object. A shallow copy might produce unexpected behaviour.
+        const sourceCopy: IDataQueryExampleSource = cloneDeep(selectedSource);
+
+        sourceCopy.id = uuidv4();
+        sourceCopy.name = newName;
+
+        setDataQueryExampleSourceDialogConfig({
+            show: true,
+            actionType: 'DUPLICATE',
+            config: sourceCopy,
+            blockedNames: blockedNames,
+            sources: sources
+        });
+    }
+
+    function handleEditQuery() {
+        if (selectedItemIds.length !== 1 || !selectedSource?.queries) {
+            return;
+        }
+
+        const selectedId = selectedItemIds[0];
+        const query = selectedSource.queries.find((query) => query.id === selectedId);
+
+        if (!query) {
+            return;
+        }
+
+        const blockedNames = selectedSource.queries.flatMap((query) =>
+            query.name && query.id !== selectedId ? [query.name] : []
+        );
+
+        setDataQueryExampleQueryPanelConfig({
+            blockedNames: blockedNames,
+            config: query,
+            panelType: 'OPEN',
+            show: true
+        });
+    }
+
+    function handleEditSource() {
+        if (!selectedSource?.id) {
+            return;
+        }
+
+        const sources = config.sources ?? [];
+        const filteredSources = sources.filter((source) => source.id !== selectedSource?.id);
+        const blockedNames = filteredSources.flatMap((source) => (source.name ? [source.name] : []));
+
+        setDataQueryExampleSourceDialogConfig({
+            show: true,
+            actionType: 'EDIT',
+            config: selectedSource,
+            blockedNames: blockedNames,
+            sources: filteredSources
+        });
+    }
+
+    function handleNavSelection(source: unknown) {
+        if (!source) {
+            return;
+        }
+
+        setSelectedSource(source);
+    }
+
+    function handleQueryDeleteDialogDismiss() {
+        setQueryDeleteDialogConfig(undefined);
+    }
+
+    function handleQueryPanelDismiss() {
+        setDataQueryExampleQueryPanelConfig(undefined);
+    }
+
+    function handleQueryPanelSubmit(newConfig: IDataQueryExampleQuery) {
+        if (!selectedSource?.queries) {
+            return;
+        }
+
+        const newSources = [...(config.sources ?? [])];
+        const sourceIndex = newSources.findIndex((source) => source.id === selectedSource.id);
+
+        if (sourceIndex < 0) {
+            return;
+        }
+
+        const newQueries = [...selectedSource.queries];
+        const index = newQueries.findIndex((query) => query.id === newConfig.id);
 
         if (index >= 0) {
-            newQueries[index] = {
-                ...newConfig
-            };
+            newQueries[index] = newConfig;
         } else {
             newQueries.push(newConfig);
         }
 
-        const newSources = [...(config.sources ?? [])];
-        const sourceIndex = newSources.findIndex(
-            (source) => source.id?.toLowerCase() === selectedSource.id?.toLowerCase()
-        );
-
-        if (sourceIndex === undefined || sourceIndex < 0) {
-            return;
-        }
-
         newSources[sourceIndex] = {
             ...selectedSource,
             queries: newQueries
         };
 
-        setConfig({
-            ...config,
-            sources: newSources
-        });
-
         setSelectedSource(newSources[sourceIndex]);
+        setConfig((current) => ({
+            ...current,
+            sources: newSources
+        }));
+
+        handleQueryPanelDismiss();
     }
 
-    function handleSourceQueryDeleteDialogDismissed() {
-        setQueryDeleteDialogConfig(undefined);
-    }
-
-    function handleSourceQueryDeleteDialogDismiss() {
-        setQueryDeleteDialogConfig({
-            show: false,
-            items: undefined
-        });
-
-        handleSourceQueryDeleteDialogDismissed();
-    }
-
-    function handleSourceQueryDeleteDialogSubmit(items?: IDataQueryExampleSource[]) {
-        handleSourceQueryDeleteDialogDismiss();
-
-        if (!items?.length) {
+    function handleRemoveQuery() {
+        if (selectedItemIds.length <= 0 || !selectedSource?.queries) {
             return;
         }
 
+        const queries = selectedSource.queries.filter((query) =>
+            selectedItemIds.some((searchId) => searchId === query.id)
+        );
+
+        if (!queries.length) {
+            return;
+        }
+
+        setQueryDeleteDialogConfig({
+            show: true,
+            queries: queries
+        });
+    }
+
+    function handleRemoveSource() {
         if (!selectedSource) {
+            return;
+        }
+
+        setSourceDeleteDialogConfig({
+            show: true,
+            sources: [selectedSource]
+        });
+    }
+
+    function handleSourceDeleteDialogDismiss() {
+        setSourceDeleteDialogConfig(undefined);
+    }
+
+    function handleSourceDeleteDialogSubmit(sources: IDataQueryExampleSource[]) {
+        if (!config.sources) {
+            return;
+        }
+
+        const newSources = [...config.sources];
+
+        for (const source of sources) {
+            const index = newSources.findIndex((src) => src.id === source.id);
+
+            if (index > -1) {
+                newSources.splice(index, 1);
+            }
+        }
+
+        setSelectedSource(undefined);
+        setConfig((current) => ({
+            ...current,
+            sources: newSources
+        }));
+
+        handleSourceDeleteDialogDismiss();
+    }
+
+    function handleSourceDialogDimiss() {
+        setDataQueryExampleSourceDialogConfig(undefined);
+    }
+
+    function handleSourceDialogSubmit(newSource: IDataQueryExampleSource) {
+        const newSources = [...(config.sources ?? [])];
+        const index = newSources.findIndex((source) => source.id === newSource.id);
+
+        if (index >= 0) {
+            newSources[index] = newSource;
+        } else {
+            newSources.push(newSource);
+        }
+
+        setSelectedSource(newSource);
+        setConfig((current) => ({
+            ...current,
+            sources: newSources
+        }));
+
+        handleSourceDialogDimiss();
+    }
+
+    function handleSourceQueryDeleteDialogSubmit(queries: IDataQueryExampleSource[]) {
+        if (!selectedSource?.id) {
+            return;
+        }
+
+        const newSources = [...(config.sources ?? [])];
+        const sourceIndex = newSources.findIndex((source) => source.id === selectedSource.id);
+
+        if (sourceIndex < 0) {
             return;
         }
 
         const newQueries = [...(selectedSource.queries ?? [])];
 
-        items?.forEach((item) => {
-            const index = newQueries.findIndex((query) => query.id?.toLowerCase() === item.id?.toLowerCase());
+        for (const query of queries) {
+            const index = newQueries.findIndex((q) => q.id === query.id);
 
             if (index > -1) {
                 newQueries.splice(index, 1);
             }
-        });
-
-        const newSources = [...(config.sources ?? [])];
-        const sourceIndex = newSources.findIndex(
-            (source) => source.id?.toLowerCase() === selectedSource.id?.toLowerCase()
-        );
-
-        if (sourceIndex === undefined || sourceIndex < 0) {
-            return;
         }
 
         newSources[sourceIndex] = {
@@ -906,119 +748,138 @@ export const DataQueryExampleConfig: React.FunctionComponent = () => {
             queries: newQueries
         };
 
-        setConfig({
-            ...config,
-            sources: newSources
-        });
-
         setSelectedSource(newSources[sourceIndex]);
+        setConfig((current) => ({
+            ...current,
+            sources: newSources
+        }));
+
+        handleQueryDeleteDialogDismiss();
+    }
+
+    function handleSourceTooltipRender(item: unknown): JSX.Element {
+        if (!item) {
+            return <></>;
+        }
+
+        const source = item as IDataQueryExampleSource;
+        const loginProfile = loginProfiles.find((profile) => profile.id === source.login_profile);
+
+        if (!loginProfile) {
+            return <></>;
+        }
+
+        return <DataQuerySourceTooltip credential={loginProfile} />;
+    }
+
+    function handleTestQuery() {
+        if (selectedItemIds.length !== 1 || !selectedSource?.queries) {
+            return;
+        }
+
+        const query = selectedSource.queries.find((query) => query.id === selectedItemIds[0]);
+
+        if (!query) {
+            return;
+        }
+
+        executeQueryTest(query);
+    }
+
+    if (!apiInitialized) {
+        return <FullSpinner />;
     }
 
     return (
-        <Fragment>
-            <AddInContentLayout
-                commands={[...topNavigation]}
-                title={translate('text.TITLE_DATA_QUERY_MANAGEMENT', 'Data Query Management')}>
-                <AddInContentWithItemList
-                    navigation={dataQuerySourceNav}
-                    noItemsInfo={translate(
-                        'text.WARNING_NO_DATA_SOURCES',
-                        'No data sources were found or configured. Start the configuration by adding a new data source'
-                    )}
-                    selectedKey={selectedSource?.id}
-                    onRenderTooltip={renderDataSourceTooltip}
-                    onSelectItem={(item: unknown) => {
-                        setSelectedSource(item as IDataQueryExampleSource);
-                    }}>
-                    {selectedSource ? (
-                        <DataQueryExampleQueries
-                            selectedSource={selectedSource}
-                            config={config}
-                            systemInfo={systemInfo}
-                            selectedItemIds={selectedItemIds}
-                            selectionCommands={selectionCommands}
-                            onOpen={() => handleActions('EDIT-QUERY')}
-                            onChange={handleConfigChange}
-                            onChangeDataQuerySelection={setSelectedItemIds}
-                        />
-                    ) : (
-                        <Stack
-                            verticalAlign='center'
-                            style={{
-                                paddingTop: '3.125rem',
-                                opacity: '0.5'
-                            }}>
-                            <Text
-                                variant='large'
-                                style={{
-                                    textAlign: 'center'
-                                }}>
-                                {translate(
-                                    'text.WARNING_NO_DATA_SOURCE_SELECTED',
-                                    'No data source selected. Selected a data source or create a new one'
-                                )}
-                            </Text>
-                        </Stack>
-                    )}
-                </AddInContentWithItemList>
-            </AddInContentLayout>
+        <AddInContentLayout
+            commands={topNavigation}
+            title={translate('text.TEMPLATE_EXAMPLE_QUERY_TITLE', 'Example Data Source Management')}>
+            <AddInContentWithItemList
+                navigation={dataQuerySourceNav}
+                onRenderTooltip={handleSourceTooltipRender}
+                onSelectItem={handleNavSelection}
+                selectedKey={selectedSource?.id}
+                noItemsInfo={translate(
+                    'text.WARNING_NO_EXAMPLE_DATA_SOURCES',
+                    'No example data sources were found or configured. Start the configuration by adding a new data source'
+                )}>
+                {selectedSource?.queries && (
+                    <DataQueryQueries
+                        onChangeDataQuerySelection={setSelectedItemIds}
+                        onEdit={handleEditQuery}
+                        queries={selectedSource.queries}
+                        selectionCommands={selectionCommands}
+                    />
+                )}
 
-            {dataQuerySearchSourceDialogConfig?.show === true && (
-                <DataQueryExampleSourceDialog
-                    hidden={!dataQuerySearchSourceDialogConfig.show}
+                {!selectedSource?.queries && (
+                    <Stack
+                        verticalAlign='center'
+                        horizontalAlign='center'>
+                        <Text
+                            variant='large'
+                            styles={{
+                                root: {
+                                    textAlign: 'center',
+                                    color: theme.semanticColors.disabledText,
+                                    padding: '4rem 0 0 0'
+                                }
+                            }}>
+                            {translate(
+                                'text.WARNING_NO_EXAMPLE_DATA_SOURCE_SELECTED',
+                                'No example data source selected. Select a data source or create a new one'
+                            )}
+                        </Text>
+                    </Stack>
+                )}
+            </AddInContentWithItemList>
+
+            {dataQuerySearchSourceDialogConfig?.show && (
+                <DataQuerySourceDialog
                     actionType={dataQuerySearchSourceDialogConfig.actionType}
-                    config={dataQuerySearchSourceDialogConfig?.config}
-                    blockedNames={dataQuerySearchSourceDialogConfig?.blockedNames}
-                    sources={dataQuerySearchSourceDialogConfig?.sources}
-                    systemInfo={systemInfo}
-                    onDismiss={handleDataQueryExampleSourceDialogDismiss}
-                    onSubmit={handleDataQueryExampleSourceDialogSubmit}
-                    modalProps={{
-                        onDismissed: handleDataQueryExampleSourceDialogDismissed
-                    }}
+                    blockedNames={dataQuerySearchSourceDialogConfig.blockedNames}
+                    config={dataQuerySearchSourceDialogConfig.config}
+                    hidden={!dataQuerySearchSourceDialogConfig.show}
+                    loginProfiles={loginProfiles}
+                    onDismiss={handleSourceDialogDimiss}
+                    onSubmit={handleSourceDialogSubmit}
+                    sources={dataQuerySearchSourceDialogConfig.sources}
                 />
             )}
 
-            {sourceDeleteDialogConfig?.show === true && (
-                <DataQueryExampleDeleteDialog
+            {sourceDeleteDialogConfig?.show && (
+                <DataQuerySourceDeleteDialog
                     hidden={!sourceDeleteDialogConfig.show}
-                    items={sourceDeleteDialogConfig.items}
                     onDismiss={handleSourceDeleteDialogDismiss}
                     onSubmit={handleSourceDeleteDialogSubmit}
-                    modalProps={{
-                        onDismissed: handleSourceDeleteDialogDismissed
-                    }}
+                    sources={sourceDeleteDialogConfig.sources}
                 />
             )}
 
-            {dataQuerySearchQueryPanelConfig?.show === true && (
-                <DataQueryExampleQueryConfigStatePanel
-                    isOpen={dataQuerySearchQueryPanelConfig.show}
-                    source={dataQuerySearchQueryPanelConfig.source}
-                    config={dataQuerySearchQueryPanelConfig.config}
-                    actionType={dataQuerySearchQueryPanelConfig.actionType}
-                    systemInfo={systemInfo}
-                    blockedNames={dataQuerySearchQueryPanelConfig.blockedNames}
-                    type={PanelType.large}
-                    onTest={handleTestQuery}
-                    onDismiss={handleDataQueryExampleQueryPanelDismiss}
-                    onDismissed={handleDataQueryExampleQueryPanelDismiss}
-                    onSubmitAction={handleDataQueryExampleQueryPanelSubmit}
-                />
-            )}
-
-            {queryDeleteDialogConfig?.show === true && (
-                <DataQueryExampleQueryDeleteDialog
+            {queryDeleteDialogConfig?.show && (
+                <DataQueryDeleteDialog
                     hidden={!queryDeleteDialogConfig.show}
-                    items={queryDeleteDialogConfig.items}
-                    onDismiss={handleSourceQueryDeleteDialogDismiss}
+                    onDismiss={handleQueryDeleteDialogDismiss}
                     onSubmit={handleSourceQueryDeleteDialogSubmit}
-                    modalProps={{
-                        onDismissed: handleSourceQueryDeleteDialogDismissed
-                    }}
+                    queries={queryDeleteDialogConfig.queries}
                 />
             )}
-        </Fragment>
+
+            {dataQuerySearchQueryPanelConfig?.show && (
+                <DataQueryConfigPanel
+                    blockedNames={dataQuerySearchQueryPanelConfig.blockedNames}
+                    config={dataQuerySearchQueryPanelConfig.config}
+                    contextMenuItems={contextMenuItems}
+                    isOpen={dataQuerySearchQueryPanelConfig.show}
+                    onDismiss={handleQueryPanelDismiss}
+                    onDismissed={handleQueryPanelDismiss}
+                    onSubmitQuery={handleQueryPanelSubmit}
+                    onTest={handleTestQuery}
+                    panelType={dataQuerySearchQueryPanelConfig.panelType}
+                    queryFields={EXAMPLE_QUERY_FIELDS}
+                    type={PanelType.large}
+                />
+            )}
+        </AddInContentLayout>
     );
 };
-

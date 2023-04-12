@@ -1,0 +1,10 @@
+{
+    "module_id": "<INSERT NEW UUID HERE>",
+    "version": "2.0.0.0000",
+    "name": "<ENTER MODULE NAME HERE>",
+    "display_text": "<ENTER DISPLAY TEXT HERE>",
+    "description": "<ENTER A DESCRIPTION HERE>",
+    "language_code": "MODULE_TITLE",
+    "language_code_description": "MODULE_DESCRIPTION",
+    "service_address": ":30100"
+}

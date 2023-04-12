@@ -1,101 +1,85 @@
-import { IProcessorExampleConfigProps } from './processor-example-config';
-
+import { SyntaxComboBox, SyntaxTextField } from '@actiwaredevelopment/io-sdk-react';
+import * as DesignerAPI from '@actiwaredevelopment/io-sdk-typescript-designer';
+import { IHttpCredential, ISyntaxFieldCategory } from '@actiwaredevelopment/io-sdk-typescript-models';
+import { Stack } from '@fluentui/react';
 import { useTranslation } from 'react-i18next';
 
-import { Stack } from '@fluentui/react';
-import { SyntaxComboBox } from '@actiwaredevelopment/io-sdk-react';
+import { useHttpLoginProfileOptions } from '../../../hooks';
+import { IProcessorExampleConfig } from '../models';
+import { ConfigErrorType } from '../validation';
 
-import { useCredentialsAsOptions } from '../../../hooks';
+interface IProcessorExampleConfigProps {
+    config: IProcessorExampleConfig;
+    contextMenuItems: ISyntaxFieldCategory[];
+    errors: ConfigErrorType;
+    loginProfiles: IHttpCredential[];
 
-export const ProcessorExampleCommonSettings: React.FunctionComponent<IProcessorExampleConfigProps> = (props) => {
+    onChange: (config: IProcessorExampleConfig) => void;
+    onAddCredential: () => void;
+}
+
+type InputChangeType = keyof Pick<IProcessorExampleConfig, 'login_profile' | 'name'>;
+type SyntaxChangeType = keyof Pick<IProcessorExampleConfig, 'name'>;
+
+export const ProcessorCommonSettings: React.FunctionComponent<IProcessorExampleConfigProps> = (props) => {
     const { t: translate } = useTranslation();
 
-    const credentialOptions = useCredentialsAsOptions(props.systemInfo ?? {}, true);
+    const credentialOptions = useHttpLoginProfileOptions(props.loginProfiles, 'id', true);
 
-    function handleInputChange(property?: string, newValue?: string | number | boolean) {
-        if (!property?.length) {
-            return;
-        }
-
-        props.onChange?.({
+    function handleInputChange(property: InputChangeType, newValue?: string) {
+        props.onChange({
             ...props.config,
             [property]: newValue ?? ''
         });
     }
 
-    // function handleOpenSyntax(property?: string, value?: string) {
-    //     if (!property?.length) {
-    //         return;
-    //     }
-
-    //     DesignerAPI.system.openSyntaxWizard(value ?? '', undefined, (newValue) => {
-    //         handleInputChange(property, newValue);
-    //     });
-    // }
+    function handleSyntaxChange(property: SyntaxChangeType) {
+        DesignerAPI.system.openSyntaxWizard(props.config[property] ?? '', undefined, (newValue) =>
+            handleInputChange(property, newValue)
+        );
+    }
 
     return (
-        <Stack>
-            <Stack
-                tokens={{
-                    childrenGap: '0.5rem'
-                }}>
-                <SyntaxComboBox
-                    onSyntax={props.onAddCredential}
-                    options={credentialOptions}
-                    label={translate('text.LABEL_LOGIN_PROFILE', 'Which login profile should be used?')}
-                    placeholder={translate('text.PLACEHOLDER_LOGIN_PROFILE', 'Select a login profile here')}
-                    errorMessage={props.errors?.login_profile ?? ''}
-                    selectedKey={props.config?.login_profile ?? ''}
-                    iconButtonProps={{
-                        iconProps: {
-                            iconName: 'fa-plus'
-                        }
-                    }}
-                    syntaxProps={{
-                        tooltip: translate('text.TOOLTIP_ADD_LOGIN_PROFILE', 'Add a new login profile')
-                    }}
-                    onChange={(_, option) => handleInputChange('login_profile', option?.key.toString() ?? '')}
-                    styles={{
-                        container: {
-                            width: '100%'
-                        }
-                    }}
-                />
-
-                {/* <SyntaxTextField
-                    label={translate(
-                        'text.LABEL_ANALYZE_AGAINST_MODERATION_CATEGORIES',
-                        'Which text should be analyze against moderation categories?'
-                    )}
-                    placeholder={translate(
-                        'text.PLACEHOLDER_ANALYZE_AGAINST_MODERATION_CATEGORIES',
-                        'Please enter the input text here'
-                    )}
-                    errorMessage={props.errors?.input ?? ''}
-                    value={props.config?.input ?? ''}
-                    syntaxFields={props.systemInfo?.context_menus}
-                    onSyntax={() => {
-                        handleOpenSyntax('input', props.config?.input);
-                    }}
-                    onChange={(_, value) => handleInputChange('input', value ?? '')}
-                /> */}
-
-                {/* <Toggle
-                    inlineLabel
-                    checked={props.config?.remove_json_files === true}
-                    onChange={(_, checked) =>
-                        handleInputChange(
-                            "remove_json_files",
-                            checked === true
-                        )
+        <Stack
+            verticalAlign='start'
+            horizontalAlign='stretch'
+            tokens={{
+                childrenGap: '0.5rem'
+            }}>
+            <SyntaxComboBox
+                errorMessage={props.errors.login_profile}
+                label={translate('text.LABEL_LOGIN_PROFILE', 'Which login profile should be used?')}
+                onChange={(_, option) => handleInputChange('login_profile', option?.key.toString())}
+                onSyntax={props.onAddCredential}
+                options={credentialOptions}
+                placeholder={translate('text.PLACEHOLDER_LOGIN_PROFILE', 'Select a login profile here')}
+                selectedKey={props.config.login_profile ?? ''}
+                iconButtonProps={{
+                    iconProps: {
+                        iconName: 'fa-plus'
                     }
-                    label={translate(
-                        "text.CHECKBOX_REMOVE_JSON_FILES",
-                        "Remove JSON files from the container after successful processing."
-                    )}
-                /> */}
-            </Stack>
+                }}
+                styles={{
+                    container: {
+                        flexGrow: 1
+                    }
+                }}
+                syntaxProps={{
+                    tooltip: translate('text.TOOLTIP_ADD_LOGIN_PROFILE', 'Add a new login profile')
+                }}
+            />
+
+            <SyntaxTextField
+                errorMessage={props.errors.name}
+                label={translate('text.LABEL_NAME', 'Please enter a name here')}
+                onChange={(_, newValue) => handleInputChange('name', newValue)}
+                placeholder={translate('text.PLACEHOLDER_NAME', 'Select a login profile here')}
+                onSyntax={() => handleSyntaxChange('name')}
+                syntaxFields={props.contextMenuItems}
+                value={props.config.name ?? ''}
+            />
+
+            {/* Place additional configuration elements here. */}
         </Stack>
     );
 };
-

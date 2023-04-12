@@ -1,93 +1,82 @@
-import { IDataQueryExampleConfig } from './models/data-query-example-config';
-
+import { copyAndSort } from '@actiwaredevelopment/io-sdk-react';
+import { ISyntaxFieldCategory } from '@actiwaredevelopment/io-sdk-typescript-models';
+import { INavLink, INavLinkGroup } from '@fluentui/react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { INavLink, INavLinkGroup, IDropdownOption } from '@fluentui/react';
-import { copyAndSort } from '@actiwaredevelopment/io-sdk-react';
+import { IDataQueryExampleSource } from './models';
 
-import { ISystemInfoResponse } from '@actiwaredevelopment/io-sdk-typescript-designer';
-import { ISyntaxFieldCategory } from '@actiwaredevelopment/io-sdk-typescript-models';
-
-export function useDataQuerySourceNav(config?: IDataQueryExampleConfig): INavLinkGroup[] | undefined {
-    const navLinks = useMemo<INavLink[] | undefined>(() => {
-        if (!config?.sources?.length) {
-            return undefined;
-        }
-
-        return copyAndSort(config?.sources ?? [], 'name', false)?.map<INavLink>((dataSource) => {
-            return {
-                key: dataSource.id ?? '',
-                title: dataSource.name || dataSource.id || '',
-                name: dataSource.name || dataSource.id || '',
-                url: `.source?itemId=${dataSource.id}`,
-                data: dataSource
-            };
-        });
-    }, [config]);
-
-    if (navLinks === undefined) {
-        return undefined;
-    }
-
-    return [
-        {
-            links: navLinks?.filter((link) => link !== undefined) ?? []
-        }
-    ];
-}
-
-export function useSolrFieldsAsOptions(items?: string[]): IDropdownOption[] {
-    const options = useMemo<ReturnType<typeof useSolrFieldsAsOptions>>(() => {
-        const options: IDropdownOption[] = [];
-
-        if (!items?.length) {
-            return options;
-        }
-
-        items.forEach((item) => {
-            options.push({
-                key: item ?? '',
-                text: item ?? ''
-            });
-        });
-
-        return options;
-    }, [items]);
-
-    return options;
-}
-
+/**
+ * Custom hook to create dropdown items for existing data query fields.
+ *
+ * @param fields The fields from the given data query.
+ * @param syntaxCategories Existing context menu items which are loaded beforehand.
+ *
+ * @returns A list which contains the existing context menu items and the data query field items.
+ */
 export function useDataQueryContextMenuItems(
-    fields?: string[],
-    systemInfo?: ISystemInfoResponse
+    fields: string[],
+    syntaxCategories: ISyntaxFieldCategory[]
 ): ISyntaxFieldCategory[] {
     const { t: translate } = useTranslation();
 
     const contextMenuItems = useMemo<ReturnType<typeof useDataQueryContextMenuItems>>(() => {
-        const menuItems: ISyntaxFieldCategory[] = [...(systemInfo?.context_menus ?? [])];
+        const menuItems: ISyntaxFieldCategory[] = [...syntaxCategories];
+        const resultFields: string[] = [];
+        const fieldMappingMenu: ISyntaxFieldCategory = {
+            prefix: 'DBO',
+            name: translate('text.MENU_ITEM_RESULT_FIELDS', 'Result Fields'),
+            fields: resultFields
+        };
 
-        if (fields?.length) {
-            const fieldMappingMenu: ISyntaxFieldCategory = {
-                prefix: 'DBO',
-                name: translate('text.MENU_ITEM_RESULT_FIELDS', 'Result Fields'),
-                fields: []
-            };
+        // Remove empty strings
+        const sortedFields = fields.filter((field) => field).sort();
 
-            fields?.sort().forEach((field) => {
-                if (field.length) {
-                    if (!fieldMappingMenu.fields?.some((search) => search.toLowerCase() === field.toLowerCase())) {
-                        fieldMappingMenu.fields?.push(field ?? '');
-                    }
-                }
-            });
+        for (const field of sortedFields) {
+            const exists = resultFields.some((search) => search.toLowerCase() === field.toLowerCase());
 
+            if (!exists) {
+                resultFields.push(field);
+            }
+        }
+
+        if (fieldMappingMenu.fields?.length) {
             menuItems.push(fieldMappingMenu);
         }
 
         return menuItems;
-    }, [fields, systemInfo?.context_menus, translate]);
+    }, [fields, syntaxCategories, translate]);
 
     return contextMenuItems;
 }
 
+/**
+ * Custom Hook to generate NavLink items.
+ *
+ * @param sources A list of data query sources.
+ *
+ * @returns A list of NavLink items which can be used to open the configuration.
+ */
+export function useDataQuerySourceNav(sources: IDataQueryExampleSource[]): INavLinkGroup[] {
+    return useMemo<INavLinkGroup[]>(() => {
+        const navLinks = copyAndSort(sources, 'name', false).flatMap<INavLink>((source) =>
+            source.id
+                ? [
+                      {
+                          key: source.id,
+                          title: source.name || source.id,
+                          name: source.name || source.id,
+                          url: `.source?itemId=${source.id}`,
+                          data: source
+                      }
+                  ]
+                : []
+        );
+
+        return [
+            {
+                links: navLinks
+            }
+        ];
+    }, [sources]);
+}
