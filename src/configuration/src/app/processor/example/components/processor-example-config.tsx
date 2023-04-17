@@ -1,108 +1,121 @@
-import { FieldType, IItemConfig } from '@actiwaredevelopment/io-sdk-typescript-models';
-import { ISystemInfoRequest, ISystemInfoResponse, SystemInfo } from '@actiwaredevelopment/io-sdk-typescript-designer';
-import { CREDENTIAL_STORE_ID } from '../../../models';
-
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { FullSpinner } from '@actiwaredevelopment/io-sdk-react';
+import * as DesignerAPI from '@actiwaredevelopment/io-sdk-typescript-designer';
+import {
+    FieldType,
+    IHttpCredential,
+    IItemConfig,
+    ISyntaxFieldCategory,
+    ReportLevel
+} from '@actiwaredevelopment/io-sdk-typescript-models';
+import { Stack } from '@fluentui/react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import * as DesignerAPI from '@actiwaredevelopment/io-sdk-typescript-designer';
-
-import { Stack, ActionButton } from '@fluentui/react';
-import { FullSpinner } from '@actiwaredevelopment/io-sdk-react';
-
-import { IProcessorExampleConfig } from '../models';
-
+import { HTTP_CREDENTIAL_STORE_ID, VALIDATION_TIMEOUT } from '../../../models';
 import { credentialUtils } from '../../../utils';
-import { convertFromItemConfig, convertToItemConfig, defaultConfig, upgradeConfig } from '../utils';
-
+import { convertToItemConfig, getDefaultProcessorConfig, upgradeConfig } from '../config';
+import { ALTERNATIVE_CONFIG_KEY, CONFIG_KEY, IProcessorExampleConfig } from '../models';
 import { ConfigErrorType, validateConfig } from '../validation';
+import { ProcessorCommonSettings } from './processor-example-common-settings';
 
-import { ProcessorExampleCommonSettings } from './processor-example-common-settings';
-
-const SYSTEM_INFO_REQUEST: ISystemInfoRequest = {
-    mode: SystemInfo.ContextMenuItems | SystemInfo.Credentials,
-    credential_store_filter: [CREDENTIAL_STORE_ID],
+const SYSTEM_INFO_REQUEST: DesignerAPI.ISystemInfoRequest = {
+    mode: DesignerAPI.SystemInfo.ContextMenuItems | DesignerAPI.SystemInfo.Credentials,
+    credential_store_filter: [HTTP_CREDENTIAL_STORE_ID],
     context_menu_items:
         FieldType.Parameter | FieldType.DataField | FieldType.Variable | FieldType.NodeField | FieldType.Plugins
 };
 
-export interface IProcessorExampleConfigProps {
-    config: IProcessorExampleConfig;
-    systemInfo: ISystemInfoResponse;
-    errors?: ConfigErrorType;
-
-    onChange?: (config: IProcessorExampleConfig) => void;
-    onAddCredential?: () => void;
-}
-
-export const ProcessorExampleConfig: React.FunctionComponent = () => {
+export const ProcessorConfig: React.FunctionComponent = () => {
     const { t: translate } = useTranslation();
 
-    const isDebug = location.search.toLowerCase().includes('debug');
-
     const [apiInitialized, setApiInitialized] = useState<boolean>(false);
-
-    const [config, setConfig] = useState<IProcessorExampleConfig>(defaultConfig);
-
-    const [systemInfo, setSystemInfo] = useState<ISystemInfoResponse | undefined>();
-
+    const [config, setConfig] = useState<IProcessorExampleConfig>(() => getDefaultProcessorConfig());
+    const [contextMenuItems, setContextMenuItems] = useState<ISyntaxFieldCategory[]>([]);
     const [errors, setErrors] = useState<ConfigErrorType>({});
+    const [loginProfiles, setLoginProfiles] = useState<IHttpCredential[]>([]);
 
-    const handleLoad = useCallback(
-        (configItem?: IItemConfig, systemInfo?: DesignerAPI.ISystemInfoResponse) => {
-            const config: IProcessorExampleConfig | undefined = convertFromItemConfig(configItem ?? {});
+    const timeoutIdRef = useRef<NodeJS.Timeout>();
 
-            if (isDebug) {
-                console.log({ config, configItem, systemInfo });
+    const handleLoad = useCallback((itemConfig?: IItemConfig, systemInfo?: DesignerAPI.ISystemInfoResponse) => {
+        let config: IProcessorExampleConfig = getDefaultProcessorConfig();
+
+        const configStr = itemConfig?.parameters?.[CONFIG_KEY] ?? itemConfig?.parameters?.[ALTERNATIVE_CONFIG_KEY];
+
+        if (configStr) {
+            try {
+                config = JSON.parse(configStr);
+            } catch (error) {
+                console.error(error);
             }
+        }
 
-            setConfig(upgradeConfig(config ?? {}));
-            setSystemInfo(systemInfo);
-        },
-        [isDebug]
-    );
+        const contextMenuItems = systemInfo?.context_menus ?? [];
+        const upgradedConfig = upgradeConfig(config);
+        const httpLoginProfiles = credentialUtils.parseHttpCredentials(systemInfo?.credentials ?? []);
+
+        setApiInitialized(true);
+        setConfig(upgradedConfig);
+        setContextMenuItems(contextMenuItems);
+        setLoginProfiles(httpLoginProfiles);
+    }, []);
 
     const handleSave = useCallback(
         (saveEvent?: DesignerAPI.ISaveEvent) => {
-            const itemConfig = convertToItemConfig(config);
+            let itemConfig: IItemConfig | undefined;
 
-            if (isDebug) {
-                console.log({ config, itemConfig });
-                console.log(JSON.stringify(itemConfig));
+            try {
+                itemConfig = convertToItemConfig(config);
+            } catch {
+                console.error('Error while serializing configration');
+            }
+
+            // If we do not have an ItemConfig at this point, the serialization must have failed.
+            // We can display the error in the IO Web Designer.
+            if (!itemConfig) {
+                DesignerAPI.system.sendNotification({
+                    errorCode: 'CONFIG_SERIALIZATION_ERROR',
+                    level: ReportLevel.Error,
+                    text: translate(
+                        'text.ITEMCONFIG_NOT_PRESENT',
+                        'Config could not be created. Serialization failed.'
+                    ),
+                    title: translate('text.SERIALIZATION_ERROR', 'Serialization Error')
+                });
+
+                return;
             }
 
             saveEvent?.notifySuccess(itemConfig);
         },
-        [config, isDebug]
+        [config, translate]
     );
 
-    const handleSystemInfoUpdate = useCallback(
-        (updateEvent?: DesignerAPI.IUpdateEvent) => {
-            const systemInfo = updateEvent?.result as DesignerAPI.ISystemInfoResponse;
-
-            if (isDebug) {
-                console.log({ systemInfo });
-            }
-
-            if (systemInfo) {
-                setSystemInfo(systemInfo);
-            }
-        },
-        [isDebug]
-    );
-
-    // Load Designer API and credential store config
-    useEffect(() => {
-        if (isDebug || apiInitialized) {
+    const handleSystemInfoUpdate = useCallback((updateEvent?: DesignerAPI.IUpdateEvent) => {
+        if (!updateEvent?.result) {
             return;
         }
 
-        DesignerAPI.initialize(() => {
-            DesignerAPI.processor.loadConfig(SYSTEM_INFO_REQUEST, handleLoad);
+        const systemInfo = updateEvent?.result as DesignerAPI.ISystemInfoResponse;
 
-            setApiInitialized(true);
-        });
-    }, [apiInitialized, handleLoad, isDebug]);
+        if (systemInfo.mode === DesignerAPI.SystemInfo.Credentials) {
+            const httpLoginProfiles = credentialUtils.parseHttpCredentials(systemInfo?.credentials ?? []);
+
+            setLoginProfiles(httpLoginProfiles);
+        }
+
+        if (systemInfo.mode === DesignerAPI.SystemInfo.ContextMenuItems) {
+            setContextMenuItems(systemInfo.context_menus ?? []);
+        }
+    }, []);
+
+    // Load Designer API and credential store config
+    useEffect(() => {
+        if (apiInitialized) {
+            return;
+        }
+
+        DesignerAPI.initialize(() => DesignerAPI.processor.loadConfig(SYSTEM_INFO_REQUEST, handleLoad));
+    }, [apiInitialized, handleLoad]);
 
     // Update save handler
     useEffect(() => {
@@ -122,95 +135,59 @@ export const ProcessorExampleConfig: React.FunctionComponent = () => {
         DesignerAPI.system.registerOnUpdateHandler(handleSystemInfoUpdate);
     }, [apiInitialized, handleSystemInfoUpdate]);
 
-    // Validate configuration
+    // Validate configuration with a delay to prevent unnecessary rerender
     useEffect(() => {
-        const errors: Record<string, string> = {};
+        clearTimeout(timeoutIdRef.current);
 
-        if (config) {
-            const isValid = validateConfig(config, translate, (validateErrors) => {
-                setErrors(validateErrors ?? {});
-            });
+        timeoutIdRef.current = setTimeout(() => {
+            const errors = validateConfig(config, translate);
+            const isValid = Object.keys(errors).length === 0;
 
-            if (apiInitialized && !isDebug) {
-                DesignerAPI.processor.setValidityState(isValid);
-            }
+            DesignerAPI.processor.setValidityState(isValid);
 
-            return;
-        }
-
-        setErrors(errors);
-    }, [apiInitialized, config, isDebug, translate]);
-
-    function handleConfigChange(config?: IProcessorExampleConfig) {
-        if (!config) {
-            return;
-        }
-
-        setConfig(config);
-
-        if (apiInitialized && !isDebug) {
-            // Send config changes directly to the designer
-            DesignerAPI.processor.setConfigState(convertToItemConfig(config));
-        }
-    }
+            setErrors(errors);
+        }, VALIDATION_TIMEOUT);
+    }, [config, translate]);
 
     function handleAddCredential() {
-        if (!apiInitialized) {
-            return;
-        }
-
-        DesignerAPI.system.openCredentialWizard([CREDENTIAL_STORE_ID], (newCredentials) => {
+        DesignerAPI.system.openCredentialWizard([HTTP_CREDENTIAL_STORE_ID], (newCredentials) => {
             if (!newCredentials?.length) {
                 return;
             }
 
-            const newCredential = credentialUtils.getCredentialData(newCredentials[0]);
+            const newCredential = credentialUtils.parseHttpCredentials(newCredentials);
 
-            if (!newCredential) {
+            if (!newCredential[0]) {
                 return;
             }
 
-            setConfig({
-                ...config,
-                login_profile: newCredential.id
-            });
+            setConfig((current) => ({
+                ...current,
+                login_profile: newCredential[0].id
+            }));
         });
     }
 
-    if (apiInitialized === false && !isDebug) {
+    if (!apiInitialized) {
         return <FullSpinner />;
     }
 
     return (
-        <Fragment>
-            <Stack
-                verticalFill
-                styles={{
-                    root: {
-                        overflow: 'auto'
-                    }
-                }}>
-                {isDebug && (
-                    <ActionButton
-                        iconProps={{
-                            iconName: 'Print'
-                        }}
-                        onClick={() => {
-                            handleSave();
-                        }}>
-                        Print config to console output
-                    </ActionButton>
-                )}
+        <Stack
+            verticalFill
+            tokens={{
+                childrenGap: '0.5rem'
+            }}>
+            <ProcessorCommonSettings
+                config={config}
+                contextMenuItems={contextMenuItems}
+                errors={errors}
+                loginProfiles={loginProfiles}
+                onAddCredential={handleAddCredential}
+                onChange={setConfig}
+            />
 
-                <ProcessorExampleCommonSettings
-                    config={config}
-                    errors={errors}
-                    systemInfo={systemInfo ?? {}}
-                    onChange={handleConfigChange}
-                    onAddCredential={handleAddCredential}
-                />
-            </Stack>
-        </Fragment>
+            {/* Place additional configuration elements here. */}
+        </Stack>
     );
 };
-

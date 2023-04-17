@@ -1,79 +1,65 @@
-import { IDataQueryExampleQueryConfigSettingsProps } from '../dialogs/data-query-example-query-config-panel';
-
-import { Fragment } from 'react';
+import { Stack, TextField, ICommandBarItemProps, CommandBar } from '@fluentui/react';
 import { useTranslation } from 'react-i18next';
 
-import { MessageBar, MessageBarType, Stack, TextField, ICommandBarItemProps, CommandBar } from '@fluentui/react';
+import { IDataQueryExampleQuery } from '../models';
+import { DataQueryErrorType } from '../validation';
 
-export const DataQueryExampleQueryCommonSettings: React.FunctionComponent<IDataQueryExampleQueryConfigSettingsProps> = (
-    props
-) => {
+interface IDataQueryCommonSettingsProps {
+    config: IDataQueryExampleQuery;
+    errors: DataQueryErrorType;
+
+    onChange: (config: IDataQueryExampleQuery) => void;
+    onTest: (config: IDataQueryExampleQuery) => void;
+}
+
+export const DataQueryCommonSettings: React.FunctionComponent<IDataQueryCommonSettingsProps> = (props) => {
     const { t: translate } = useTranslation();
 
     const queryCommands: ICommandBarItemProps[] = [
         {
+            disabled: !props.config.query,
             key: 'test-query',
-            disabled: !props.config?.query?.length,
+            onClick: () => props.onTest(props.config),
             text: translate('text.BUTTON_TEST_QUERY', 'Test Query'),
             iconProps: {
                 iconName: 'fa-play'
-            },
-            onClick: () => {
-                props.onTest?.(props.config);
             }
         }
     ];
 
-    function handleInputChange(property?: string, newValue?: string | number) {
-        if (!property?.length) {
-            return;
-        }
-
-        props.onChange?.({
+    function handleNameChange(_?: unknown, newValue?: string) {
+        props.onChange({
             ...props.config,
-            [property]: newValue ?? ''
+            name: newValue ?? ''
         });
     }
 
     return (
-        <Fragment>
-            <Stack
-                tokens={{
-                    childrenGap: '0.5rem'
-                }}>
-                <CommandBar
-                    items={queryCommands}
-                    styles={{
-                        root: {
-                            marginLeft: '0',
-                            paddingLeft: '0'
-                        }
-                    }}
-                />
+        <Stack
+            tokens={{
+                childrenGap: '0.5rem'
+            }}>
+            <CommandBar
+                items={queryCommands}
+                styles={{
+                    root: {
+                        padding: 0
+                    }
+                }}
+            />
 
-                {props.errors?.warning_source?.length && (
-                    <MessageBar
-                        messageBarType={MessageBarType.warning}
-                        isMultiline={true}
-                        dismissButtonAriaLabel='Close'>
-                        {props.errors?.warning_source}
-                    </MessageBar>
+            <TextField
+                required
+                autoFocus
+                label={translate('text.LABEL_QUERY_NAME', 'How do you want to name the query?')}
+                errorMessage={props.errors.name ?? ''}
+                value={props.config.name ?? ''}
+                onChange={handleNameChange}
+                placeholder={translate(
+                    'text.WATERMARK_ENTER_DATA_QUERY_NAME',
+                    'Please enter a name for the data query'
                 )}
-
-                <TextField
-                    required
-                    autoFocus
-                    label={translate('text.LABEL_QUERY_NAME', 'How do you want to name the query?')}
-                    placeholder={translate(
-                        'text.WATERMARK_ENTER_DATA_QUERY_NAME',
-                        'Please enter a name for the data query'
-                    )}
-                    errorMessage={props.errors?.name ?? ''}
-                    value={props.config?.name ?? ''}
-                    onChange={(_, value) => handleInputChange('name', value ?? '')}
-                />
-            </Stack>
-        </Fragment>
+            />
+        </Stack>
     );
 };
-

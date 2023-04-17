@@ -1,78 +1,36 @@
-import { ICredentialStoreItem, IHttpCredential } from '@actiwaredevelopment/io-sdk-typescript-models';
-import { ISystemInfoResponse } from '@actiwaredevelopment/io-sdk-typescript-designer';
-
-import { CREDENTIAL_STORE_CONFIG_KEY } from '../models/constants';
-
+import { IDropdownOption } from '@fluentui/react';
+import { IHttpCredential } from '@actiwaredevelopment/io-sdk-typescript-models';
 import { useMemo } from 'react';
 
-import { IDropdownOption } from '@fluentui/react';
+/**
+ * Custom hook to generate a dropdown list of `IHttpCredential` login profiles
+ *
+ * @param loginProfiles The list of available login profiles
+ * @param key A selection of properties which can be used as a key
+ * @param withEmptyOption `optional` Empty option to allow a user to "unselect"
+ *        a login profile
+ *
+ * @returns A list of dropdown items
+ */
+export function useHttpLoginProfileOptions(
+    loginProfiles: IHttpCredential[],
+    key: keyof Pick<IHttpCredential, 'id' | 'name'> = 'id',
+    withEmptyOption = false
+): IDropdownOption[] {
+    return useMemo<ReturnType<typeof useHttpLoginProfileOptions>>(() => {
+        const options = loginProfiles.flatMap<IDropdownOption<IHttpCredential>>((profile) =>
+            profile[key]
+                ? [
+                      {
+                          data: profile,
+                          key: profile[key] ?? '',
+                          text: profile.name ?? profile.id ?? ''
+                      }
+                  ]
+                : []
+        );
 
-export function useCredentials(systemInfo: ISystemInfoResponse): IHttpCredential[] {
-    const items = useMemo<ReturnType<typeof useCredentials>>(() => {
-        const items: IHttpCredential[] = [];
-
-        if (!systemInfo?.credentials?.length) {
-            return items;
-        }
-
-        systemInfo?.credentials?.forEach((credential: ICredentialStoreItem) => {
-            if (
-                credential !== undefined &&
-                credential.parameters !== undefined &&
-                credential.parameters?.[CREDENTIAL_STORE_CONFIG_KEY] !== undefined
-            ) {
-                try {
-                    const loginProfile = JSON.parse(
-                        credential?.parameters?.[CREDENTIAL_STORE_CONFIG_KEY] ?? ''
-                    ) as IHttpCredential;
-
-                    if (loginProfile) {
-                        items.push(loginProfile);
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-        });
-
-        return items;
-    }, [systemInfo]);
-
-    return items;
-}
-
-export function useCredentialsAsOptions(systemInfo: ISystemInfoResponse, withEmptyOption = false): IDropdownOption[] {
-    const options = useMemo<ReturnType<typeof useCredentialsAsOptions>>(() => {
-        const options: IDropdownOption[] = [];
-
-        if (!systemInfo?.credentials?.length) {
-            return options;
-        }
-
-        systemInfo?.credentials?.forEach((credential: ICredentialStoreItem) => {
-            if (
-                credential !== undefined &&
-                credential.parameters !== undefined &&
-                credential.parameters?.[CREDENTIAL_STORE_CONFIG_KEY] !== undefined
-            ) {
-                try {
-                    const loginProfile = JSON.parse(
-                        credential?.parameters?.[CREDENTIAL_STORE_CONFIG_KEY] ?? ''
-                    ) as IHttpCredential;
-
-                    if (loginProfile) {
-                        options.push({
-                            key: loginProfile.id ?? credential._id ?? loginProfile.name ?? '',
-                            text: loginProfile.name ?? loginProfile.id ?? credential._id ?? ''
-                        });
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-        });
-
-        if (withEmptyOption === true) {
+        if (withEmptyOption) {
             options.unshift({
                 key: '',
                 text: ''
@@ -80,8 +38,5 @@ export function useCredentialsAsOptions(systemInfo: ISystemInfoResponse, withEmp
         }
 
         return options;
-    }, [systemInfo, withEmptyOption]);
-
-    return options;
+    }, [key, loginProfiles, withEmptyOption]);
 }
-

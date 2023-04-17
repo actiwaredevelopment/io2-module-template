@@ -3,29 +3,23 @@ import { IProcessorExampleConfig } from './models';
 import { TFunction } from 'i18next';
 
 const ERROR_NO_LOGIN_PROFILE_SELECTED = 'No login profile was selected, please select a login profile.';
+const ERROR_NO_NAME_GIVEN = 'No name entered, please enter a name.';
 
-type ConfigErrorProperties = keyof Partial<Pick<IProcessorExampleConfig, 'login_profile'>>;
-export type ConfigErrorType = Partial<Record<ConfigErrorProperties, string>>;
+type ConfigRequiredType = keyof Pick<IProcessorExampleConfig, 'login_profile' | 'name'>;
+export type ConfigErrorType = Partial<Record<ConfigRequiredType, string>>;
 
-export function validateConfig(
-    config: IProcessorExampleConfig,
-    translate?: TFunction,
-    callback?: (error?: ConfigErrorType) => void
-): boolean {
+export function validateConfig(config: IProcessorExampleConfig, translate?: TFunction): ConfigErrorType {
     const errors: ConfigErrorType = {};
 
-    if (!config) {
-        return false;
-    }
-
-    if (!config.login_profile?.length) {
+    if (!config.login_profile) {
         errors.login_profile =
             translate?.('exception.ERROR_NO_LOGIN_PROFILE_SELECTED', ERROR_NO_LOGIN_PROFILE_SELECTED) ??
             ERROR_NO_LOGIN_PROFILE_SELECTED;
     }
 
-    callback?.(errors);
+    if (!config.name) {
+        errors.name = translate?.('exception.ERROR_NO_NAME_GIVEN', ERROR_NO_NAME_GIVEN) ?? ERROR_NO_NAME_GIVEN;
+    }
 
-    return Object.keys(errors).length === 0;
+    return errors;
 }
-

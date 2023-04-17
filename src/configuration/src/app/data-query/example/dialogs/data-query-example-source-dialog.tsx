@@ -1,75 +1,92 @@
-import { DataQueryExampleSourceConfig } from '../components/data-query-example-source-config';
-import { IDataQueryExampleSource } from '../models';
-import { ISystemInfoResponse } from '@actiwaredevelopment/io-sdk-typescript-designer';
-
-import { useState } from 'react';
+import * as DesignerAPI from '@actiwaredevelopment/io-sdk-typescript-designer';
+import { IHttpCredential } from '@actiwaredevelopment/io-sdk-typescript-models';
+import { SyntaxComboBox } from '@actiwaredevelopment/io-sdk-react';
+import {
+    DefaultButton,
+    Dialog,
+    DialogFooter,
+    IDialogProps,
+    MessageBar,
+    MessageBarType,
+    PrimaryButton,
+    Stack,
+    Text,
+    TextField
+} from '@fluentui/react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { DefaultButton, Dialog, DialogFooter, IDialogContentProps, IDialogProps, PrimaryButton } from '@fluentui/react';
+import { IDataQueryExampleSource } from '../models';
+import { SourceErrorType, SourceWarningType, validateDataSourceConfig } from '../validation';
+import { HTTP_CREDENTIAL_STORE_ID, VALIDATION_TIMEOUT } from '../../../models';
+import { useHttpLoginProfileOptions } from '../../../hooks';
+import { credentialUtils } from '../../../utils';
 
-import { validateDataSourceConfig } from '../validation';
+type InputChangeType = keyof Pick<IDataQueryExampleSource, 'name' | 'login_profile'>;
 
-export type DataQueryExampleSourceActionType = 'NEW' | 'DUPLICATE' | 'EDIT';
+interface IDataQuerySourceDialogProps extends IDialogProps {
+    actionType: DataQuerySourceActionType;
+    blockedNames: string[];
+    config: IDataQueryExampleSource;
+    loginProfiles: IHttpCredential[];
+    sources: IDataQueryExampleSource[];
 
-export interface IDataQueryExampleSourceDialogConfig {
-    show?: boolean;
-    actionType?: DataQueryExampleSourceActionType;
-
-    systemInfo?: ISystemInfoResponse;
-
-    blockedNames?: string[];
-    sources?: IDataQueryExampleSource[];
-
-    config?: IDataQueryExampleSource;
+    onSubmit: (config: IDataQueryExampleSource) => void;
 }
 
-export interface IDataQueryExampleSourceDialogProps extends IDataQueryExampleSourceDialogConfig, IDialogProps {
-    onSubmit?: (config?: IDataQueryExampleSource) => void;
+export type DataQuerySourceActionType = 'NEW' | 'DUPLICATE' | 'EDIT';
+
+export interface IDataQuerySourceDialogConfig {
+    actionType: DataQuerySourceActionType;
+    blockedNames: string[];
+    config: IDataQueryExampleSource;
+    show: boolean;
+    sources: IDataQueryExampleSource[];
 }
 
-export interface IDataQueryExampleSourceConfigProps {
-    config?: IDataQueryExampleSource;
-    systemInfo?: ISystemInfoResponse;
-
-    onChange?: (config: IDataQueryExampleSource) => void;
-    onValidate?: (config?: IDataQueryExampleSource, callback?: (error?: Record<string, string>) => void) => void;
-}
-
-export const DataQueryExampleSourceDialog: React.FunctionComponent<IDataQueryExampleSourceDialogProps> = (props) => {
+export const DataQuerySourceDialog: React.FunctionComponent<IDataQuerySourceDialogProps> = (props) => {
     const { t: translate } = useTranslation();
 
-    const [formData, setFormData] = useState<IDataQueryExampleSource | undefined>(props.config);
+    const [config, setConfig] = useState<IDataQueryExampleSource>(props.config);
+    const [errors, setErrors] = useState<SourceErrorType>({});
+    const [warnings, setWarnings] = useState<SourceWarningType>({});
 
-    const [isValid, setValidState] = useState<boolean>(false);
+    const loginProfileOptions = useHttpLoginProfileOptions(props.loginProfiles ?? []);
 
-    const primaryButtonDisabled = !formData?.name || !!props.blockedNames?.includes(formData.name) || isValid !== true;
+    const timeoutIdRef = useRef<NodeJS.Timeout>();
 
-    let title = '';
-    let primaryButtonText = '';
+    const isValid = Object.keys(errors).length === 0;
+    const primaryButtonDisabled = !config.name || !!props.blockedNames.includes(config.name) || !isValid;
+
+    let title = translate('text.TITLE_MODIFY_SOURCE', 'Modify Source');
+    let primaryButtonText = translate('text.BUTTON_SAVE', 'Save');
 
     switch (props.actionType) {
         case 'DUPLICATE':
             title = translate('text.TITLE_CLONE_SOURCE', 'Duplicate Source');
-            primaryButtonText = translate('text.BUTTON_DUPLICATE_SOURCE', 'Duplicate');
+            primaryButtonText = translate('text.BUTTON_CLONE_SOURCE', 'Duplicate');
             break;
+
         case 'NEW':
             title = translate('text.TITLE_ADD_SOURCE', 'Add Source');
             primaryButtonText = translate('text.BUTTON_ADD', 'Add');
             break;
-
-        default:
-            title = translate('text.TITLE_MODIFY_SOURCE', 'Modify Source');
-            primaryButtonText = translate('text.BUTTON_SAVE', 'Save');
     }
 
-    const dialogContentProps: IDialogContentProps = {
-        title,
-        ...props.dialogContentProps
-    };
+    // Validate configuration
+    useEffect(() => {
+        clearTimeout(timeoutIdRef.current);
+
+        timeoutIdRef.current = setTimeout(() => {
+            const [errors, warnings] = validateDataSourceConfig(config, props.blockedNames, props.sources);
+
+            // This will cause two rerenders, be cautious with additional changes
+            setErrors(errors);
+            setWarnings(warnings);
+        }, VALIDATION_TIMEOUT);
+    }, [config, props.blockedNames, props.sources]);
 
     function handleAfterDismiss() {
-        setFormData(undefined);
-
         // Chain callback
         props.modalProps?.onDismissed?.();
     }
@@ -79,56 +96,93 @@ export const DataQueryExampleSourceDialog: React.FunctionComponent<IDataQueryExa
         props.onDismiss?.(event);
     }
 
-    async function handlePrimaryButtonClick() {
-        if (!formData) {
-            return;
-        }
-
-        props.onSubmit?.(formData);
+    function handlePrimaryButtonClick() {
+        props.onSubmit(config);
     }
 
-    function handleConfigChange(config?: IDataQueryExampleSource) {
-        if (!config) {
-            return;
-        }
-
-        setFormData(config);
+    function handleInputChange(property: InputChangeType, newValue?: string) {
+        setConfig((current) => ({
+            ...current,
+            [property]: newValue ?? ''
+        }));
     }
 
-    function handleValidateConfig(
-        config?: IDataQueryExampleSource,
-        callback?: (error?: Record<string, string>) => void
-    ) {
-        const errors: Record<string, string> = {};
+    function handleOpenCredentialWizard() {
+        DesignerAPI.system.openCredentialWizard([HTTP_CREDENTIAL_STORE_ID], (credentials) => {
+            const httpLoginProfile = credentialUtils.parseHttpCredentials(credentials);
 
-        if (config) {
-            const isValid = validateDataSourceConfig(config, props.blockedNames, props.sources, translate, callback);
+            // The Designer API only returns the new element. If the number of login profiles
+            // does not equal one, something must have gone wrong.
+            if (httpLoginProfile.length !== 1) {
+                return;
+            }
 
-            setValidState(isValid);
-
-            return;
-        }
-
-        callback?.(errors);
+            setConfig((current) => ({
+                ...current,
+                login_profile: httpLoginProfile[0].id
+            }));
+        });
     }
 
     return (
         <Dialog
             minWidth='32rem'
             {...props}
-            dialogContentProps={dialogContentProps}
             onDismiss={handleDismiss}
+            dialogContentProps={{
+                ...props.dialogContentProps,
+                title
+            }}
             modalProps={{
                 ...props.modalProps,
                 onDismissed: handleAfterDismiss,
                 isBlocking: true
             }}>
-            <DataQueryExampleSourceConfig
-                config={formData}
-                systemInfo={props.systemInfo}
-                onChange={handleConfigChange}
-                onValidate={handleValidateConfig}
-            />
+            <Stack
+                tokens={{
+                    childrenGap: '0.5rem'
+                }}>
+                <TextField
+                    autoFocus
+                    required
+                    errorMessage={errors.name ?? ''}
+                    label={translate('text.LABEL_SOURCE_NAME', 'Name')}
+                    onChange={(_, value) => handleInputChange('name', value ?? '')}
+                    placeholder={translate('text.PLACEHOLDER_SOURCE_NAME', 'Please enter here the name of your source')}
+                    value={config.name ?? ''}
+                />
+
+                <SyntaxComboBox
+                    errorMessage={errors.login_profile ?? ''}
+                    label={translate('text.LABEL_LOGIN_PROFILE', 'Which login profile should be used?')}
+                    onChange={(_, option) => handleInputChange('login_profile', option?.key.toString())}
+                    onSyntax={handleOpenCredentialWizard}
+                    options={loginProfileOptions}
+                    placeholder={translate('text.PLACEHOLDER_LOGIN_PROFILE', 'Select a login profile here')}
+                    selectedKey={config.login_profile ?? ''}
+                    iconButtonProps={{
+                        iconProps: {
+                            iconName: 'fa-plus'
+                        }
+                    }}
+                    styles={{
+                        container: {
+                            flexGrow: 1
+                        }
+                    }}
+                    syntaxProps={{
+                        tooltip: translate('text.TOOLTIP_ADD_LOGIN_PROFILE', 'Add a new login profile')
+                    }}
+                />
+
+                {warnings.source && (
+                    <MessageBar
+                        messageBarType={MessageBarType.warning}
+                        dismissButtonAriaLabel='Close'>
+                        <Text>{warnings.source}</Text>
+                    </MessageBar>
+                )}
+            </Stack>
 
             <DialogFooter>
                 <PrimaryButton
@@ -139,12 +193,9 @@ export const DataQueryExampleSourceDialog: React.FunctionComponent<IDataQueryExa
 
                 <DefaultButton
                     text={translate('text.BUTTON_CANCEL', 'Cancel')}
-                    onClick={() => {
-                        handleDismiss();
-                    }}
+                    onClick={() => handleDismiss()}
                 />
             </DialogFooter>
         </Dialog>
     );
 };
-

@@ -1,10 +1,264 @@
 {
-    "module_id": "<INSERT NEW UUID HERE>",
+    "description": "A module with example configurations to bootstrap the development process",
+    "display_text": "Template Module",
+    "informational_version": "TEMPLATE",
+    "language_code_description": "MODULE_TEMPLATE_DESCRIPTION",
+    "language_code": "MODULE_TEMPLATE_TITLE",
+    "module_id": "d54c7889-aab5-47c0-9ee1-a622f2ed6b2f",
+    "name": "Template Module",
+    "service_address": ":31234",
     "version": "2.0.0.0000",
-    "name": "<ENTER MODULE NAME HERE>",
-    "display_text": "<ENTER DISPLAY TEXT HERE>",
-    "description": "<ENTER A DESCRIPTION HERE>",
-    "language_code": "MODULE_TITLE",
-    "language_code_description": "MODULE_DESCRIPTION",
-    "service_address": ":30100"
+    "data_query_addins": [
+        {
+            "info": {
+                "id": "45fac709-7ff6-4b0e-8998-7e0b1524a626",
+                "name": "Template Query",
+                "version": "2.0.0",
+                "display_text": "Template Query",
+                "description": "",
+                "language_code": "MODULE_TEMPLATE_QUERY",
+                "language_code_description": "MODULE_TEMPLATE_QUERY_DESC"
+            },
+            "routes": {
+                "config": [
+                    {
+                        "function": "LOAD",
+                        "type": "website",
+                        "website": {
+                            "url": "/api/v2/data-query/example/config"
+                        }
+                    },
+                    {
+                        "function": "SAVE",
+                        "type": "website",
+                        "website": {
+                            "url": "/api/v2/data-query/example/config"
+                        }
+                    },
+                    {
+                        "function": "VALIDATE",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/data-query/example/config/validate"
+                        }
+                    },
+                    {
+                        "function": "GET_ITEMS",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/data-query/example/config/get-items"
+                        }
+                    },
+                    {
+                        "function": "GET_EXPORT_ITEMS",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/data-query/example/config/export/items"
+                        }
+                    },
+                    {
+                        "function": "EXPORT",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/data-query/example/config/export"
+                        }
+                    },
+                    {
+                        "function": "IMPORT",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/data-query/example/config/import"
+                        }
+                    }
+                ],
+                "execution": [
+                    {
+                        "function": "EXECUTE",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/data-query/example/execute"
+                        }
+                    },
+                    {
+                        "function": "TEST",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/data-query/example/test"
+                        }
+                    }
+                ],
+                "analytics": [
+                    {
+                        "function": "COLLECT_REFERENCES",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/data-query/example/config/analytics/collect"
+                        }
+                    },
+                    {
+                        "function": "INSPECT",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/data-query/example/config/analytics/inspect"
+                        }
+                    },
+                    {
+                        "function": "GENERATE_DOCUMENTATION",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/data-query/example/config/analytics/documentation"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "processors": [
+        {
+            "info": {
+                "id": "dd9ca690-3073-4215-8c9b-f65d33f0da19",
+                "version": "1.0.0",
+                "name": "Template Processor",
+                "display_text": "Template Processor",
+                "description": "This processor illustrates how one can create a processor.",
+                "language_code": "TEMPLATE_PROCESSOR_TITLE",
+                "language_code_description": "TEMPLATE_PROCESSOR_DESC",
+                "icon": {
+                    "small": "image:/images/template-16.png",
+                    "medium": "image:/images/template-32.png",
+                    "large": "image:/images/template-48.png"
+                }
+            },
+            "input_ports": [
+                {
+                    "id": "input",
+                    "name": "Input",
+                    "description": "",
+                    "language_code": "TEMPLATE_PORT_INPUT_TITLE",
+                    "language_code_description": "TEMPLATE_PORT_INPUT_DESCRIPTION"
+                }
+            ],
+            "output_ports": [
+                {
+                    "id": "output",
+                    "name": "Output",
+                    "description": "",
+                    "language_code": "TEMPLATE_PORT_OUTPUT_TITLE",
+                    "language_code_description": "TEMPLATE_PORT_OUTPUT_DESCRIPTION"
+                }
+            ],
+            "routes": {
+                "config": [
+                    {
+                        "function": "LOAD",
+                        "type": "website",
+                        "website": {
+                            "url": "/api/v2/processor/example/config"
+                        }
+                    },
+                    {
+                        "function": "SAVE",
+                        "type": "website",
+                        "website": {
+                            "url": "/api/v2/processor/example/config"
+                        }
+                    },
+                    {
+                        "function": "UPGRADE",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/processor/example/config/upgrade"
+                        }
+                    },
+                    {
+                        "function": "UPDATE_REFERENCES",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/processor/example/config/update"
+                        }
+                    },
+                    {
+                        "function": "VALIDATE",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/processor/example/config/validate"
+                        }
+                    },
+                    {
+                        "function": "GET_USED_ITEMS",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/processor/example/config/items"
+                        }
+                    }
+                ],
+                "execution": [
+                    {
+                        "function": "EXECUTE",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/processor/example/execute"
+                        }
+                    },
+                    {
+                        "function": "TEST",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/processor/example/test"
+                        }
+                    }
+                ],
+                "analytics": [
+                    {
+                        "function": "COLLECT_REFERENCES",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/processor/example/analytics/collect"
+                        }
+                    },
+                    {
+                        "function": "INSPECT",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/processor/example/analytics/inspect"
+                        }
+                    },
+                    {
+                        "function": "GENERATE_DOCUMENTATION",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/processor/example/analytics/documentation"
+                        }
+                    },
+                    {
+                        "function": "DEPENDENCIES",
+                        "type": "http",
+                        "http": {
+                            "method": "POST",
+                            "url": "/api/v2/processor/example/analytics/dependencies"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
 }
