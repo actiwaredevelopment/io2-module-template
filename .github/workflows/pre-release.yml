@@ -7,11 +7,19 @@ on:
             - 'hotfix/*'
     workflow_dispatch:
         inputs:
-            release:
+            version:
                 description: 'The release version'
                 required: true
                 type: string
-                default: ''
+                default: '2.0.0'
+            type:
+                description: 'The release type'
+                required: true
+                default: 'prerelease'
+                type: choice
+                options:
+                    - 'prerelease/'
+                    - 'hotfix/'
 
 jobs:
     version:
@@ -21,6 +29,7 @@ jobs:
         outputs:
             version: ${{ steps.version.outputs.result }}
             setup-tag: ${{ steps.setup_tag.outputs.result }}
+            setup-version: ${{ steps.version.outputs.result }}.${{ steps.build.outputs.formattedTime }}
             docker-tag: ${{ steps.docker_tag.outputs.result }}
             build-version: ${{ steps.build.outputs.formattedTime }}
 
@@ -32,21 +41,23 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   result-encoding: string
                   script: |
-                      let version = ''
+                      let version = '${{ github.event.inputs.type }}${{ github.event.inputs.version }}'
 
-                      if (context.payload.ref.indexOf('prerelease') > -1) {
-                        version = context.payload.ref.replace(/refs\/heads\/prerelease\//gi, '')
-                      } else {
-                        version = context.payload.ref.replace(/refs\/heads\/hotfix\//gi, '')
+                      if (version == '') {
+                        version = context.payload.ref
                       }
 
-                      if (version !== '' && version !== 'refs/heads/master' && version !== 'refs/heads/main') {
+                      if (version.indexOf('prerelease') > -1) {
+                        version = version.replace(/refs\/heads\/prerelease\//gi, '')
+                      } else {
+                        version = version.replace(/refs\/heads\/hotfix\//gi, '')
+                      }
+
+                      if (version !== '' && version !== 'refs/heads/master') {
                         return version
                       }
 
-                      version = '${{ github.event.inputs.release }}';
-
-                      return version.replace('/prerelease/gi', '').replace('/hotfix/gi', '')
+                      return '${{ github.event.inputs.version }}'
 
             - name: Set Setup Tag
               id: setup_tag
@@ -55,10 +66,10 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   result-encoding: string
                   script: |
-                      let version = context.payload.ref;
+                      let version = '${{ github.event.inputs.type }}${{ github.event.inputs.version }}'
 
-                      if (version === '' || version === 'refs/heads/master' || version === 'refs/heads/main') {
-                        version = '${{ github.event.inputs.release }}';
+                      if (version == '') {
+                        version = context.payload.ref
                       }
 
                       if (version.indexOf('prerelease') > -1) {
@@ -76,10 +87,10 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   result-encoding: string
                   script: |
-                      let version = context.payload.ref;
+                      let version = '${{ github.event.inputs.type }}${{ github.event.inputs.version }}'
 
-                      if (version === '' || version === 'refs/heads/master' || version === 'refs/heads/main') {
-                        version = '${{ github.event.inputs.release }}';
+                      if (version == '') {
+                        version = context.payload.ref
                       }
 
                       if (version.indexOf('prerelease') > -1) {
