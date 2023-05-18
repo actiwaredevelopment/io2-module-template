@@ -7,15 +7,15 @@ on:
             - 'hotfix/*'
     workflow_dispatch:
         inputs:
-            version:
-                description: 'The release version'
-                required: true
+            release:
+                description: 'The default release version'
+                required: false
                 type: string
-                default: '2.0.0'
-            type:
+                default: ''
+            release_type:
                 description: 'The release type'
-                required: true
-                default: 'prerelease'
+                required: false
+                default: 'prerelease/'
                 type: choice
                 options:
                     - 'prerelease/'
@@ -24,92 +24,15 @@ on:
 jobs:
     version:
         name: 'Determine Version'
-        runs-on: ubuntu-latest
-
-        outputs:
-            version: ${{ steps.version.outputs.result }}
-            setup-tag: ${{ steps.setup_tag.outputs.result }}
-            setup-version: ${{ steps.version.outputs.result }}.${{ steps.build.outputs.formattedTime }}
-            docker-tag: ${{ steps.docker_tag.outputs.result }}
-            build-version: ${{ steps.build.outputs.formattedTime }}
-
-        steps:
-            - name: Set Version
-              id: version
-              uses: actions/github-script@v6
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  result-encoding: string
-                  script: |
-                      let version = '${{ github.event.inputs.type }}${{ github.event.inputs.version }}'
-
-                      if (version == '') {
-                        version = context.payload.ref
-                      }
-
-                      if (version.indexOf('prerelease') > -1) {
-                        version = version.replace(/refs\/heads\/prerelease\//gi, '')
-                      } else {
-                        version = version.replace(/refs\/heads\/hotfix\//gi, '')
-                      }
-
-                      if (version !== '' && version !== 'refs/heads/master') {
-                        return version
-                      }
-
-                      return '${{ github.event.inputs.version }}'
-
-            - name: Set Setup Tag
-              id: setup_tag
-              uses: actions/github-script@v6
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  result-encoding: string
-                  script: |
-                      let version = '${{ github.event.inputs.type }}${{ github.event.inputs.version }}'
-
-                      if (version == '') {
-                        version = context.payload.ref
-                      }
-
-                      if (version.indexOf('prerelease') > -1) {
-                        return 'Pre-Release'
-                      } else {
-                        return 'Hotfix'
-                      }
-
-                      return ''
-
-            - name: Set Docker Tag
-              id: docker_tag
-              uses: actions/github-script@v6
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  result-encoding: string
-                  script: |
-                      let version = '${{ github.event.inputs.type }}${{ github.event.inputs.version }}'
-
-                      if (version == '') {
-                        version = context.payload.ref
-                      }
-
-                      if (version.indexOf('prerelease') > -1) {
-                        return 'prerelease'
-                      } else {
-                        return 'hotfix'
-                      }
-
-                      return ''
-
-            - name: Get current date
-              id: build
-              uses: josStorer/get-current-time@v2
-              with:
-                  format: MMDD
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/determine-version.yml@main
+        with:
+            branch: ${{ github.ref_name }}
+            default_version: ${{ inputs.release }}
+            type: ${{ inputs.release_type }}
 
     build-ui:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-ui-io-module.yml@main
-        needs: [version, clean-up-old-cache]
+        needs: [version]
         with:
             repository: ${{ github.repository }}
             branch: ${{ github.ref_name }}

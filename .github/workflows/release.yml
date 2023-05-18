@@ -15,26 +15,10 @@ on:
 jobs:
     version:
         name: 'Determine Version'
-        runs-on: ubuntu-latest
-
-        outputs:
-            version: ${{ steps.version.outputs.result }}
-
-        steps:
-            - name: Set Version
-              id: version
-              uses: actions/github-script@v3
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  result-encoding: string
-                  script: |
-                      const version = context.payload.ref.replace(/refs\/tags\/release-/gi, '')
-
-                      if (version !== '' && version !== 'refs/heads/master' && version !== 'refs/heads/main') {
-                        return version
-                      }
-
-                      return '${{ github.event.inputs.release }}'
+        uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/determine-version.yml@main
+        with:
+            branch: ${{ github.ref_name }}
+            default_version: ${{ inputs.release }}
 
     # build-windows-ui-elements:
     #     name: 'Build UI Elements for Windows'

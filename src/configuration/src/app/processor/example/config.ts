@@ -1,4 +1,4 @@
-import { NODE_FIELD_PARAMTER } from '../../models';
+import { NODE_FIELD_PARAMETER } from '../../models';
 import { CONFIG_KEY, IProcessorExampleConfig } from './models';
 import { IItemConfig } from '@actiwaredevelopment/io-sdk-typescript-models';
 
@@ -41,10 +41,11 @@ export function convertToItemConfig(config: IProcessorExampleConfig): IItemConfi
     const itemConfig: IItemConfig = {
         parameters: {
             [CONFIG_KEY]: JSON.stringify(config),
-            [NODE_FIELD_PARAMTER]: JSON.stringify(nodeFields),
+            [NODE_FIELD_PARAMETER]: JSON.stringify(nodeFields),
             login_profile: config.login_profile ?? ''
         }
     };
 
     return itemConfig;
 }
+
