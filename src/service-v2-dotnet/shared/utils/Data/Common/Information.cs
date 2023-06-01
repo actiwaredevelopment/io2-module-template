@@ -25,7 +25,7 @@ public class Information
 
     public string ProductName { get; init; } = "ACTIWARE: IO";
     public string ModuleName { get; init; } = "Module: IOTemplate";
-
+    public Guid ModuleId { get; init; } = Guid.Parse("");
     public Version ModuleVersion { get; init; } = new Version(2, 0, 0, 0000);
 
     #endregion
