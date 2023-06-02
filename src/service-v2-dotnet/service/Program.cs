@@ -116,6 +116,9 @@ builder.Services.AddProcessorExampleScope();
 
 // Add scope for crawler addins
 
+// Add http client for healtch check
+builder.Services.AddHttpClient();
+
 // In production, the React files will be served from this directory
 builder.Services.AddSpaStaticFiles(configuration =>
 {

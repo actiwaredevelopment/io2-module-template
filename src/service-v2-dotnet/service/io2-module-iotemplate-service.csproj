@@ -23,7 +23,7 @@
   
   <ItemGroup>
     <PackageReference Include="Development.SDK.Logging" Version="2.0.6" />
-    <PackageReference Include="Development.SDK.Module" Version="2.0.76" />
+    <PackageReference Include="Development.SDK.Module" Version="2.0.98" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />
@@ -56,7 +56,7 @@
       <Message Text=" MSBuildBinPath  = $(MSBuildBinPath)" Importance="high" />
       <Message Text=" MSBuildProjectDefaultTargets  = $(MSBuildProjectDefaultTargets)" Importance="high" />
       <Message Text=" MSBuildExtensionsPath  = $(MSBuildExtensionsPath)" Importance="high" />
-      <Message Text=" MSBuildStartupDirectory  = $(MSBuildStartupDirectory)" Importance="high"/>
+      <Message Text=" MSBuildStartupDirectory  = $(MSBuildStartupDirectory)" Importance="high" />
   </Target>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

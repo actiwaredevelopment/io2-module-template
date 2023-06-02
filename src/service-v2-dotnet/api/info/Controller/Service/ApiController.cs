@@ -18,7 +18,7 @@ public class ApiController : ControllerBase
     /// <param name="informationHandler"></param>
     /// <param name="languageManager"></param>
     /// <param name="sdkLogger"></param>
-    public ApiController(ILogger<ApiController> logger, Utils.Data.Common.Information informationHandler, Development.SDK.Module.Controller.LanguageManager languageManager, Development.SDK.Logging.Controller.Logger sdkLogger)
+    public ApiController(ILogger<ApiController> logger, Utils.Data.Common.Information informationHandler, Development.SDK.Module.Controller.LanguageManager languageManager, Development.SDK.Logging.Controller.Logger sdkLogger, IHttpClientFactory httpClientFactory)
     {
         sdkLogger.Initialize(logger);
         _logger = sdkLogger;
@@ -26,6 +26,8 @@ public class ApiController : ControllerBase
         _languageManager = languageManager;
 
         _information = informationHandler ?? new();
+
+        _httpClient = httpClientFactory.CreateClient();
     }
 
     #endregion
@@ -36,6 +38,8 @@ public class ApiController : ControllerBase
     private readonly Development.SDK.Module.Controller.LanguageManager? _languageManager;
 
     private readonly Utils.Data.Common.Information _information;
+
+    private readonly HttpClient _httpClient;
 
     #endregion
 
@@ -113,6 +117,17 @@ public class ApiController : ControllerBase
             _logger?.Critcial(_information.GetExceptionCode("0000"), "The following error occurred while reading the module definition file. Error: {0}", ex.Message);
             return StatusCode(500, ex.Message);
         }
+    }
+
+    /// <summary>
+    /// Check if the module is available
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("module/healthcheck")]
+    public async Task<Development.SDK.Module.Data.HealthCheck.Result> HealthCheck(Development.SDK.Module.Data.HealthCheck.Request request)
+    {
+        return await Development.SDK.Module.Controller.HealthCheck.DoHealthCheckAsync(_httpClient, _information.ModuleId, _information.ModuleName, request.Services);
     }
 
     #endregion
