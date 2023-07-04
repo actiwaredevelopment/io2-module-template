@@ -37,6 +37,8 @@ if (OperatingSystem.IsWindows() == true)
         ContentRootPath = baseDirectory,
         Args = args
     });
+
+    System.IO.Directory.SetCurrentDirectory(baseDirectory ?? AppContext.BaseDirectory);
 }
 else
 {
