@@ -9,12 +9,8 @@
     "service_address": ":31234",
     "version": "2.0.0.0000",
     "health_check": {
-        "routes": {
-            "type": "website",
-            "website": {
-                "url": "/api/v2/info/module/health-check"
-            }
-        }
+        "method": "POST",
+        "url": "/api/v2/info/module/health-check"
     },
     "data_query_addins": [
         {
