@@ -124,7 +124,7 @@ public class ApiController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPost]
-    [Route("module/healthcheck")]
+    [Route("module/health")]
     public async Task<Development.SDK.Module.Data.HealthCheck.Result> HealthCheck(Development.SDK.Module.Data.HealthCheck.Request request)
     {
         return await Development.SDK.Module.Controller.HealthCheck.DoHealthCheckAsync(_httpClient, _information.ModuleId, _information.ModuleName, request.Services);
