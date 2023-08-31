@@ -4,7 +4,7 @@
     "private": true,
     "installTypes": true,
     "dependencies": {
-        "@actiwaredevelopment/io-sdk-react": "^0.0.164",
+        "@actiwaredevelopment/io-sdk-react": "^0.0.163",
         "@actiwaredevelopment/io-sdk-typescript-designer": "^0.0.44",
         "@actiwaredevelopment/io-sdk-typescript-models": "^0.0.157",
         "@fluentui/font-icons-mdl2": "^8.5.24",
