@@ -53,14 +53,14 @@ jobs:
         needs: [build-ui, version]
         with:
             repository: ${{ github.repository }}
-            branch: tags/${{ github.ref_name }}
+            branch: ${{ github.ref_name }}
             dotnet-version: 7.0.x
-            project: src/service/service/io2-module-elo-service.csproj
+            project: src/service/service/io2-module-template-service.csproj
             ui-build-cache-key: ${{ needs.build-ui.outputs.cache-key }}
             ui-build-cache-path: ${{ needs.build-ui.outputs.cache-path }}
             module-artifact: ${{ needs.build-windows-ui-elements.outputs.download }}
             module-artifact-path: ./module-definition/functions/io2-module-elo**.dll
-            modulefile: elo.zip
+            modulefile: IOTemplate.zip
             dockerfile: ./.github/docker/dockerfile
             ui-build-path: ./src/configuration/build
             rid: 'linux-x64'
@@ -79,8 +79,8 @@ jobs:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
         with:
             artifact: ${{ needs.build-linux.outputs.download }}
-            image-name: actiwareio/io-module-template
-            image-tag: 2-latest,actiwareio/io-module-template:${{ needs.version.outputs.version }}
+            image-name: actiwareio/io-module-iotemplate
+            image-tag: 2-latest,actiwareio/io-module-iotemplate:${{ needs.version.outputs.version }}
             remove-tags: prerelease-${{ needs.version.outputs.version }}
             force-remove: true
             use-cache: true
