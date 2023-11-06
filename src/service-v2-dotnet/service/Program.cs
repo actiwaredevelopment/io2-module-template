@@ -211,11 +211,6 @@ app.UseSpaStaticFiles();
 
 app.UseRouting();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
-
 app.UseSpa(spa =>
 {
     spa.Options.SourcePath = "ClientApp";
@@ -223,6 +218,7 @@ app.UseSpa(spa =>
     if (app.Environment.IsDevelopment())
     {
         spa.Options.SourcePath = System.IO.Path.GetFullPath(System.IO.Path.Combine(baseDirectory ?? System.AppDomain.CurrentDomain.BaseDirectory, "../../configuration"));
+        spa.Options.DevServerPort = 3100;
         spa.UseReactDevelopmentServer(npmScript: "start");
     }
 });
