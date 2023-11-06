@@ -4,9 +4,9 @@
     "private": true,
     "installTypes": true,
     "dependencies": {
-        "@actiwaredevelopment/io-sdk-react": "^0.0.163",
+        "@actiwaredevelopment/io-sdk-react": "^0.0.174",
         "@actiwaredevelopment/io-sdk-typescript-designer": "^0.0.44",
-        "@actiwaredevelopment/io-sdk-typescript-models": "^0.0.157",
+        "@actiwaredevelopment/io-sdk-typescript-models": "^0.0.163",
         "@fluentui/font-icons-mdl2": "^8.5.24",
         "@fluentui/react": "^8.111.2",
         "@monaco-editor/react": "^4.5.2",
