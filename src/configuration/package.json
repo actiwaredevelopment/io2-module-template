@@ -47,7 +47,7 @@
     },
     "scripts": {
         "prestart": "node logdevserverstart.js",
-        "start": "vite start",
+        "start": "vite",
         "build": "vite build",
         "postinstall": "ts-node ./scripts/postinstall.ts",
         "prepare": "cd ../.. && husky install",
