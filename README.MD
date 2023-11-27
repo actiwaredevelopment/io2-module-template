@@ -4,10 +4,8 @@
 
 ### Build Status
 
--   ![Build Status Release](https://github.com/actiwaredevelopment/io2-module-iotemplate/actions/workflows/release.yml/badge.svg)
--   ![Build Status Pre-Release](https://github.com/actiwaredevelopment/io2-module-iotemplate/actions/workflows/pre-release.yml/badge.svg)
--   ![Build Status Nightly](https://github.com/actiwaredevelopment/io2-module-iotemplate/actions/workflows/nightly.yml/badge.svg)
--   ![Build Status Linux](https://github.com/actiwaredevelopment/io2-module-iotemplate/actions/workflows/linux.yml/badge.svg)
+-   ![Build Status Release](https://github.com/actiwaredevelopment/io2-module-template/actions/workflows/release.yml/badge.svg)
+-   ![Build Status Pre-Release](https://github.com/actiwaredevelopment/io2-module-template/actions/workflows/pre-release.yml/badge.svg)
 
 ## Quick reference
 
