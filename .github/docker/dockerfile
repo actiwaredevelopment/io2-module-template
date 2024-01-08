@@ -1,5 +1,5 @@
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-bullseye-slim
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates

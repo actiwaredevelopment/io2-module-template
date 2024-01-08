@@ -45,13 +45,13 @@ jobs:
 
     build-container:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
-        needs: [version]
+        needs: [version, build-ui]
         with:
             artifact-name: BuildOutputLinux
             version-postfix: '-pre-release'
             repository: ${{ github.repository }}
             branch: ${{ github.ref_name }}
-            dotnet-version: 7.0.x
+            dotnet-version: 8.0.x
             project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
             modulefile: IOTemplate.zip
             dockerfile: ./.github/docker/dockerfile
@@ -70,13 +70,13 @@ jobs:
 
     build-windows:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
-        needs: [version]
+        needs: [version, build-ui]
         with:
             artifact-name: BuildOutputWindows
             version-postfix: ${{ needs.version.outputs.setup-tag }}
             repository: ${{ github.repository }}
             branch: ${{ github.ref_name }}
-            dotnet-version: 7.0.x
+            dotnet-version: 8.0.x
             project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
             modulefile: IOTemplate.zip
             dockerfile: ./.github/docker/dockerfile
@@ -103,7 +103,7 @@ jobs:
             image-name: actiwareio/io-module-iotemplate
             image-tag: ${{ needs.version.outputs.docker-tag }}-${{ needs.version.outputs.version }}
             use-cache: true
-            cache-path: ${{ needs.build-linux.outputs.cache-path }}
+            cache-path: ${{ needs.build-container.outputs.cache-path }}
         secrets:
             docker-username: ${{ secrets.DOCKER_HUB_USER }}
             docker-password: ${{ secrets.DOCKER_HUB_SECRET }}

@@ -51,14 +51,15 @@ jobs:
     build-linux:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
         needs: [build-ui, version]
+        # needs: [build-ui, build-windows-ui-elements, version]
         with:
             repository: ${{ github.repository }}
             branch: ${{ github.ref_name }}
-            dotnet-version: 7.0.x
+            dotnet-version: 8.0.x
             project: src/service/service/io2-module-template-service.csproj
             ui-build-cache-key: ${{ needs.build-ui.outputs.cache-key }}
             ui-build-cache-path: ${{ needs.build-ui.outputs.cache-path }}
-            module-artifact: ${{ needs.build-windows-ui-elements.outputs.download }}
+            # module-artifact: ${{ needs.build-windows-ui-elements.outputs.download }}
             module-artifact-path: ./module-definition/functions/io2-module-elo**.dll
             modulefile: IOTemplate.zip
             dockerfile: ./.github/docker/dockerfile
