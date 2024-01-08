@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Module.IOTemplate.Api.Processor.Example</RootNamespace>
     <Product>ACTIWARE: IO</Product>
     <ProductName>Module: IOTemplate</ProductName>		
