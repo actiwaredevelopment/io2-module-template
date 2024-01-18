@@ -102,21 +102,7 @@ builder.Services.AddSingleton<Development.SDK.Module.Controller.LanguageManager>
 });
 builder.Services.AddSingleton<Module.IOTemplate.Utils.Data.Common.Information>();
 
-// Add scope for api's
-builder.Services.AddInfoApiScope();
-
-// Add scope for credentials
-
-// Add scope for actions
-
-// Add scope for processors
-builder.Services.AddProcessorExampleScope();
-
-// Add scope for data-query addins
-
-// Add scope for smart-search addins
-
-// Add scope for crawler addins
+// Add scope for api's here
 
 // Add http client for healtch check
 builder.Services.AddHttpClient();
