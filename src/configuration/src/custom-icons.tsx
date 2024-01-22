@@ -6,7 +6,7 @@ export function initializeCustomIcons() {
             'fa-arrow-down': <i className='fa-light fa-arrow-down' />,
             'fa-arrow-up': <i className='fa-light fa-arrow-up' />,
             'fa-circle-exclamation': <i className='fa-light fa-circle-exclamation' />,
-            'fa-circle-question': <i className='fa-light a-circle-question' />,
+            'fa-circle-question': <i className='fa-light fa-circle-question' />,
             'fa-clone': <i className='fa-light fa-clone' />,
             'fa-copy': <i className='fa-light fa-copy' />,
             'fa-list-alt': <i className='fa-light fa-list-alt' />,
