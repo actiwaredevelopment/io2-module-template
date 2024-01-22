@@ -1,5 +1,5 @@
 import { NODE_FIELD_PARAMETER } from '../../models';
-import { CONFIG_KEY, IProcessorExampleConfig } from './models';
+import { IProcessorExampleConfig } from './models';
 import { IItemConfig } from '@actiwaredevelopment/io-sdk-typescript-models';
 
 /**
@@ -9,7 +9,9 @@ import { IItemConfig } from '@actiwaredevelopment/io-sdk-typescript-models';
  * @returns A new default configuration
  */
 export function getDefaultProcessorConfig(): IProcessorExampleConfig {
-    return {};
+    return {
+        login_profile: ''
+    };
 }
 
 /**
@@ -36,11 +38,31 @@ export function upgradeConfig(config: IProcessorExampleConfig): IProcessorExampl
  *
  * @returns An `IItemConfig` which contains the serialized configuration
  */
+export function convertItemConfigToConfig(config?: IItemConfig): IProcessorExampleConfig {
+    if (!config?.parameters || !Object.keys(config.parameters).length) {
+        return getDefaultProcessorConfig();
+    }
+
+    return {
+        login_profile: config.parameters?.['login_profile'] ?? ''
+    };
+}
+
+/**
+ * Convert the given configuration to an `ItemConfig`. This will convert the
+ * given processor configuration to a JSON string.
+ *
+ * @param config The configuration which will be serialized.
+ *
+ * @throws An exception if the configuration could not be stringified
+ *
+ * @returns An `IItemConfig` which contains the serialized configuration
+ */
 export function convertToItemConfig(config: IProcessorExampleConfig): IItemConfig {
-    const nodeFields = ['NodeField1', 'NodeField2'];
+    const nodeFields = [''];
+
     const itemConfig: IItemConfig = {
         parameters: {
-            [CONFIG_KEY]: JSON.stringify(config),
             [NODE_FIELD_PARAMETER]: JSON.stringify(nodeFields),
             login_profile: config.login_profile ?? ''
         }

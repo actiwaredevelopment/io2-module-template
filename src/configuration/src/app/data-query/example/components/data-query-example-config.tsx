@@ -107,7 +107,7 @@ export const DataQueryConfig: React.FunctionComponent = () => {
         try {
             itemConfig = convertToItemConfig(config);
         } catch {
-            console.error('Error while serializing configration');
+            console.error('Error while serializing configuration');
         }
 
         // If we do not have an ItemConfig at this point, the serialization must have failed.
@@ -883,3 +883,4 @@ export const DataQueryConfig: React.FunctionComponent = () => {
         </AddInContentLayout>
     );
 };
+

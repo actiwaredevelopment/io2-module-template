@@ -66,7 +66,7 @@ export const ProcessorConfig: React.FunctionComponent = () => {
             try {
                 itemConfig = convertToItemConfig(config);
             } catch {
-                console.error('Error while serializing configration');
+                console.error('Error while serializing configuration');
             }
 
             // If we do not have an ItemConfig at this point, the serialization must have failed.
@@ -137,7 +137,9 @@ export const ProcessorConfig: React.FunctionComponent = () => {
 
     // Validate configuration with a delay to prevent unnecessary rerender
     useEffect(() => {
-        clearTimeout(timeoutIdRef.current);
+        if (timeoutIdRef.current) {
+            clearTimeout(timeoutIdRef.current);
+        }
 
         timeoutIdRef.current = setTimeout(() => {
             const errors = validateConfig(config, translate);
@@ -191,3 +193,4 @@ export const ProcessorConfig: React.FunctionComponent = () => {
         </Stack>
     );
 };
+
