@@ -4,7 +4,7 @@
 /// The controller for the registration of the routes for the function.
 /// </summary>
 [ApiController]
-[Route("/api/v2/processor/bucket/exists")]
+[Route("/api/v2/processor/example")]
 public partial class ApiController : ControllerBase
 {
     #region Constructor
