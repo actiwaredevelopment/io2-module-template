@@ -6,5 +6,14 @@
     "description": "<ENTER A DESCRIPTION HERE>",
     "language_code": "MODULE_TITLE",
     "language_code_description": "MODULE_DESCRIPTION",
-    "service_address": ":30100"
+    "service_address": ":30100",
+    "icon": {
+        "small": "font-fad:microchip",
+        "medium": "font-fad:microchip",
+        "large": "font-fad:microchip"
+    },
+    "health_check": {
+        "method": "POST",
+        "url": "/api/v2/info/module/health"
+    }
 }

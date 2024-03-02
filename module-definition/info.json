@@ -6,8 +6,13 @@
     "language_code": "MODULE_TEMPLATE_TITLE",
     "module_id": "d54c7889-aab5-47c0-9ee1-a622f2ed6b2f",
     "name": "Template Module",
-    "service_address": ":31234",
+    "service_address": ":30100",
     "version": "2.0.0.0000",
+    "icon": {
+        "small": "font-fad:microchip",
+        "medium": "font-fad:microchip",
+        "large": "font-fad:microchip"
+    },
     "health_check": {
         "method": "POST",
         "url": "/api/v2/info/module/health"
@@ -21,19 +26,17 @@
                 "display_text": "Template Query",
                 "description": "",
                 "language_code": "MODULE_TEMPLATE_QUERY",
-                "language_code_description": "MODULE_TEMPLATE_QUERY_DESC"
+                "language_code_description": "MODULE_TEMPLATE_QUERY_DESC",
+                "icon": {
+                    "small": "font-fas:database",
+                    "medium": "font-fas:database",
+                    "large": "font-fas:database"
+                }
             },
             "routes": {
                 "config": [
                     {
                         "function": "LOAD",
-                        "type": "website",
-                        "website": {
-                            "url": "/api/v2/data-query/example/config"
-                        }
-                    },
-                    {
-                        "function": "SAVE",
                         "type": "website",
                         "website": {
                             "url": "/api/v2/data-query/example/config"
@@ -138,9 +141,9 @@
                 "language_code": "TEMPLATE_PROCESSOR_TITLE",
                 "language_code_description": "TEMPLATE_PROCESSOR_DESC",
                 "icon": {
-                    "small": "image:/images/template-16.png",
-                    "medium": "image:/images/template-32.png",
-                    "large": "image:/images/template-48.png"
+                    "small": "font:microchip",
+                    "medium": "font:microchip",
+                    "large": "font:microchip"
                 }
             },
             "input_ports": [
@@ -165,13 +168,6 @@
                 "config": [
                     {
                         "function": "LOAD",
-                        "type": "website",
-                        "website": {
-                            "url": "/api/v2/processor/example/config"
-                        }
-                    },
-                    {
-                        "function": "SAVE",
                         "type": "website",
                         "website": {
                             "url": "/api/v2/processor/example/config"
