@@ -1,22 +1,13 @@
 import { SyntaxComboBox, SyntaxTextField } from '@actiwaredevelopment/io-sdk-react';
 import * as DesignerAPI from '@actiwaredevelopment/io-sdk-typescript-designer';
-import { IHttpCredential, ISyntaxFieldCategory } from '@actiwaredevelopment/io-sdk-typescript-models';
+
+import { IProcessorExampleConfigProps } from './processor-example-config';
+
 import { Stack } from '@fluentui/react';
 import { useTranslation } from 'react-i18next';
 
 import { useHttpLoginProfileOptions } from '../../../hooks';
 import { IProcessorExampleConfig } from '../models';
-import { ConfigErrorType } from '../validation';
-
-interface IProcessorExampleConfigProps {
-    config: IProcessorExampleConfig;
-    contextMenuItems: ISyntaxFieldCategory[];
-    errors: ConfigErrorType;
-    loginProfiles: IHttpCredential[];
-
-    onChange: (config: IProcessorExampleConfig) => void;
-    onAddCredential: () => void;
-}
 
 type InputChangeType = keyof Pick<IProcessorExampleConfig, 'login_profile' | 'name'>;
 type SyntaxChangeType = keyof Pick<IProcessorExampleConfig, 'name'>;
@@ -83,3 +74,4 @@ export const ProcessorCommonSettings: React.FunctionComponent<IProcessorExampleC
         </Stack>
     );
 };
+

@@ -4,10 +4,10 @@
     "private": true,
     "installTypes": true,
     "dependencies": {
-        "@actiwaredevelopment/io-sdk-react": "^0.0.215",
+        "@actiwaredevelopment/io-sdk-react": "^0.0.233",
         "@actiwaredevelopment/io-sdk-typescript-client": "^0.0.16",
-        "@actiwaredevelopment/io-sdk-typescript-designer": "^0.0.44",
-        "@actiwaredevelopment/io-sdk-typescript-models": "^0.0.174",
+        "@actiwaredevelopment/io-sdk-typescript-designer": "^0.0.47",
+        "@actiwaredevelopment/io-sdk-typescript-models": "^0.0.184",
         "@fluentui/font-icons-mdl2": "^8.5.4",
         "@fluentui/react": "^8.103.5",
         "@fortawesome/fontawesome-svg-core": "^6.5.1",
