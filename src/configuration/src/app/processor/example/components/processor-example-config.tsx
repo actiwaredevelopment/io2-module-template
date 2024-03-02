@@ -13,8 +13,8 @@ import { useTranslation } from 'react-i18next';
 
 import { HTTP_CREDENTIAL_STORE_ID, VALIDATION_TIMEOUT } from '../../../models';
 import { credentialUtils } from '../../../utils';
-import { convertToItemConfig, getDefaultProcessorConfig, upgradeConfig } from '../config';
-import { ALTERNATIVE_CONFIG_KEY, CONFIG_KEY, IProcessorExampleConfig } from '../models';
+import { convertItemConfigToConfig, convertToItemConfig, getDefaultProcessorConfig, upgradeConfig } from '../config';
+import { IProcessorExampleConfig } from '../models';
 import { ConfigErrorType, validateConfig } from '../validation';
 import { ProcessorCommonSettings } from './processor-example-common-settings';
 
@@ -25,6 +25,17 @@ const SYSTEM_INFO_REQUEST: DesignerAPI.ISystemInfoRequest = {
         FieldType.Parameter | FieldType.DataField | FieldType.Variable | FieldType.NodeField | FieldType.Plugins
 };
 
+export interface IProcessorExampleConfigProps {
+    config: IProcessorExampleConfig;
+    contextMenuItems: ISyntaxFieldCategory[];
+    errors: ConfigErrorType;
+    readOnly: boolean;
+    loginProfiles: IHttpCredential[];
+
+    onChange: (config: IProcessorExampleConfig) => void;
+    onAddCredential: () => void;
+}
+
 export const ProcessorConfig: React.FunctionComponent = () => {
     const { t: translate } = useTranslation();
 
@@ -33,30 +44,24 @@ export const ProcessorConfig: React.FunctionComponent = () => {
     const [contextMenuItems, setContextMenuItems] = useState<ISyntaxFieldCategory[]>([]);
     const [errors, setErrors] = useState<ConfigErrorType>({});
     const [loginProfiles, setLoginProfiles] = useState<IHttpCredential[]>([]);
+    const [locked, setLockState] = useState<boolean>(false);
 
     const timeoutIdRef = useRef<NodeJS.Timeout>();
 
     const handleLoad = useCallback((itemConfig?: IItemConfig, systemInfo?: DesignerAPI.ISystemInfoResponse) => {
-        let config: IProcessorExampleConfig = getDefaultProcessorConfig();
+        const config: IProcessorExampleConfig = convertItemConfigToConfig(itemConfig);
 
-        const configStr = itemConfig?.parameters?.[CONFIG_KEY] ?? itemConfig?.parameters?.[ALTERNATIVE_CONFIG_KEY];
-
-        if (configStr) {
-            try {
-                config = JSON.parse(configStr);
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
-        const contextMenuItems = systemInfo?.context_menus ?? [];
         const upgradedConfig = upgradeConfig(config);
+        const contextMenuItems = systemInfo?.context_menus ?? [];
         const httpLoginProfiles = credentialUtils.parseHttpCredentials(systemInfo?.credentials ?? []);
+
+        console.log(systemInfo);
 
         setApiInitialized(true);
         setConfig(upgradedConfig);
         setContextMenuItems(contextMenuItems);
         setLoginProfiles(httpLoginProfiles);
+        setLockState(systemInfo?.locked === true);
     }, []);
 
     const handleSave = useCallback(
@@ -76,7 +81,7 @@ export const ProcessorConfig: React.FunctionComponent = () => {
                     errorCode: 'CONFIG_SERIALIZATION_ERROR',
                     level: ReportLevel.Error,
                     text: translate(
-                        'text.ITEMCONFIG_NOT_PRESENT',
+                        'text.ITEM_CONFIG_NOT_PRESENT',
                         'Config could not be created. Serialization failed.'
                     ),
                     title: translate('text.SERIALIZATION_ERROR', 'Serialization Error')
@@ -184,6 +189,7 @@ export const ProcessorConfig: React.FunctionComponent = () => {
                 config={config}
                 contextMenuItems={contextMenuItems}
                 errors={errors}
+                readOnly={locked}
                 loginProfiles={loginProfiles}
                 onAddCredential={handleAddCredential}
                 onChange={setConfig}

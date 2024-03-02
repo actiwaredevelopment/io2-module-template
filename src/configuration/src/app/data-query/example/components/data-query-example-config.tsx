@@ -116,7 +116,7 @@ export const DataQueryConfig: React.FunctionComponent = () => {
             DesignerAPI.system.sendNotification({
                 errorCode: 'CONFIG_SERIALIZATION_ERROR',
                 level: ReportLevel.Error,
-                text: translate('text.ITEMCONFIG_NOT_PRESENT', 'Config could not be created. Serialization failed.'),
+                text: translate('text.ITEM_CONFIG_NOT_PRESENT', 'Config could not be created. Serialization failed.'),
                 title: translate('text.SERIALIZATION_ERROR', 'Serialization Error')
             });
 
