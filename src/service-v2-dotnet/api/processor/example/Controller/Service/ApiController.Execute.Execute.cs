@@ -36,6 +36,8 @@ public partial class ApiController
                 // Set fields
                 Fields = new Dictionary<string, List<string>>(),
                 HiddenFields = new Dictionary<string, List<string>>(),
+
+                Messages = helper.Messages
             };
 
             if (executionInfo.Config is null)
