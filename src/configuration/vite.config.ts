@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(() => {
-    const port = parseInt(process.env.PORT ?? '31234');
+    const port = parseInt(process.env.PORT ?? '30100');
 
     return {
         build: {
@@ -15,3 +15,4 @@ export default defineConfig(() => {
         }
     };
 });
+
