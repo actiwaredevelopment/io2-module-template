@@ -41,6 +41,7 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
     <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
     <ROW Directory="ClientApp_Dir" Directory_Parent="Service_Dir" DefaultDir="CLIENT~1|ClientApp"/>
+    <ROW Directory="ClientAppBuild_Dir" Directory_Parent="ClientApp_Dir" DefaultDir="build"/>
     <ROW Directory="Modules_Dir" Directory_Parent="APPDIR" DefaultDir="Modules"/>
     <ROW Directory="Service_Dir" Directory_Parent="Modules_Dir" DefaultDir="MODULE~1|IOTemplate"/>
     <ROW Directory="LanguageFiles_Dir" Directory_Parent="Service_Dir" DefaultDir="LANGUA~1|languages"/>
@@ -58,12 +59,12 @@
     <ATTRIBUTE name="CurrentFeature" value="Module"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
-    <ROW File="io2moduleiotemplateservice.exe" Component_="ServiceApplication" FileName="IO2MOD~1.EXE|io2-module-iotemplate-service.exe" Attributes="0" SourcePath="out\io2-module-iotemplate-service.exe" SelfReg="false" DigSign="true"/>
-    <ROW File="IOTemplate.zip" Component_="ServiceApplication" FileName="MODULE~1.ZIP|IOTemplate.zip" Attributes="0" SourcePath="IOTemplate.zip" SelfReg="false"/>
-    <ROW File="version.txt" Component_="ServiceApplication" FileName="version.txt" Attributes="0" SourcePath="version.txt" SelfReg="false"/>
-    <ROW File="info.json" Component_="ServiceApplication" FileName="INFO~1.JSO|info.json" Attributes="0" SourcePath="module-definition\info.json" SelfReg="false"/>
-    <ROW File="deDE.json" Component_="LanguageFiles" FileName="deDE~1.JSO|de-DE.json" Attributes="0" SourcePath="module-definition\languages\de-DE.json" SelfReg="false"/>
-    <ROW File="enUS.json" Component_="LanguageFiles" FileName="enUS~1.JSO|en-US.json" Attributes="0" SourcePath="module-definition\languages\en-US.json" SelfReg="false"/>
+    <ROW File="io2moduleiotemplateservice.exe" Component_="ServiceApplication" FileName="IO2MOD~1.EXE|io2-module-iotemplate-service.exe" Attributes="0" SourcePath="..\..\out\io2-module-iotemplate-service.exe" SelfReg="false" DigSign="true"/>
+    <ROW File="IOTemplate.zip" Component_="ServiceApplication" FileName="MODULE~1.ZIP|IOTemplate.zip" Attributes="0" SourcePath="..\..\IOTemplate.zip" SelfReg="false"/>
+    <ROW File="version.txt" Component_="ServiceApplication" FileName="version.txt" Attributes="0" SourcePath="..\..\version.txt" SelfReg="false"/>
+    <ROW File="info.json" Component_="ServiceApplication" FileName="INFO~1.JSO|info.json" Attributes="0" SourcePath="..\..\module-definition\info.json" SelfReg="false"/>
+    <ROW File="deDE.json" Component_="LanguageFiles" FileName="deDE~1.JSO|de-DE.json" Attributes="0" SourcePath="..\..\module-definition\languages\de-DE.json" SelfReg="false"/>
+    <ROW File="enUS.json" Component_="LanguageFiles" FileName="enUS~1.JSO|en-US.json" Attributes="0" SourcePath="..\..\module-definition\languages\en-US.json" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
@@ -341,6 +342,6 @@
     <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="1026" ActionProperty="AI_NEWERPRODUCTFOUND"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.SynchronizedFolderComponent">
-    <ROW Directory_="ClientApp_Dir" SourcePath="..\..\src\configuration" Feature="Module" ExcludePattern="*~|#*#|%*%|._|CVS|.cvsignore|SCCS|vssver.scc|mssccprj.scc|vssver2.scc|.svn|.DS_Store" ExcludeFlags="6" FileAddOptions="4"/>
+    <ROW Directory_="ClientAppBuild_Dir" SourcePath="..\..\src\configuration\build" Feature="Module" ExcludePattern="*~|#*#|%*%|._|CVS|.cvsignore|SCCS|vssver.scc|mssccprj.scc|vssver2.scc|.svn|.DS_Store" ExcludeFlags="6" FileAddOptions="4"/>
   </COMPONENT>
 </DOCUMENT>

@@ -12,7 +12,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<OutputType>Library</OutputType>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+		<NoDefaultLaunchSettingsFile>True</NoDefaultLaunchSettingsFile>
 	</PropertyGroup>
 
 	<ItemGroup>

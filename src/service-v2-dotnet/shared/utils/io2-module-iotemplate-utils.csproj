@@ -11,7 +11,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<OutputType>Library</OutputType>
-    <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<NoDefaultLaunchSettingsFile>True</NoDefaultLaunchSettingsFile>
   </PropertyGroup>
 
 	<ItemGroup>
