@@ -57,7 +57,7 @@ dotnet_style_prefer_conditional_expression_over_return = true:suggestion
 dotnet_style_prefer_foreach_explicit_cast_in_source = when_strongly_typed
 dotnet_style_prefer_inferred_anonymous_type_member_names = false
 dotnet_style_prefer_inferred_tuple_names = true
-dotnet_style_prefer_is_null_check_over_reference_equality_method = false
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true
 dotnet_style_prefer_simplified_boolean_expressions = true
 dotnet_style_prefer_simplified_interpolation = true
 
@@ -92,7 +92,7 @@ csharp_style_expression_bodied_operators = false:suggestion
 csharp_style_expression_bodied_properties = when_on_single_line:suggestion
 
 # Pattern matching preferences
-csharp_style_pattern_matching_over_as_with_null_check = false
+csharp_style_pattern_matching_over_as_with_null_check = true
 csharp_style_pattern_matching_over_is_with_cast_check = true
 csharp_style_prefer_extended_property_pattern = true
 csharp_style_prefer_not_pattern = true
@@ -119,7 +119,7 @@ csharp_style_prefer_top_level_statements = false:suggestion
 # Expression-level preferences
 csharp_prefer_simple_default_expression = true
 csharp_style_deconstructed_variable_declaration = true
-csharp_style_implicit_object_creation_when_type_is_apparent = false
+csharp_style_implicit_object_creation_when_type_is_apparent = true
 csharp_style_inlined_variable_declaration = true
 csharp_style_prefer_index_operator = false
 csharp_style_prefer_local_over_anonymous_function = true
@@ -155,9 +155,9 @@ csharp_new_line_between_query_expression_clauses = true
 # Indentation preferences
 csharp_indent_block_contents = true
 csharp_indent_braces = false
-csharp_indent_case_contents = false
+csharp_indent_case_contents = true
 csharp_indent_case_contents_when_block = false
-csharp_indent_labels = one_less_than_current
+csharp_indent_labels = no_change
 csharp_indent_switch_labels = true
 
 # Space preferences
@@ -194,7 +194,7 @@ csharp_preserve_single_line_statements = false
 
 dotnet_naming_rule.interface_should_be_begins_with_i.severity = suggestion
 dotnet_naming_rule.interface_should_be_begins_with_i.symbols = interface
-dotnet_naming_rule.interface_should_be_begins_with_i.style = begins_with_i
+dotnet_naming_rule.interface_should_be_begins_with_i.style = pascal_case
 
 dotnet_naming_rule.types_should_be_pascal_case.severity = suggestion
 dotnet_naming_rule.types_should_be_pascal_case.symbols = types
