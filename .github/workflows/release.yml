@@ -13,9 +13,32 @@ on:
                 default: ''
 
 jobs:
+    settings:
+        name: 'Prepare Workflow'
+        runs-on: ubuntu-latest
+
+        outputs:
+            DOTNET_VERSION: 8.0.x
+            PROJECT_FILE: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
+            UI_BUILD_PATH: ./src/configuration/build
+            MODULE_FILE: IOTemplate.zip
+            DOCKER_FILE: ./.github/docker/dockerfile
+            DOCKER_IMAGE: actiwareio/io-module-iotemplate
+            SETUP_PROJECT: src/setup/setup-module-dotnet.aip
+            SERVICE_NAME: IOTemplateService
+            S3_TARGET: 'Modules/IOTemplate Module'
+            PRODUCT_NAME: 'IOTemplate Module'
+            #MODULE_ARTIFACT_PATH: ./module-definition/functions/io2-module-elo**.dll
+
+        steps:
+            - name: Log output
+              run: |
+                  echo "Setting up workflow for ${{ github.ref_name }}"
+
     version:
         name: 'Determine Version'
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/determine-version.yml@main
+        needs: [settings]
         with:
             branch: ${{ github.ref_name }}
             default_version: ${{ inputs.release }}
@@ -37,7 +60,7 @@ jobs:
 
     build-ui:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-ui-io-module.yml@main
-        needs: [version]
+        needs: [settings, version]
         with:
             repository: ${{ github.repository }}
             branch: ${{ github.ref_name }}
@@ -48,22 +71,20 @@ jobs:
             npm-package-token: ${{ secrets.AWDEV_NPM_PACKAGE_TOKEN }}
             npmrc-config: ${{ secrets.NPMRC_CONFIG }}
 
-    build-linux:
+    build-container:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
-        needs: [build-ui, version]
-        # needs: [build-ui, build-windows-ui-elements, version]
+        needs: [settings, version, build-ui]
         with:
             repository: ${{ github.repository }}
             branch: ${{ github.ref_name }}
-            dotnet-version: 8.0.x
-            project: src/service/service/io2-module-template-service.csproj
+            dotnet-version: ${{ needs.settings.outputs.DOTNET_VERSION }}
+            project: ${{ needs.settings.outputs.PROJECT_FILE }}
+            modulefile: ${{ needs.settings.outputs.MODULE_FILE }}
+            dockerfile: ${{ needs.settings.outputs.DOCKER_FILE }}
+            # module-artifact-path: ${{ needs.settings.outputs.MODULE_ARTIFACT_PATH}}
+            ui-build-path: ${{ needs.settings.outputs.UI_BUILD_PATH }}
             ui-build-cache-key: ${{ needs.build-ui.outputs.cache-key }}
             ui-build-cache-path: ${{ needs.build-ui.outputs.cache-path }}
-            # module-artifact: ${{ needs.build-windows-ui-elements.outputs.download }}
-            module-artifact-path: ./module-definition/functions/io2-module-elo**.dll
-            modulefile: IOTemplate.zip
-            dockerfile: ./.github/docker/dockerfile
-            ui-build-path: ./src/configuration/build
             rid: 'linux-x64'
             create-single-file: false
             use-cache: true
@@ -75,23 +96,23 @@ jobs:
             npmrc-config: ${{ secrets.NPMRC_CONFIG }}
 
     docker-latest:
-        needs: [version, build-linux]
+        needs: [settings, version, build-container]
 
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
         with:
-            artifact: ${{ needs.build-linux.outputs.download }}
-            image-name: actiwareio/io-module-iotemplate
-            image-tag: 2-latest,actiwareio/io-module-iotemplate:${{ needs.version.outputs.version }}
+            artifact: ${{ needs.build-container.outputs.download }}
+            image-name: ${{ needs.settings.outputs.DOCKER_IMAGE }}
+            image-tag: 2-latest,${{ needs.settings.outputs.DOCKER_IMAGE }}:${{ needs.version.outputs.version }}
             remove-tags: prerelease-${{ needs.version.outputs.version }}
             force-remove: true
             use-cache: true
-            cache-path: ${{ needs.build-linux.outputs.cache-path }}
+            cache-path: ${{ needs.build-container.outputs.cache-path }}
         secrets:
             docker-username: ${{ secrets.DOCKER_HUB_USER }}
             docker-password: ${{ secrets.DOCKER_HUB_SECRET }}
 
     clean-up-cache:
-        needs: [version, build-linux, docker-latest]
+        needs: [version, build-container, docker-latest]
         runs-on: ubuntu-latest
 
         steps:
