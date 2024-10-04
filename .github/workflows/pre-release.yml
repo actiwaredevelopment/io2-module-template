@@ -22,8 +22,30 @@ on:
                     - 'hotfix/'
 
 jobs:
+    settings:
+        name: 'Prepare Workflow'
+        runs-on: ubuntu-latest
+
+        outputs:
+            DOTNET_VERSION: 8.0.x
+            PROJECT_FILE: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
+            UI_BUILD_PATH: ./src/configuration/build
+            MODULE_FILE: IOTemplate.zip
+            DOCKER_FILE: ./.github/docker/dockerfile
+            DOCKER_IMAGE: actiwareio/io-upload-center
+            SETUP_PROJECT: src/setup/setup-module-dotnet.aip
+            SERVICE_NAME: IOTemplateService
+            S3_TARGET: 'Modules/IOTemplate Module'
+            PRODUCT_NAME: 'IOTemplate Module'
+
+        steps:
+            - name: Log output
+              run: |
+                  echo "Setting up workflow for ${{ github.ref_name }}"
+
     version:
         name: 'Determine Version'
+        needs: [settings]
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/determine-version.yml@main
         with:
             branch: ${{ github.ref_name }}
@@ -32,7 +54,7 @@ jobs:
 
     build-ui:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-ui-io-module.yml@main
-        needs: [version]
+        needs: [settings, version]
         with:
             repository: ${{ github.repository }}
             branch: ${{ github.ref_name }}
@@ -45,17 +67,17 @@ jobs:
 
     build-container:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
-        needs: [version, build-ui]
+        needs: [settings, version, build-ui]
         with:
             artifact-name: BuildOutputLinux
             version-postfix: '-pre-release'
             repository: ${{ github.repository }}
             branch: ${{ github.ref_name }}
-            dotnet-version: 8.0.x
-            project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
-            modulefile: IOTemplate.zip
-            dockerfile: ./.github/docker/dockerfile
-            ui-build-path: ./src/configuration/build
+            dotnet-version: ${{ needs.settings.outputs.DOTNET_VERSION }}
+            project: ${{ needs.settings.outputs.PROJECT_FILE }}
+            modulefile: ${{ needs.settings.outputs.MODULE_FILE }}
+            dockerfile: ${{ needs.settings.outputs.DOCKER_FILE }}
+            ui-build-path: ${{ needs.settings.outputs.UI_BUILD_PATH }}
             ui-build-cache-key: ${{ needs.build-ui.outputs.cache-key }}
             ui-build-cache-path: ${{ needs.build-ui.outputs.cache-path }}
             rid: 'linux-x64'
@@ -70,20 +92,20 @@ jobs:
 
     build-windows:
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-dotnet-io-module.yml@main
-        needs: [version, build-ui]
+        needs: [settings, version, build-ui]
         with:
             artifact-name: BuildOutputWindows
             version-postfix: ${{ needs.version.outputs.setup-tag }}
             repository: ${{ github.repository }}
             branch: ${{ github.ref_name }}
-            dotnet-version: 8.0.x
-            project: src/service-v2-dotnet/service/io2-module-iotemplate-service.csproj
-            modulefile: IOTemplate.zip
-            dockerfile: ./.github/docker/dockerfile
-            ui-build-path: ./src/configuration/build
+            dotnet-version: ${{ needs.settings.outputs.DOTNET_VERSION }}
+            project: ${{ needs.settings.outputs.PROJECT_FILE }}
+            modulefile: ${{ needs.settings.outputs.MODULE_FILE }}
+            dockerfile: ${{ needs.settings.outputs.DOCKER_FILE }}
+            ui-build-path: ${{ needs.settings.outputs.UI_BUILD_PATH }}
             ui-build-cache-key: ${{ needs.build-ui.outputs.cache-key }}
             ui-build-cache-path: ${{ needs.build-ui.outputs.cache-path }}
-            module-aip-setup: src/setup/setup-module-dotnet.aip
+            module-aip-setup: ${{ needs.settings.outputs.SETUP_PROJECT }}
             rid: 'win-x64'
             create-single-file: true
             use-cache: true
@@ -95,7 +117,7 @@ jobs:
             npmrc-config: ${{ secrets.NPMRC_CONFIG }}
 
     docker:
-        needs: [version, build-container]
+        needs: [settings, version, build-container]
 
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/publish-to-docker.yml@main
         with:
@@ -109,20 +131,22 @@ jobs:
             docker-password: ${{ secrets.DOCKER_HUB_SECRET }}
 
     build-setup-for-io:
-        needs: [version, build-windows]
+        needs: [settings, version, build-windows]
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
         with:
             artifact: ${{ needs.build-windows.outputs.download }}
             cache-path: ${{ needs.build-windows.outputs.cache-path }}
             artifact-setup: IoSetup
-            aip-file: src/setup/setup-module-dotnet.aip
+            aip-file: ${{ needs.settings.outputs.SETUP_PROJECT }}
             major-version: 2
             minor-version: 0
-            service-name: 'IoIOTemplateService'
-            setup-name: 'IO - IOTemplate Module'
+            patch-level: ${{ needs.version.outputs.patch-level }}
+            build-version: ${{ needs.version.outputs.version }}
+            service-name: 'Io${{ needs.settings.outputs.SERVICE_NAME }}'
+            setup-name: 'IO - ${{ needs.settings.outputs.PRODUCT_NAME }}'
             setup-name-postfix: ' - ${{ needs.version.outputs.setup-tag }}'
             s3-bucket: 'io-setups'
-            publish-target: '2.x/Modules/IOTemplate Module'
+            publish-target: '2.x/${{ needs.settings.outputs.S3_TARGET }}'
             manufacture: 'ACTIWARE Development GmbH'
             partner: 'ACTIWARE'
             branding: 'IO'
@@ -138,20 +162,22 @@ jobs:
             certificate-pwd: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX_PWD }}
 
     build-setup-for-blp:
-        needs: [version, build-windows]
+        needs: [settings, version, build-windows]
         uses: actiwaredevelopment/action-io-build-workflows/.github/workflows/build-advanced-installer-setups.yml@main
         with:
             artifact: ${{ needs.build-windows.outputs.download }}
             cache-path: ${{ needs.build-windows.outputs.cache-path }}
             artifact-setup: BlpSetup
-            aip-file: src/setup/setup-module-dotnet.aip
+            aip-file: ${{ needs.settings.outputs.SETUP_PROJECT }}
             major-version: 6
             minor-version: 0
-            service-name: 'BlpIOTemplateService'
-            setup-name: 'Business Logic Provider - IOTemplate Module'
+            patch-level: ${{ needs.version.outputs.patch-level }}
+            build-version: ${{ needs.version.outputs.version }}
+            service-name: 'Blp${{ needs.settings.outputs.SERVICE_NAME }}'
+            setup-name: 'Business Logic Provider - ${{ needs.settings.outputs.PRODUCT_NAME }}'
             setup-name-postfix: ' - ${{ needs.version.outputs.setup-tag }}'
             s3-bucket: 'blp-setups'
-            publish-target: '6.x/Modules/IOTemplate Module'
+            publish-target: '6.x/${{ needs.settings.outputs.S3_TARGET }}'
             manufacture: 'ELO Digital Office GmbH'
             partner: 'ELO'
             branding: 'Business Logic Provider'
@@ -193,7 +219,8 @@ jobs:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     send-mail-to-qa:
-        needs: [build-setup-for-io, build-setup-for-blp, docker, version]
+        needs:
+            [build-setup-for-io, build-setup-for-blp, docker, version, settings]
         runs-on: ubuntu-latest
 
         steps:
@@ -204,4 +231,4 @@ jobs:
                   TEMPLATE_ID: 'd-ec4fb5e968ff4e6992b604f265e8492f'
                   SENDER_MAIL: 'development@actiware-development.com'
                   SEND_TO: ${{ secrets.SEND_GRID_QA_MAILS }}
-                  TEMPLATE_DATA: setup=IOTemplate Module;version=${{ needs.version.outputs.version }}.${{ needs.version.outputs.build-version }}
+                  TEMPLATE_DATA: setup=${{ needs.settings.outputs.PRODUCT_NAME }};version=${{ needs.version.outputs.version }}.${{ needs.version.outputs.build-version }}
