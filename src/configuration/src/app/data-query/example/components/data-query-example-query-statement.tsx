@@ -1,5 +1,5 @@
 import * as DesignerAPI from '@actiwaredevelopment/io-sdk-typescript-designer';
-import { Text, Stack, useTheme, Label, StackItem } from '@fluentui/react';
+import { Label, Stack, StackItem, Text, useTheme } from '@fluentui/react';
 import Editor, { loader } from '@monaco-editor/react';
 import { KeyCode, KeyMod, editor } from 'monaco-editor';
 import { useRef } from 'react';
@@ -10,7 +10,7 @@ import { DataQueryErrorType } from '../validation';
 
 loader.config({
     paths: {
-        vs: `${process.env.PUBLIC_URL}/js/monaco-editor/vs`
+        vs: `/js/monaco-editor/vs`
     }
 });
 
