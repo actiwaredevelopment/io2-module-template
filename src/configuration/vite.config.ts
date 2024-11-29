@@ -8,10 +8,6 @@ export default defineConfig(() => {
         build: {
             outDir: 'build'
         },
-        // COMMENT IN IF YOU ARE USING THE MONACO EDITOR
-        // define: {
-        //     'process.env': process.env
-        // },
         plugins: [react()],
         server: {
             port: port,
