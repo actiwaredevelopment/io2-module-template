@@ -50,7 +50,7 @@
         "react-scripts": "5.0.1",
         "ts-node": "^10.9.1",
         "typescript": "^5.1.6",
-        "vite": "^4.4.11"
+        "vite": "^5.4.20"
     },
     "peerDependencies": {
         "prop-types": "^15.8.1"
