@@ -158,8 +158,11 @@ jobs:
             action-token: ${{ secrets.GH_ACTION_TOKEN }}
             aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
             aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
-            certificate-file: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX }}
-            certificate-pwd: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX_PWD }}
+            azure-tenant-id: ${{ secrets.GLOBAL_SIGN_AZ_KEY_VAULT_TENANT_ID }}
+            azure-client-id: ${{ secrets.GLOBAL_SIGN_AZ_KEY_VAULT_CLIENT_ID }}
+            azure-client-secret: ${{ secrets.GLOBAL_SIGN_AZ_KEY_VAULT_CLIENT_SECRET }}
+            azure-key-vault-cert-name: ${{ secrets.GLOBAL_SIGN_AZ_KEY_VAULT_CERT }}
+            azure-key-vault-name: ${{ secrets.GLOBAL_SIGN_AZ_KEY_VAULT_NAME }}
 
     build-setup-for-blp:
         needs: [settings, version, build-windows]
@@ -189,8 +192,11 @@ jobs:
             action-token: ${{ secrets.GH_ACTION_TOKEN }}
             aws-access-key: ${{ secrets.AWS_SETUP_ACCESS_KEY }}
             aws-secret-key: ${{ secrets.AWS_SETUP_SECRET_KEY }}
-            certificate-file: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX }}
-            certificate-pwd: ${{ secrets.ADVANCED_INSTALLER_SIGN_PFX_PWD }}
+            azure-tenant-id: ${{ secrets.GLOBAL_SIGN_AZ_KEY_VAULT_TENANT_ID }}
+            azure-client-id: ${{ secrets.GLOBAL_SIGN_AZ_KEY_VAULT_CLIENT_ID }}
+            azure-client-secret: ${{ secrets.GLOBAL_SIGN_AZ_KEY_VAULT_CLIENT_SECRET }}
+            azure-key-vault-cert-name: ${{ secrets.GLOBAL_SIGN_AZ_KEY_VAULT_CERT }}
+            azure-key-vault-name: ${{ secrets.GLOBAL_SIGN_AZ_KEY_VAULT_NAME }}
 
     clean-up-cache:
         needs: [build-setup-for-io, build-setup-for-blp, docker]
